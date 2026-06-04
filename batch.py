@@ -13,6 +13,7 @@
 # 단 RPDExceeded(오늘 호출 한도 소진)면 그 자리에서 멈춘다 — 진행 불가라 §6 정책상 사람이 본다.
 
 import time
+import sys
 
 from run import run_task
 from limiter import RPDExceeded
@@ -110,7 +111,7 @@ if __name__ == "__main__":
 
     # 실제 데이터는 ~/aaa/runs.jsonl에 쌓는다(.gitignore에 있어 커밋 안 됨 — §14).
     # 회차 태그를 시각으로 붙여 재실행해도 task_id가 안 겹치게.
-    tag = "r" + time.strftime("%m%d")
+    tag = sys.argv[1] if len(sys.argv) > 1 else "r" + time.strftime("%m%d")
     results = run_batch(runs_path="runs.jsonl", tag=tag)
 
     # 끝나고 분포를 칸별로 한눈에(이건 화면 요약 — 로그엔 비율 저장 안 함, §3).
