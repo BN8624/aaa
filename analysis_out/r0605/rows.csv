@@ -3,10 +3,10 @@ r0605_1_A1,1,A1,exit0가짜,,0,3,,2026-06-04T07:44:28.909966-08:00
 r0605_1_A1,1,A1,exit0가짜,,0,3,,2026-06-04T08:02:02.017415-08:00
 r0605_2_A1,2,A1,exit0가짜,,0,3,,2026-06-04T08:13:32.260051-08:00
 r0605_2_A1,2,A1,exit0가짜,,0,3,,2026-06-04T08:31:13.816914-08:00
-r0605_3_A1,3,A1,기타예외,,-1,3,"
+r0605_3_A1,3,A1,timeout,,-1,3,"
 [runner] TimeoutExpired after 20s",2026-06-04T08:46:04.243356-08:00
 r0605_3_A1,3,A1,exit0가짜,,0,3,,2026-06-04T09:02:27.727207-08:00
-r0605_4_A1,4,A1,기타예외,,-1,3,"
+r0605_4_A1,4,A1,timeout,,-1,3,"
 [runner] TimeoutExpired after 20s",2026-06-04T09:14:59.508897-08:00
 r0605_4_A1,4,A1,exit0가짜,,0,3,,2026-06-04T09:33:45.725331-08:00
 r0605_5_A1,5,A1,exit0가짜,,0,3,,2026-06-04T09:50:38.992653-08:00
@@ -356,7 +356,7 @@ r0605_1_D2,1,D2,exit0가짜,,0,4,,2026-06-04T08:22:00.975179-08:00
 r0605_2_D2,2,D2,코더빈손,,-1,0,"ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}",2026-06-04T08:34:06.921973-08:00
 r0605_2_D2,2,D2,exit0가짜,,0,4,,2026-06-04T08:52:55.958480-08:00
 r0605_3_D2,3,D2,exit0가짜,,0,4,,2026-06-04T09:05:01.163120-08:00
-r0605_3_D2,3,D2,기타예외,,1,4,"Traceback (most recent call last):
+r0605_3_D2,3,D2,H1c런타임값,ValueError: Member with id MEM123 not found.,1,4,"Traceback (most recent call last):
   File ""/tmp/aaa_run_do1b31kw/main.py"", line 41, in <module>
     run_demo()
   File ""/tmp/aaa_run_do1b31kw/main.py"", line 9, in run_demo
@@ -368,7 +368,7 @@ r0605_3_D2,3,D2,기타예외,,1,4,"Traceback (most recent call last):
 ValueError: Member with id MEM123 not found.
 ",2026-06-04T09:23:48.103466-08:00
 r0605_4_D2,4,D2,exit0가짜,,0,4,,2026-06-04T09:39:28.302868-08:00
-r0605_4_D2,4,D2,기타예외,,1,4,"Traceback (most recent call last):
+r0605_4_D2,4,D2,H1c런타임값,ValueError: Insufficient points balance,1,4,"Traceback (most recent call last):
   File ""/tmp/aaa_run_lgqribf4/main.py"", line 42, in <module>
     main()
   File ""/tmp/aaa_run_lgqribf4/main.py"", line 36, in main
@@ -378,7 +378,7 @@ r0605_4_D2,4,D2,기타예외,,1,4,"Traceback (most recent call last):
 ValueError: Insufficient points balance
 ",2026-06-04T09:56:03.996505-08:00
 r0605_5_D2,5,D2,exit0가짜,,0,4,,2026-06-04T10:08:41.394091-08:00
-r0605_5_D2,5,D2,기타예외,,1,4,"Traceback (most recent call last):
+r0605_5_D2,5,D2,H1c런타임값,ValueError: Member not found,1,4,"Traceback (most recent call last):
   File ""/tmp/aaa_run_tqtor09s/main.py"", line 30, in <module>
     run_demo()
   File ""/tmp/aaa_run_tqtor09s/main.py"", line 21, in run_demo
@@ -417,7 +417,7 @@ r0605_2_E1,2,E1,H1b,계약(unhashable),1,4,"Traceback (most recent call last):
     permissions = ROLE_PERMISSIONS.get(role, set())
 TypeError: unhashable type: 'Role'
 ",2026-06-04T08:55:44.283135-08:00
-r0605_3_E1,3,E1,기타예외,,1,4,"Traceback (most recent call last):
+r0605_3_E1,3,E1,H1c런타임값,ValueError: 'editor' is not a valid Role,1,4,"Traceback (most recent call last):
   File ""/tmp/aaa_run_fv3ngxy1/main.py"", line 36, in <module>
     main()
   File ""/tmp/aaa_run_fv3ngxy1/main.py"", line 9, in main
@@ -449,7 +449,7 @@ r0605_5_E1,5,E1,H1b,계약(AttributeError),1,5,"Traceback (most recent call last
     raise AttributeError(name) from None
 AttributeError: EDITOR
 ",2026-06-04T10:30:50.623303-08:00
-r0605_1_E2,1,E2,기타예외,,1,5,"Traceback (most recent call last):
+r0605_1_E2,1,E2,H1c런타임값,ValueError: Insufficient stock for product p1,1,5,"Traceback (most recent call last):
   File ""/tmp/aaa_run_isu4fypc/main.py"", line 34, in <module>
     run_demo()
   File ""/tmp/aaa_run_isu4fypc/main.py"", line 14, in run_demo
@@ -477,7 +477,7 @@ ImportError: cannot import name 'InventoryManager' from 'inventory_manager' (/tm
 r0605_3_E2,3,E2,exit0가짜,,0,5,,2026-06-04T09:29:30.952345-08:00
 r0605_4_E2,4,E2,exit0가짜,,0,5,,2026-06-04T09:46:19.094821-08:00
 r0605_4_E2,4,E2,exit0가짜,,0,5,,2026-06-04T10:03:22.473703-08:00
-r0605_5_E2,5,E2,기타예외,,1,6,"Traceback (most recent call last):
+r0605_5_E2,5,E2,H1c런타임값,KeyError: 'Product with ID p101 not found in ,1,6,"Traceback (most recent call last):
   File ""/tmp/aaa_run_siy0oxxq/main.py"", line 44, in <module>
     main()
   File ""/tmp/aaa_run_siy0oxxq/main.py"", line 14, in main

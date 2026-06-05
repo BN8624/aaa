@@ -56,7 +56,7 @@ def main():
         try: rec=json.loads(line)
         except: continue
         tid=str(rec.get("task_id",""))
-        if tagfilter and tagfilter not in tid: continue
+        if tagfilter and not tid.startswith(tagfilter + "_"): continue
         m=TID.search(tid)
         if not m: continue
         cat,sub=classify(rec)
