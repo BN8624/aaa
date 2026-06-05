@@ -1,0 +1,10 @@
+H1b 칸 수: 8
+  r0605_1_E1 TypeError기타
+  r0605_2_D1 AttributeError
+  r0605_2_E1 TypeError기타
+  r0605_2_E2 AttributeError
+  r0605_3_E2 import불일치
+  r0605_4_D1 시그니처불일치
+  r0605_4_E1 AttributeError
+  r0605_5_E1 AttributeError
+칸별: {'E1': 4, 'D1': 2, 'E2': 2}

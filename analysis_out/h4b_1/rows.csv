@@ -1,1 +1,40 @@
 task_id,round,cell,cat,sub,exit,g,stderr_full,created_at
+h4b_1_A1,1,A1,exit0가짜,,0,3,"Error: Expected exactly 3 arguments: <value1> <value2> <operation>
+",2026-06-04T21:31:09.540463-08:00
+h4b_1_A2,1,A2,argparse,,2,3,"usage: main.py [-h] value label
+main.py: error: the following arguments are required: value, label
+",2026-06-04T21:33:57.732473-08:00
+h4b_1_B1,1,B1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_onyznwhi/main.py"", line 59, in <module>
+    run_app()
+  File ""/tmp/aaa_run_onyznwhi/main.py"", line 12, in run_app
+    choice = input(""Choose an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T21:35:37.222686-08:00
+h4b_1_B2,1,B2,메뉴앞EOF,,1,3,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_c18l2zjt/main.py"", line 65, in <module>
+    main()
+  File ""/tmp/aaa_run_c18l2zjt/main.py"", line 12, in main
+    choice = input(""Select an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T21:38:25.727348-08:00
+h4b_1_C1,1,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_pwyjmdcm/main.py"", line 56, in <module>
+    main()
+  File ""/tmp/aaa_run_pwyjmdcm/main.py"", line 17, in main
+    category = input(""Enter income category (e.g., Salary, Gift): "")
+EOFError: EOF when reading a line
+",2026-06-04T21:40:54.219653-08:00
+h4b_1_C2,1,C2,메뉴앞EOF,,1,5,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_5zhz_ixm/main.py"", line 11, in <module>
+    main()
+  File ""/tmp/aaa_run_5zhz_ixm/main.py"", line 8, in main
+    run_menu()
+  File ""/tmp/aaa_run_5zhz_ixm/cli_interface.py"", line 17, in run_menu
+    amount = int(input(""Enter amount to add: ""))
+EOFError: EOF when reading a line
+",2026-06-04T21:43:47.481464-08:00
+h4b_1_D1,1,D1,exit0가짜,,0,5,,2026-06-04T21:46:18.144242-08:00
+h4b_1_D2,1,D2,exit0가짜,,0,4,,2026-06-04T21:49:38.340112-08:00
+h4b_1_E1,1,E1,exit0가짜,,0,4,,2026-06-04T21:51:53.768488-08:00
+h4b_1_E2,1,E2,exit0가짜,,0,5,,2026-06-04T21:55:14.767708-08:00

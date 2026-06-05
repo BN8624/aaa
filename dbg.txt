@@ -1,0 +1,8 @@
+r0605_2_D1 | g= 4 | exit= 1 | AttributeError: 'Product' object has no attribute 'id'
+r0605_2_E2 | g= 6 | exit= 1 | AttributeError: 'MockInventoryService' object has no at
+r0605_2_D1 | g= 5 | exit= 0 | (빈)
+r0605_2_E2 | g= 5 | exit= 0 | (빈)
+r0605_4_D1 | g= 5 | exit= 1 | TypeError: Product.__init__() got an unexpected keyword
+r0605_4_E2 | g= 5 | exit= 0 | (빈)
+r0605_4_D1 | g= 5 | exit= 0 | (빈)
+r0605_4_E2 | g= 5 | exit= 0 | (빈)

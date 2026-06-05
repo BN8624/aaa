@@ -1,0 +1,10 @@
+r0605_1_E1 TypeError: unhashable type: 'Role'
+r0605_2_D1 AttributeError: 'Product' object has no attribute 'id'
+r0605_2_E1 ImportError: cannot import name 'User_Object' from 'models' (/tmp/aaa_
+r0605_2_E2 AttributeError: 'MockInventoryService' object has no attribute 'is_sto
+r0605_2_E1 TypeError: unhashable type: 'Role'
+r0605_3_E2 ImportError: cannot import name 'InventoryManager' from 'inventory_man
+r0605_4_D1 TypeError: Product.__init__() got an unexpected keyword argument 'prod
+r0605_4_E1 AttributeError: EDITOR
+r0605_5_E1 AttributeError: EDITOR
+H1b 후보 줄 수: 9
