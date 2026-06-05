@@ -1,0 +1,17 @@
+{
+  "label": "h4b_1",
+  "n_rows": 0,
+  "cells": [],
+  "rounds": [],
+  "exec": {
+    "tally": {},
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 0
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {}
+}
