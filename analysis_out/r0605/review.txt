@@ -1,0 +1,78 @@
+# 분류 애매/확인필요 10줄 (전문). 분류기 점검은 여기부터.
+
+=== r0605_1_E2 [기타예외] exit=1 g=5
+Traceback (most recent call last):
+  File "/tmp/aaa_run_isu4fypc/main.py", line 34, in <module>
+    run_demo()
+  File "/tmp/aaa_run_isu4fypc/main.py", line 14, in run_demo
+    add_item(p1, 1)
+  File "/tmp/aaa_run_isu4fypc/cart_service.py", line 11, in add_item
+    raise ValueError(f"Insufficient stock for product {product.id}")
+ValueError: Insufficient stock for product p1
+
+=== r0605_2_D2 [코더빈손] exit=-1 g=0
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}
+
+=== r0605_3_A1 [기타예외] exit=-1 g=3
+[runner] TimeoutExpired after 20s
+
+=== r0605_3_E1 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_fv3ngxy1/main.py", line 36, in <module>
+    main()
+  File "/tmp/aaa_run_fv3ngxy1/main.py", line 9, in main
+    User("Bob", Role("editor")),
+  File "/usr/lib/python3.10/enum.py", line 385, in __call__
+    return cls.__new__(cls, value)
+  File "/usr/lib/python3.10/enum.py", line 710, in __new__
+    raise ve_exc
+ValueError: 'editor' is not a valid Role
+
+=== r0605_4_A1 [기타예외] exit=-1 g=3
+[runner] TimeoutExpired after 20s
+
+=== r0605_3_D2 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_do1b31kw/main.py", line 41, in <module>
+    run_demo()
+  File "/tmp/aaa_run_do1b31kw/main.py", line 9, in run_demo
+    initial_balance = service.get_balance(member_id)
+  File "/tmp/aaa_run_do1b31kw/service.py", line 35, in get_balance
+    member = get_member(member_id)
+  File "/tmp/aaa_run_do1b31kw/repository.py", line 12, in get_member
+    raise ValueError(f"Member with id {member_id} not found.")
+ValueError: Member with id MEM123 not found.
+
+=== r0605_4_D2 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_lgqribf4/main.py", line 42, in <module>
+    main()
+  File "/tmp/aaa_run_lgqribf4/main.py", line 36, in main
+    spend_points(user_b_id, 100)
+  File "/tmp/aaa_run_lgqribf4/point_service.py", line 19, in spend_points
+    raise ValueError("Insufficient points balance")
+ValueError: Insufficient points balance
+
+=== r0605_5_A1 [미분류] exit=1 g=4
+(stderr 없음)
+
+=== r0605_5_E2 [기타예외] exit=1 g=6
+Traceback (most recent call last):
+  File "/tmp/aaa_run_siy0oxxq/main.py", line 44, in <module>
+    main()
+  File "/tmp/aaa_run_siy0oxxq/main.py", line 14, in main
+    product = product_service.get_product(item_id_1)
+  File "/tmp/aaa_run_siy0oxxq/product_service.py", line 13, in get_product
+    raise KeyError(f"Product with ID {item_id} not found in the system.")
+KeyError: 'Product with ID p101 not found in the system.'
+
+=== r0605_5_D2 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_tqtor09s/main.py", line 30, in <module>
+    run_demo()
+  File "/tmp/aaa_run_tqtor09s/main.py", line 21, in run_demo
+    remaining_balance = use_points(member_id, spend_amount)
+  File "/tmp/aaa_run_tqtor09s/service.py", line 16, in use_points
+    raise ValueError("Member not found")
+ValueError: Member not found
+

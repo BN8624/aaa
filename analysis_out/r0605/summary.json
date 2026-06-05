@@ -1,0 +1,156 @@
+{
+  "label": "r0605",
+  "n_rows": 100,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
+  ],
+  "rounds": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "exec": {
+    "tally": {
+      "exit0가짜": 32,
+      "argparse": 10,
+      "메뉴앞EOF": 39,
+      "H1b": 9,
+      "기타예외": 8,
+      "코더빈손": 1,
+      "미분류": 1
+    },
+    "h1b": 9,
+    "h1b_types": {
+      "계약(unhashable)": 2,
+      "계약(AttributeError)": 4,
+      "import불일치": 2,
+      "시그니처불일치": 1
+    }
+  },
+  "round": {
+    "h1b_cells": 8,
+    "total_cells": 50
+  },
+  "nondeterministic_splits": [
+    "D1 r2",
+    "D1 r4",
+    "E1 r1",
+    "E1 r4",
+    "E1 r5",
+    "E2 r2",
+    "E2 r3"
+  ],
+  "per_cell": {
+    "A1": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 7,
+        "기타예외": 2,
+        "미분류": 1
+      }
+    },
+    "A2": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "argparse": 10
+      }
+    },
+    "B1": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 10
+      }
+    },
+    "B2": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 10
+      }
+    },
+    "C1": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1,
+        "메뉴앞EOF": 9
+      }
+    },
+    "C2": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 10
+      }
+    },
+    "D1": {
+      "n_exec": 10,
+      "h1b": 2,
+      "h1b_types": {
+        "계약(AttributeError)": 1,
+        "시그니처불일치": 1
+      },
+      "cats": {
+        "exit0가짜": 8,
+        "H1b": 2
+      }
+    },
+    "D2": {
+      "n_exec": 10,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 6,
+        "코더빈손": 1,
+        "기타예외": 3
+      }
+    },
+    "E1": {
+      "n_exec": 10,
+      "h1b": 5,
+      "h1b_types": {
+        "계약(unhashable)": 2,
+        "import불일치": 1,
+        "계약(AttributeError)": 2
+      },
+      "cats": {
+        "H1b": 5,
+        "exit0가짜": 4,
+        "기타예외": 1
+      }
+    },
+    "E2": {
+      "n_exec": 10,
+      "h1b": 2,
+      "h1b_types": {
+        "계약(AttributeError)": 1,
+        "import불일치": 1
+      },
+      "cats": {
+        "기타예외": 2,
+        "exit0가짜": 6,
+        "H1b": 2
+      }
+    }
+  }
+}

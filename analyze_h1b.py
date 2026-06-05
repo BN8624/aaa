@@ -29,6 +29,13 @@ def classify(rec):
        or (ec==2 and "argument" in se): return ("argparse","")
     if ec==0:
         return ("exit0가짜","") if so.strip()=="" else ("exit0정상","")
+    # H1c: import/시그니처는 통과(파일간 호출 성공), 실행 중 값/상태로 죽음.
+    #      H1b(계약 파괴)와 구분되는 별도 범주. 멀티파일에서만 의미.
+    if "TimeoutExpired" in se: return ("timeout","")
+    if se.strip() and any(e in se for e in
+        ["ValueError","KeyError","IndexError","ZeroDivisionError",
+         "RuntimeError","AssertionError","FileNotFoundError"]):
+        return ("H1c런타임값", se.strip().splitlines()[-1][:45])
     if se.strip(): return ("기타예외","")
     return ("미분류","")
 
