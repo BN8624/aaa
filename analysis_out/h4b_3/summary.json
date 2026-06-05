@@ -1,0 +1,114 @@
+{
+  "label": "h4b_3",
+  "n_rows": 10,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
+  ],
+  "rounds": [
+    "3"
+  ],
+  "exec": {
+    "tally": {
+      "exit0가짜": 5,
+      "코더빈손": 5
+    },
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 10
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "A2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    },
+    "B1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    },
+    "B2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "C1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "C2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "D1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "D2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    },
+    "E1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    },
+    "E2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# 분류 애매/확인필요 5줄 (전문). 분류기 점검은 여기부터.
+
+=== h4b_3_A2 [코더빈손] exit=-1 g=0
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}
+
+=== h4b_3_B1 [코더빈손] exit=-1 g=0
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}
+
+=== h4b_3_D2 [코더빈손] exit=-1 g=0
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}
+
+=== h4b_3_E1 [코더빈손] exit=-1 g=0
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}
+
+=== h4b_3_E2 [코더빈손] exit=-1 g=0
+ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+

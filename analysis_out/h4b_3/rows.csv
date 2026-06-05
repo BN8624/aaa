@@ -1,0 +1,11 @@
+task_id,round,cell,cat,sub,exit,g,stderr_full,created_at
+h4b_3_A1,3,A1,exit0가짜,,0,2,,2026-06-05T05:01:23.878251-08:00
+h4b_3_A2,3,A2,코더빈손,,-1,0,"ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}",2026-06-05T05:04:47.509915-08:00
+h4b_3_B1,3,B1,코더빈손,,-1,0,"ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}",2026-06-05T05:05:39.209636-08:00
+h4b_3_B2,3,B2,exit0가짜,,0,4,,2026-06-05T05:06:44.674688-08:00
+h4b_3_C1,3,C1,exit0가짜,,0,3,,2026-06-05T05:11:01.698321-08:00
+h4b_3_C2,3,C2,exit0가짜,,0,3,,2026-06-05T05:15:22.921074-08:00
+h4b_3_D1,3,D1,exit0가짜,,0,5,,2026-06-05T05:20:16.240520-08:00
+h4b_3_D2,3,D2,코더빈손,,-1,0,"ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}",2026-06-05T05:24:45.256357-08:00
+h4b_3_E1,3,E1,코더빈손,,-1,0,"ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}",2026-06-05T05:24:45.524146-08:00
+h4b_3_E2,3,E2,코더빈손,,-1,0,"ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}",2026-06-05T05:24:45.790859-08:00
