@@ -1,0 +1,223 @@
+task_id,round,cell,cat,sub,exit,g,stderr_full,created_at
+r0605b_1_A1,1,A1,H1b,import불일치,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_kgydoqj7/main.py"", line 1, in <module>
+    from parser import parse_expression
+  File ""/tmp/aaa_run_kgydoqj7/parser.py"", line 1, in <module>
+    from exceptions import InvalidExpressionError
+ImportError: cannot import name 'InvalidExpressionError' from 'exceptions' (/tmp/aaa_run_kgydoqj7/exceptions.py)
+",2026-06-04T16:25:17.112405-08:00
+r0605b_2_A1,2,A1,exit0가짜,,0,3,,2026-06-04T16:54:48.924185-08:00
+r0605b_3_A1,3,A1,exit0가짜,,0,3,,2026-06-04T17:24:35.356287-08:00
+r0605b_4_A1,4,A1,기타예외,,-1,2,"
+[runner] TimeoutExpired after 20s",2026-06-04T17:52:56.811069-08:00
+r0605b_5_A1,5,A1,기타예외,,-1,3,"
+[runner] TimeoutExpired after 20s",2026-06-04T18:20:51.510808-08:00
+r0605b_1_A2,1,A2,argparse,,2,3,"usage: main.py [-h] value direction
+main.py: error: the following arguments are required: value, direction
+",2026-06-04T16:29:43.098771-08:00
+r0605b_2_A2,2,A2,argparse,,2,3,"usage: main.py [-h] value unit
+main.py: error: the following arguments are required: value, unit
+",2026-06-04T16:56:36.666372-08:00
+r0605b_3_A2,3,A2,argparse,,1,3,"usage: main.py [-h] value direction
+main.py: error: the following arguments are required: value, direction
+",2026-06-04T17:27:26.239667-08:00
+r0605b_4_A2,4,A2,exit0가짜,,0,3,,2026-06-04T17:55:17.676594-08:00
+r0605b_5_A2,5,A2,argparse,,2,3,"usage: main.py [-h] value direction
+main.py: error: the following arguments are required: value, direction
+",2026-06-04T18:23:05.130864-08:00
+r0605b_1_B1,1,B1,메뉴앞EOF,,1,3,"Traceback (most recent call last):
+  File ""/tmp/aaa_run__gxmju3i/main.py"", line 59, in <module>
+    run()
+  File ""/tmp/aaa_run__gxmju3i/main.py"", line 12, in run
+    choice = input(""Choose an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T16:32:19.356103-08:00
+r0605b_2_B1,2,B1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_cgt0ru_8/main.py"", line 60, in <module>
+    main()
+  File ""/tmp/aaa_run_cgt0ru_8/main.py"", line 12, in main
+    choice = input(""Choose an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T16:59:23.685387-08:00
+r0605b_3_B1,3,B1,메뉴앞EOF,,1,3,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_e6gfaznl/main.py"", line 60, in <module>
+    run()
+  File ""/tmp/aaa_run_e6gfaznl/main.py"", line 12, in run
+    choice = input(""Choose an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T17:29:44.263166-08:00
+r0605b_4_B1,4,B1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_v8drzrhj/main.py"", line 13, in <module>
+    main()
+  File ""/tmp/aaa_run_v8drzrhj/main.py"", line 10, in main
+    run_menu(manager)
+  File ""/tmp/aaa_run_v8drzrhj/cli_interface.py"", line 12, in run_menu
+    choice = input(""Select an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T17:57:47.239401-08:00
+r0605b_5_B1,5,B1,메뉴앞EOF,,1,3,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_j965utvt/main.py"", line 63, in <module>
+    main()
+  File ""/tmp/aaa_run_j965utvt/main.py"", line 16, in main
+    choice = input(""Choose an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T18:24:48.207027-08:00
+r0605b_1_B2,1,B2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_b8pgy36l/main.py"", line 59, in <module>
+    run_cli()
+  File ""/tmp/aaa_run_b8pgy36l/main.py"", line 12, in run_cli
+    choice = input(""Select an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T16:34:10.366978-08:00
+r0605b_2_B2,2,B2,기타예외,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_ecmtuxet/main.py"", line 71, in <module>
+    main()
+  File ""/tmp/aaa_run_ecmtuxet/main.py"", line 59, in main
+    handle_add_memo()
+  File ""/tmp/aaa_run_ecmtuxet/main.py"", line 25, in handle_add_memo
+    result = memo_service.add_memo(content)
+  File ""/tmp/aaa_run_ecmtuxet/memo_service.py"", line 7, in add_memo
+    new_id = max([m['memo_id'] for m in memos], default=0) + 1
+  File ""/tmp/aaa_run_ecmtuxet/memo_service.py"", line 7, in <listcomp>
+    new_id = max([m['memo_id'] for m in memos], default=0) + 1
+KeyError: 'memo_id'
+",2026-06-04T17:02:03.910759-08:00
+r0605b_3_B2,3,B2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_yre9lpoh/main.py"", line 59, in <module>
+    main()
+  File ""/tmp/aaa_run_yre9lpoh/main.py"", line 12, in main
+    choice = input(""Select an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T17:31:49.871907-08:00
+r0605b_4_B2,4,B2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_h92yhu5o/main.py"", line 61, in <module>
+    run_cli()
+  File ""/tmp/aaa_run_h92yhu5o/main.py"", line 12, in run_cli
+    choice = input(""Select an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T18:00:38.474213-08:00
+r0605b_5_B2,5,B2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_jsmf516t/main.py"", line 11, in <module>
+    main()
+  File ""/tmp/aaa_run_jsmf516t/main.py"", line 8, in main
+    run_menu()
+  File ""/tmp/aaa_run_jsmf516t/cli.py"", line 12, in run_menu
+    choice = input(""Select an option (1-5): "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T18:27:24.411272-08:00
+r0605b_1_C1,1,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_pxfqh3u3/main.py"", line 53, in <module>
+    main()
+  File ""/tmp/aaa_run_pxfqh3u3/main.py"", line 22, in main
+    category = input(""Enter category: "")
+EOFError: EOF when reading a line
+",2026-06-04T16:36:54.919912-08:00
+r0605b_2_C1,2,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_x6rp1g_h/main.py"", line 61, in <module>
+    main()
+  File ""/tmp/aaa_run_x6rp1g_h/main.py"", line 22, in main
+    choice = input(""Select an option: "")
+EOFError: EOF when reading a line
+",2026-06-04T17:04:56.612415-08:00
+r0605b_3_C1,3,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_juv8nj7h/main.py"", line 50, in <module>
+    main()
+  File ""/tmp/aaa_run_juv8nj7h/main.py"", line 20, in main
+    category = input(""Enter category: "")
+EOFError: EOF when reading a line
+",2026-06-04T17:34:11.910934-08:00
+r0605b_4_C1,4,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_7khbrm0w/main.py"", line 54, in <module>
+    main()
+  File ""/tmp/aaa_run_7khbrm0w/main.py"", line 23, in main
+    amount = float(input(""Enter amount: ""))
+EOFError: EOF when reading a line
+",2026-06-04T18:03:31.881143-08:00
+r0605b_5_C1,5,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_kgrwis8g/main.py"", line 60, in <module>
+    run_cli()
+  File ""/tmp/aaa_run_kgrwis8g/main.py"", line 15, in run_cli
+    choice = input(""Select an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T18:29:49.864414-08:00
+r0605b_1_C2,1,C2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_z9jm7e7w/main.py"", line 57, in <module>
+    run()
+  File ""/tmp/aaa_run_z9jm7e7w/main.py"", line 17, in run
+    amount = int(input(""Enter amount to add: ""))
+EOFError: EOF when reading a line
+",2026-06-04T16:39:45.670213-08:00
+r0605b_2_C2,2,C2,기타예외,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_apw2hjsf/main.py"", line 67, in <module>
+    main()
+  File ""/tmp/aaa_run_apw2hjsf/main.py"", line 29, in main
+    inventory_manager.receive_stock(item_id, quantity)
+  File ""/tmp/aaa_run_apw2hjsf/inventory_manager.py"", line 20, in receive_stock
+    raise KeyError(f""Item with ID {item_id} not found in inventory."")
+KeyError: 'Item with ID 1 not found in inventory.'
+",2026-06-04T17:08:44.083886-08:00
+r0605b_3_C2,3,C2,메뉴앞EOF,,1,3,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_qtd92mm5/main.py"", line 57, in <module>
+    main()
+  File ""/tmp/aaa_run_qtd92mm5/main.py"", line 17, in main
+    quantity = int(input(""Enter quantity to add: ""))
+EOFError: EOF when reading a line
+",2026-06-04T17:37:33.195835-08:00
+r0605b_4_C2,4,C2,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_4vyt27rc/main.py"", line 58, in <module>
+    main()
+  File ""/tmp/aaa_run_4vyt27rc/main.py"", line 12, in main
+    choice = input(""Select an option: "").strip()
+EOFError: EOF when reading a line
+",2026-06-04T18:05:50.399357-08:00
+r0605b_5_C2,5,C2,메뉴앞EOF,,1,5,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_ow7ou8dm/main.py"", line 11, in <module>
+    main()
+  File ""/tmp/aaa_run_ow7ou8dm/main.py"", line 8, in main
+    run_menu()
+  File ""/tmp/aaa_run_ow7ou8dm/cli.py"", line 17, in run_menu
+    amount = int(input(""Enter amount to add: ""))
+EOFError: EOF when reading a line
+",2026-06-04T18:32:50.820839-08:00
+r0605b_1_D1,1,D1,exit0가짜,,0,5,,2026-06-04T16:42:01.234566-08:00
+r0605b_2_D1,2,D1,exit0가짜,,0,5,,2026-06-04T17:11:30.148966-08:00
+r0605b_3_D1,3,D1,exit0가짜,,0,5,,2026-06-04T17:39:39.342243-08:00
+r0605b_4_D1,4,D1,exit0가짜,,0,5,,2026-06-04T18:08:50.510897-08:00
+r0605b_5_D1,5,D1,exit0가짜,,0,4,,2026-06-04T18:35:52.928455-08:00
+r0605b_1_D2,1,D2,exit0가짜,,0,4,,2026-06-04T16:45:09.671262-08:00
+r0605b_2_D2,2,D2,exit0가짜,,0,4,,2026-06-04T17:16:09.293033-08:00
+r0605b_3_D2,3,D2,exit0가짜,,0,4,,2026-06-04T17:44:04.884763-08:00
+r0605b_4_D2,4,D2,exit0가짜,,0,4,,2026-06-04T18:11:29.434732-08:00
+r0605b_5_D2,5,D2,exit0가짜,,0,4,,2026-06-04T18:38:31.543307-08:00
+r0605b_1_E1,1,E1,exit0가짜,,0,5,,2026-06-04T16:48:31.064759-08:00
+r0605b_2_E1,2,E1,H1b,계약(AttributeError),1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_zbpiggda/main.py"", line 27, in <module>
+    main()
+  File ""/tmp/aaa_run_zbpiggda/main.py"", line 22, in main
+    result = execute_action(user_obj, action)
+  File ""/tmp/aaa_run_zbpiggda/actions.py"", line 5, in execute_action
+    if is_authorized(user, action_name):
+  File ""/tmp/aaa_run_zbpiggda/permissions.py"", line 29, in is_authorized
+    role_key = user_role.lower()
+AttributeError: 'Role' object has no attribute 'lower'
+",2026-06-04T17:18:03.008146-08:00
+r0605b_3_E1,3,E1,exit0가짜,,0,4,,2026-06-04T17:46:22.080177-08:00
+r0605b_4_E1,4,E1,exit0가짜,,0,4,,2026-06-04T18:13:55.561280-08:00
+r0605b_5_E1,5,E1,exit0가짜,,0,4,,2026-06-04T18:41:10.678926-08:00
+r0605b_1_E2,1,E2,exit0가짜,,0,6,,2026-06-04T16:50:53.428233-08:00
+r0605b_2_E2,2,E2,exit0가짜,,0,5,,2026-06-04T17:20:55.432197-08:00
+r0605b_3_E2,3,E2,H1b,import불일치,1,5,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_xk1tqq6v/main.py"", line 2, in <module>
+    from inventory_service import InventoryService
+ImportError: cannot import name 'InventoryService' from 'inventory_service' (/tmp/aaa_run_xk1tqq6v/inventory_service.py)
+",2026-06-04T17:49:02.468006-08:00
+r0605b_4_E2,4,E2,exit0가짜,,0,5,,2026-06-04T18:16:40.432997-08:00
+r0605b_5_E2,5,E2,기타예외,,1,6,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_1zon0ubp/main.py"", line 48, in <module>
+    run_demo()
+  File ""/tmp/aaa_run_1zon0ubp/main.py"", line 21, in run_demo
+    add_item(keyboard, 1)
+  File ""/tmp/aaa_run_1zon0ubp/cart_manager.py"", line 13, in add_item
+    raise ValueError(""Product is out of stock or insufficient quantity available."")
+ValueError: Product is out of stock or insufficient quantity available.
+",2026-06-04T18:44:27.870152-08:00

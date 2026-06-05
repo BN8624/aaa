@@ -1,0 +1,42 @@
+# 분류 애매/확인필요 5줄 (전문). 분류기 점검은 여기부터.
+
+=== r0605b_2_B2 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_ecmtuxet/main.py", line 71, in <module>
+    main()
+  File "/tmp/aaa_run_ecmtuxet/main.py", line 59, in main
+    handle_add_memo()
+  File "/tmp/aaa_run_ecmtuxet/main.py", line 25, in handle_add_memo
+    result = memo_service.add_memo(content)
+  File "/tmp/aaa_run_ecmtuxet/memo_service.py", line 7, in add_memo
+    new_id = max([m['memo_id'] for m in memos], default=0) + 1
+  File "/tmp/aaa_run_ecmtuxet/memo_service.py", line 7, in <listcomp>
+    new_id = max([m['memo_id'] for m in memos], default=0) + 1
+KeyError: 'memo_id'
+
+=== r0605b_2_C2 [기타예외] exit=1 g=4
+Traceback (most recent call last):
+  File "/tmp/aaa_run_apw2hjsf/main.py", line 67, in <module>
+    main()
+  File "/tmp/aaa_run_apw2hjsf/main.py", line 29, in main
+    inventory_manager.receive_stock(item_id, quantity)
+  File "/tmp/aaa_run_apw2hjsf/inventory_manager.py", line 20, in receive_stock
+    raise KeyError(f"Item with ID {item_id} not found in inventory.")
+KeyError: 'Item with ID 1 not found in inventory.'
+
+=== r0605b_4_A1 [기타예외] exit=-1 g=2
+[runner] TimeoutExpired after 20s
+
+=== r0605b_5_A1 [기타예외] exit=-1 g=3
+[runner] TimeoutExpired after 20s
+
+=== r0605b_5_E2 [기타예외] exit=1 g=6
+Traceback (most recent call last):
+  File "/tmp/aaa_run_1zon0ubp/main.py", line 48, in <module>
+    run_demo()
+  File "/tmp/aaa_run_1zon0ubp/main.py", line 21, in run_demo
+    add_item(keyboard, 1)
+  File "/tmp/aaa_run_1zon0ubp/cart_manager.py", line 13, in add_item
+    raise ValueError("Product is out of stock or insufficient quantity available.")
+ValueError: Product is out of stock or insufficient quantity available.
+

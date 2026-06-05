@@ -1,0 +1,138 @@
+{
+  "label": "r0605b",
+  "n_rows": 50,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
+  ],
+  "rounds": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+  ],
+  "exec": {
+    "tally": {
+      "H1b": 3,
+      "argparse": 4,
+      "메뉴앞EOF": 18,
+      "exit0가짜": 20,
+      "기타예외": 5
+    },
+    "h1b": 3,
+    "h1b_types": {
+      "import불일치": 2,
+      "계약(AttributeError)": 1
+    }
+  },
+  "round": {
+    "h1b_cells": 3,
+    "total_cells": 50
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 5,
+      "h1b": 1,
+      "h1b_types": {
+        "import불일치": 1
+      },
+      "cats": {
+        "H1b": 1,
+        "exit0가짜": 2,
+        "기타예외": 2
+      }
+    },
+    "A2": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "argparse": 4,
+        "exit0가짜": 1
+      }
+    },
+    "B1": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 5
+      }
+    },
+    "B2": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 4,
+        "기타예외": 1
+      }
+    },
+    "C1": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 5
+      }
+    },
+    "C2": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 4,
+        "기타예외": 1
+      }
+    },
+    "D1": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 5
+      }
+    },
+    "D2": {
+      "n_exec": 5,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 5
+      }
+    },
+    "E1": {
+      "n_exec": 5,
+      "h1b": 1,
+      "h1b_types": {
+        "계약(AttributeError)": 1
+      },
+      "cats": {
+        "exit0가짜": 4,
+        "H1b": 1
+      }
+    },
+    "E2": {
+      "n_exec": 5,
+      "h1b": 1,
+      "h1b_types": {
+        "import불일치": 1
+      },
+      "cats": {
+        "exit0가짜": 3,
+        "H1b": 1,
+        "기타예외": 1
+      }
+    }
+  }
+}

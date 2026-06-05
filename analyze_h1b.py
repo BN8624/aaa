@@ -1,123 +1,148 @@
 #!/usr/bin/env python3
-"""
-§4 (길A) 분석: r0605_1~r0605_5 50줄을 읽어 칸별·회차별 H1b 분포를 낸다.
-- 규칙: stderr 전문을 읽고 분류(머리글자 금지). H1_RUN 교훈 반영.
-- 입력: runs.jsonl (0단계 8필드). tag로 회차 구분.
-사용법: python3 analyze_h1b.py runs.jsonl
-"""
-import json, sys, re
-from collections import defaultdict
+"""runs.jsonl 분석틀 (관측 전용). python3 analyze_h1b.py [tag] [--push]"""
+import json, re, sys, os, subprocess, csv
+from collections import defaultdict, Counter
 
-TAGS = [f"r0605_{i}" for i in range(1, 6)]
-CELLS = ["A1","A2","B1","B2","C1","C2","D1","D2","E1","E2"]
+TID = re.compile(r"(r\d+[a-z]?)_([0-9]+)_([A-E][12])")
+
+def h1b_type(se):
+    if "ImportError" in se or "cannot import name" in se or "ModuleNotFoundError" in se:
+        return "import불일치"
+    if "TypeError" in se and ("unexpected keyword argument" in se
+                              or "positional argument" in se
+                              or ("takes" in se and "argument" in se)):
+        return "시그니처불일치"
+    if "TypeError" in se and "unhashable" in se: return "계약(unhashable)"
+    if "AttributeError" in se: return "계약(AttributeError)"
+    if "NameError" in se: return "계약(NameError)"
+    return None
 
 def classify(rec):
-    exit_code = rec.get("exit_code", rec.get("exit"))
-    stderr = (rec.get("stderr") or "")
-    stdout = (rec.get("stdout") or "")
-    generated = rec.get("generated_files", rec.get("generated", []))
-    g = len(generated) if isinstance(generated, list) else generated
+    se = rec.get("stderr") or ""; so = rec.get("stdout") or ""
+    ec = rec.get("exit_code"); g = len(rec.get("generated_files") or [])
+    if g == 0: return ("코더빈손","")
+    t = h1b_type(se)
+    if t: return ("H1b", t)
+    if "EOFError" in se:
+        return ("메뉴앞EOF","") if so.strip()=="" else ("메뉴중EOF","")
+    if "usage:" in se or "the following arguments are required" in se \
+       or (ec==2 and "argument" in se): return ("argparse","")
+    if ec==0:
+        return ("exit0가짜","") if so.strip()=="" else ("exit0정상","")
+    if se.strip(): return ("기타예외","")
+    return ("미분류","")
 
-    if g == 0:
-        return ("코더빈손", "generated=[] (500/인프라)")
-    if "ImportError" in stderr or "cannot import name" in stderr or \
-       ("ModuleNotFoundError" in stderr and g >= 2):
-        return ("H1b", "import불일치")
-    if "TypeError" in stderr and ("unexpected keyword argument" in stderr or
-                                  "positional argument" in stderr or
-                                  "argument" in stderr):
-        return ("H1b", "시그니처불일치")
-    if "AttributeError" in stderr and "object has no attribute" in stderr:
-        return ("H1b", "기타계약(AttributeError)")
-    if "NameError" in stderr:
-        return ("H1b", "기타계약(NameError)")
-    if "EOFError" in stderr:
-        if stdout.strip() == "":
-            return ("메뉴앞EOF", "첫 input EOFError(stdout빔)")
-        else:
-            return ("메뉴중EOF", "메뉴 일부 통과 후 EOFError(stdout있음)")
-    if "usage:" in stderr or "error: the following arguments are required" in stderr \
-       or (exit_code == 2 and "argument" in stderr):
-        return ("argparse", "stdin무력(명령행인자)")
-    if exit_code == 0:
-        if stdout.strip() == "":
-            return ("exit0가짜", "stdout빔(가짜 의심)")
-        else:
-            return ("exit0정상", "stdout있음(동작 추정)")
-    if stderr.strip():
-        first = stderr.strip().splitlines()[-1][:60]
-        return ("기타예외", first)
-    return ("미분류", f"exit={exit_code} g={g}")
+AMBIGUOUS = {"기타예외","미분류","코더빈손"}
 
 def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else "runs.jsonl"
-    grid = defaultdict(dict)
-    raw = defaultdict(dict)
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            rec = json.loads(line)
-            tag = rec.get("tag", "")
-            if tag not in TAGS:
-                continue
-            task = rec.get("task_id", rec.get("task", ""))
-            m = re.search(r"\b([A-E][12])\b", str(task))
-            cell = m.group(1) if m else task
-            if cell not in CELLS:
-                continue
-            cat, sub = classify(rec)
-            grid[tag][cell] = (cat, sub)
-            raw[cell][tag] = (cat, sub)
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    tagfilter = args[0] if args else None
+    label = tagfilter if tagfilter else "all"
+    outdir = os.path.join("analysis_out", label)
+    os.makedirs(outdir, exist_ok=True)
 
-    print("="*78)
-    print("회차별 × 칸별 결과 (대분류)")
-    print("="*78)
-    header = "칸 |" + "|".join(f"{t.split('_')[1]:>10}" for t in TAGS)
-    print(header)
-    print("-"*len(header))
-    for cell in CELLS:
-        row = f"{cell:>2} |"
-        for t in TAGS:
-            cat = grid[t].get(cell, ("-",""))[0]
-            row += f"{cat:>10}|"
-        print(row)
+    rows=[]
+    for line in open("runs.jsonl"):
+        line=line.strip()
+        if not line: continue
+        try: rec=json.loads(line)
+        except: continue
+        tid=str(rec.get("task_id",""))
+        if tagfilter and tagfilter not in tid: continue
+        m=TID.search(tid)
+        if not m: continue
+        cat,sub=classify(rec)
+        se=(rec.get("stderr") or "")
+        rows.append({"task_id":tid,"round":m.group(2),"cell":m.group(3),
+            "cat":cat,"sub":sub,"exit":rec.get("exit_code"),
+            "g":len(rec.get("generated_files") or []),
+            "stderr_full":se,"created_at":rec.get("created_at","")})
 
-    print()
-    print("="*78)
-    print("칸별 H1b 분포 — 5회 중 몇 회 H1b로 죽나 + 유형 + 안 죽은 회차 결말")
-    print("="*78)
-    for cell in CELLS:
-        h1b = [(t, raw[cell][t][1]) for t in TAGS
-               if raw[cell].get(t, ("",""))[0] == "H1b"]
-        non = [(t.split('_')[1], raw[cell][t][0]) for t in TAGS
-               if raw[cell].get(t, ("",""))[0] not in ("H1b","결측")]
-        n_h1b = len(h1b)
-        types = sorted(set(s for _, s in h1b))
-        print(f"\n[{cell}]  H1b {n_h1b}/5")
-        print(f"    유형: {', '.join(types) if types else '(H1b 없음)'}")
-        if non:
-            print(f"    H1b 아닌 회차: " + ", ".join(f"{r}:{c}" for r, c in non))
+    cells=sorted({r["cell"] for r in rows})
+    rounds=sorted({r["round"] for r in rows}, key=int)
 
-    print()
-    print("="*78)
-    print("전체 유형 집계 (50칸)")
-    print("="*78)
-    tally = defaultdict(int)
-    subtally = defaultdict(int)
-    for t in TAGS:
-        for cell in CELLS:
-            cat, sub = grid[t].get(cell, ("결측",""))
-            tally[cat] += 1
-            if cat == "H1b":
-                subtally[sub] += 1
-    for cat, n in sorted(tally.items(), key=lambda x: -x[1]):
-        print(f"  {cat:>14}: {n}")
-    if subtally:
-        print("  └ H1b 세부:")
-        for sub, n in sorted(subtally.items(), key=lambda x: -x[1]):
-            print(f"      {sub:>22}: {n}")
+    with open(os.path.join(outdir,"rows.csv"),"w",newline="") as f:
+        w=csv.writer(f)
+        w.writerow(["task_id","round","cell","cat","sub","exit","g","stderr_full","created_at"])
+        for r in sorted(rows,key=lambda x:(x["cell"],x["round"])):
+            w.writerow([r["task_id"],r["round"],r["cell"],r["cat"],r["sub"],
+                        r["exit"],r["g"],r["stderr_full"],r["created_at"]])
 
-if __name__ == "__main__":
+    with open(os.path.join(outdir,"review.txt"),"w") as f:
+        amb=[r for r in rows if r["cat"] in AMBIGUOUS]
+        f.write(f"# 분류 애매/확인필요 {len(amb)}줄 (전문). 분류기 점검은 여기부터.\n\n")
+        for r in amb:
+            f.write(f"=== {r['task_id']} [{r['cat']}] exit={r['exit']} g={r['g']}\n")
+            f.write((r["stderr_full"].strip() or "(stderr 없음)")+"\n\n")
+
+    cell_round=defaultdict(lambda: defaultdict(list))
+    for r in rows: cell_round[r["cell"]][r["round"]].append(r["cat"])
+    summary={"label":label,"n_rows":len(rows),"cells":cells,"rounds":rounds}
+    exec_tally=Counter(r["cat"] for r in rows)
+    exec_h1b_types=Counter(r["sub"] for r in rows if r["cat"]=="H1b")
+    summary["exec"]={"tally":dict(exec_tally),
+        "h1b":sum(1 for r in rows if r["cat"]=="H1b"),
+        "h1b_types":dict(exec_h1b_types)}
+    split=[]; rh=rt=0
+    for c in cells:
+        for rd in rounds:
+            cats=cell_round[c].get(rd,[])
+            if not cats: continue
+            rt+=1
+            if "H1b" in cats: rh+=1
+            if "H1b" in cats and any(x!="H1b" for x in cats): split.append(f"{c} r{rd}")
+    summary["round"]={"h1b_cells":rh,"total_cells":rt}
+    summary["nondeterministic_splits"]=split
+    summary["per_cell"]={}
+    for c in cells:
+        lst=[r for r in rows if r["cell"]==c]
+        summary["per_cell"][c]={"n_exec":len(lst),
+            "h1b":sum(1 for r in lst if r["cat"]=="H1b"),
+            "h1b_types":dict(Counter(r["sub"] for r in lst if r["cat"]=="H1b")),
+            "cats":dict(Counter(r["cat"] for r in lst))}
+    with open(os.path.join(outdir,"summary.json"),"w") as f:
+        json.dump(summary,f,ensure_ascii=False,indent=2)
+
+    L=[f"분석: {label} | {len(rows)}실행 | 칸 {len(cells)} 회차 {rounds}",
+       "="*50,"칸별 H1b 분포 (분모=실행수)","="*50]
+    for c in cells:
+        s=summary["per_cell"][c]
+        L.append(f"\n[{c}] H1b {s['h1b']}/{s['n_exec']}")
+        if s["h1b_types"]:
+            L.append("  유형: "+", ".join(f"{k}×{v}" for k,v in s["h1b_types"].items()))
+        det=[]
+        for rd in rounds:
+            cats=cell_round[c].get(rd,[])
+            if not cats: continue
+            nh=sum(1 for x in cats if x=="H1b")
+            t=f"r{rd}:{nh}/{len(cats)}"
+            if "H1b" in cats and any(x!="H1b" for x in cats): t+="*"
+            det.append(t)
+        L.append("  회차(H1b/실행): "+" ".join(det))
+    L+=["\n"+"="*50,"★ 비결정성 (* 동일칸·회차 갈림)","="*50,
+        "  "+(", ".join(split) if split else "(없음)"),
+        "\n"+"="*50,f"실행단위 집계 ({len(rows)}실행)","="*50]
+    for k,v in sorted(exec_tally.items(),key=lambda x:-x[1]):
+        L.append(f"  {k:>12}: {v}")
+    if exec_h1b_types:
+        L.append("  └ H1b 유형:")
+        for k,v in sorted(exec_h1b_types.items(),key=lambda x:-x[1]):
+            L.append(f"      {k:>18}: {v}")
+    L+=["\n"+"="*50,"회차단위(칸×회차 H1b 노출)","="*50,f"  {rh}/{rt}"]
+    open(os.path.join(outdir,"report.txt"),"w").write("\n".join(L)+"\n")
+
+    print(f"[완료] {outdir}/ 4파일")
+    print(f"  실행 {len(rows)} | H1b {summary['exec']['h1b']} | 애매 {sum(1 for r in rows if r['cat'] in AMBIGUOUS)}줄")
+
+    if "--push" in flags:
+        try:
+            subprocess.run(["git","add","analyze_h1b.py",outdir],check=True)
+            subprocess.run(["git","commit","-m",f"analysis: {label}"],check=True)
+            subprocess.run(["git","push"],check=True)
+            print("[푸시] 완료")
+        except subprocess.CalledProcessError as e:
+            print(f"[푸시 실패] {e}")
+
+if __name__=="__main__":
     main()
