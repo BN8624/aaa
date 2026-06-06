@@ -79,8 +79,8 @@ def call_model(model: str, contents, *, limiter, system: str = None,
             # 429(Too Many Requests)로 보이면 백오프 후 재시도(대시보드-실제 어긋남 대비, 6장).
             # 그 외 예외는 그대로 올린다(조용히 삼키지 않음 — 짐작 금지).
             msg = str(e)
-            is_429 = "429" in msg or "RESOURCE_EXHAUSTED" in msg or "rate" in msg.lower()
-            if is_429 and attempt < max_retries:
+            is_retryable = "429" in msg or "RESOURCE_EXHAUSTED" in msg or "rate" in msg.lower() or "500" in msg or "INTERNAL" in msg or "ServerError" in msg or "503" in msg or "UNAVAILABLE" in msg
+            if is_retryable and attempt < max_retries:
                 limiter.backoff(attempt)
                 attempt += 1
                 continue
