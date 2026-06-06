@@ -136,7 +136,7 @@ class TaskState:
     # ---------- Failure Dataset 적재 ----------
 
     def dump_to_dataset(self, exit_code: int, stderr: str, runtime: float,
-                        path: str = "runs.jsonl") -> None:
+                        path: str = "runs.jsonl", stdin: str = None) -> None:
         """루프 종료 시(성공·실패·중단 가리지 않고) 결과 '한 줄'을 runs.jsonl에 append.
         ★ 0단계 필드 = 관측 사실만. 계산된 값(success/실패 버킷·비율) 금지 — 사람이 사후에(§2-1).
         observer 키(py_compile/ruff/mypy)는 0단계 로그가 호명할 때만 추가(§6).
@@ -151,6 +151,7 @@ class TaskState:
             "exit_code": exit_code,
             "stderr": stderr,
             "runtime": runtime,
+            "stdin": stdin,
             "created_at": self.created_at,
         }
         with open(path, "a", encoding="utf-8") as f:
@@ -214,7 +215,7 @@ if __name__ == "__main__":
     row = json.loads(line)
     expected_keys = {"task_id", "expected_type", "designed_files",
                      "generated_files", "exit_code", "stderr",
-                     "runtime", "created_at"}
+                     "runtime", "stdin", "created_at"}
     assert set(row.keys()) == expected_keys, f"runs.jsonl 키가 0단계와 다름: {set(row.keys())}"
     # 계산된 값이 새어들지 않았는지 확인
     for forbidden in ("success", "success_rate", "status", "verdict"):

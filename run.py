@@ -106,11 +106,11 @@ def run_task(requirement: str, *, expected_type: str = None,
         from limiter import RPDExceeded
         if isinstance(e, RPDExceeded):
             # 기록은 남기고(아래 dump) 멈춤 신호로 올린다
-            state.dump_to_dataset(exit_code=exit_code, stderr=stderr, runtime=runtime, path=runs_path)
+            state.dump_to_dataset(exit_code=exit_code, stderr=stderr, runtime=runtime, path=runs_path, stdin=stdin_input)
             raise
 
     # ★ 종료 시(성공·실패 가리지 않고) runs.jsonl에 결과 한 줄 — 0단계 사실 필드만(§3)
-    state.dump_to_dataset(exit_code=exit_code, stderr=stderr, runtime=runtime, path=runs_path)
+    state.dump_to_dataset(exit_code=exit_code, stderr=stderr, runtime=runtime, path=runs_path, stdin=stdin_input)
 
     # 사람이 바로 볼 요약 반환(이건 화면용 — 로그 파일과 별개, 계산값 아님)
     return {
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     assert len(lines) == 1, f"runs.jsonl 줄 수가 1이 아님: {len(lines)}"
     row = json.loads(lines[0])
     expected_keys = {"task_id", "expected_type", "designed_files",
-                     "generated_files", "exit_code", "stderr", "runtime", "created_at"}
+                     "generated_files", "exit_code", "stderr", "runtime", "stdin", "created_at"}
     assert set(row.keys()) == expected_keys, f"0단계 필드 불일치: {set(row.keys())}"
     for forbidden in ("success", "success_rate", "status", "verdict", "bucket"):
         assert forbidden not in row, f"금지된 계산/판정 필드: {forbidden}"
