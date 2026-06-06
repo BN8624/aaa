@@ -32,3 +32,11 @@
 - 메뉴앞EOF=0의 실제 원인: 데모형은 애초에 EOF 안 냄, 메뉴형은 대본이 exit까지 끌고 감. 둘 다 exit0가짜로 수렴.
 - ★ stdin 로깅 호명됨: exit0가짜가 "굶음"인지 "완주"인지 stderr만으론 영구 구분 불가
   → run.py(주입 시) + state.py(dump 시) 별도 깨끗한 변경으로.
+
+## §6 vtx1 (Gemini 3.5 Flash 첫 회차, 2026-06-06)
+- 전환 후 첫 깨끗한 회차. 10칸 전부 코드 생성(코더빈손 0).
+- ★ 메뉴앞EOF 4→0: Gemma는 input()맨몸→EOF즉사였으나, Gemini는 input을 try/except (EOFError)로 감싸 "Goodbye!" 후 정상 break. → 죽지 않지만 메뉴 루프 0바퀴, 파일상호작용 미실행 = exit0가짜(불명).
+- 즉 관측천장의 정체가 "메뉴앞EOF(죽음)"→"exit0가짜(우아한 무동작)"로 이동. 관측가능률은 여전히 낮음(B·C 4칸 불명).
+- H1b 표면상 0. 단 E1은 H1c(create_user가 role 도메인 {admin,user,guest}인데 main이 'editor'/'viewer' 주입→ValueError)이고, 그 뒤 user.get() vs dataclass 반환 불일치(H1b)가 잠복(도달 전 사망).
+- ★ 함의: H4(stdin 대본)이 Gemini에서 처음 쓸모 가능. B1은 데모형이 아닌 진짜 메뉴형이라, 대본 주입 시 EOF로 안 죽고 메뉴를 실제로 돌 가능성 → D·E 아닌 B·C에서도 계약 실행 관측 기회.
+- 주의: tag 'vtx1'은 analyze 정규식(_숫자_) 불일치로 rows.csv 빈값. 다음부터 'vtx_2' 형식.
