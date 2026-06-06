@@ -129,7 +129,7 @@ def code_one_file(target_file: dict, design: dict, *, limiter, max_retries: int 
     """
     from client import call_model
 
-    M31 = "gemma-4-31b-it"   # 코딩 담당(3장)
+    M31 = "gemini-3.5-flash"   # 코딩 담당(3장)
     context = build_context(target_file, design)
     prompt = _CODER_INSTRUCTION + context + "\n\nNow write the complete code for this file:\n"
 

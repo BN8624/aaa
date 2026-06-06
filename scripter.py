@@ -23,7 +23,7 @@
 import re
 
 # 입력 대본 생성은 '구조 해석' 작업 → 설계 담당과 같은 26B(코더 31B 연타 경로와 분리, §8).
-_M26 = "gemma-4-26b-a4b-it"
+_M26 = "gemini-3.5-flash"
 
 _SCRIPTER_INSTRUCTION = """\
 You are given a small multi-file Python program and its acceptance criteria.

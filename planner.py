@@ -109,7 +109,7 @@ def make_design(requirement: str, *, limiter, max_retries: int = 2) -> dict:
     # 단일 입구 call_model만 거친다(한도·usage가 한 곳에서). 26B = 설계 담당(3장).
     from client import call_model
 
-    M26 = "gemma-4-26b-a4b-it"
+    M26 = "gemini-3.5-flash"
     prompt = _PLANNER_INSTRUCTION + requirement.strip() + "\n"
 
     last_err = None
