@@ -1,0 +1,25 @@
+task_id,round,cell,cat,sub,exit,g,stderr_full,created_at
+probe_1780746513_A1,1780746513,A1,argparse,,2,4,"usage: main.py [-h] val1 val2 label
+main.py: error: the following arguments are required: val1, val2, label
+",2026-06-06T03:48:33.090452-08:00
+probe_1780746513_A2,1780746513,A2,argparse,,2,3,"usage: main.py [-h] --value VALUE --mode MODE
+main.py: error: the following arguments are required: --value, --mode
+",2026-06-06T03:51:43.723098-08:00
+probe_1780746513_B1,1780746513,B1,exit0가짜,,0,4,,2026-06-06T03:53:19.418648-08:00
+probe_1780746513_B2,1780746513,B2,exit0가짜,,0,4,,2026-06-06T03:57:32.045515-08:00
+probe_1780746513_C1,1780746513,C1,exit0가짜,,0,4,,2026-06-06T04:01:35.890835-08:00
+probe_1780746513_C2,1780746513,C2,exit0가짜,,0,4,,2026-06-06T04:05:35.515415-08:00
+probe_1780746513_D1,1780746513,D1,exit0가짜,,0,4,,2026-06-06T04:09:29.324114-08:00
+probe_1780746513_D2,1780746513,D2,H1c런타임값,ValueError: User with id user_88 not found.,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_g0j8s87m/main.py"", line 39, in <module>
+    run_demonstration()
+  File ""/tmp/aaa_run_g0j8s87m/main.py"", line 9, in run_demonstration
+    initial_bal = get_balance(user_id)
+  File ""/tmp/aaa_run_g0j8s87m/point_service.py"", line 18, in get_balance
+    user = get_user(user_id)
+  File ""/tmp/aaa_run_g0j8s87m/repository.py"", line 7, in get_user
+    raise ValueError(f""User with id {user_id} not found."")
+ValueError: User with id user_88 not found.
+",2026-06-06T04:11:33.174562-08:00
+probe_1780746513_E1,1780746513,E1,exit0가짜,,0,5,,2026-06-06T04:14:02.533459-08:00
+probe_1780746513_E2,1780746513,E2,exit0가짜,,0,5,,2026-06-06T04:16:21.902908-08:00
