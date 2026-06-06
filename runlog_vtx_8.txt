@@ -1,0 +1,42 @@
+=== batch 시작: 10개 (A~E × 2) ===
+    runs_path=runs.jsonl, timeout=20s
+    stdin: 공통 더미 주입(길1) '1\n테스트\n2\n3\n2\n1\n0\n'
+    대본: 태스크별 생성(길B) — 실패 시 위로 fallback
+
+[1/10] vtx_8_A1 (칸 A) 시작 — 간단한 사칙연산 계산기 CLI. 두 수와 연산자(+,-…
+      → exit=0 status=done files: d3/g3 (30s)
+      stderr: Error: Invalid number of arguments. Expected exactly 3 arguments.
+
+[2/10] vtx_8_A2 (칸 A) 시작 — 섭씨↔화씨 단위 변환기 CLI. 값과 방향을 받아 변환…
+      → exit=2 status=failed files: d3/g3 (28s)
+      stderr: usage: main.py [-h] value direction
+main.py: error: the following arguments are required: value, direction
+
+[3/10] vtx_8_B1 (칸 B) 시작 — 할 일 목록 관리 프로그램. 추가/삭제/완료/목록 4기…
+      → exit=0 status=done files: d3/g3 (40s)
+[4/10] vtx_8_B2 (칸 B) 시작 — 메모 관리 프로그램. 메모 추가/수정/삭제/목록 기능.…
+      → exit=0 status=done files: d3/g3 (35s)
+[5/10] vtx_8_C1 (칸 C) 시작 — 간단한 가계부. 수입/지출 기록 추가, 잔액 계산, 내…
+      → exit=0 status=done files: d3/g3 (40s)
+[6/10] vtx_8_C2 (칸 C) 시작 — 재고 관리 프로그램. 품목 입고/출고, 현재 수량 조회…
+      → exit=0 status=done files: d3/g3 (62s)
+[7/10] vtx_8_D1 (칸 D) 시작 — 간단한 주문 처리. 주문이 들어오면 재고를 줄이고 주문…
+      → exit=0 status=done files: d4/g4 (45s)
+[8/10] vtx_8_D2 (칸 D) 시작 — 회원 포인트 시스템. 구매하면 포인트 적립, 포인트로 …
+      → exit=0 status=done files: d3/g3 (42s)
+[9/10] vtx_8_E1 (칸 E) 시작 — 사용자 권한 관리. 역할(admin/user/guest…
+      → exit=0 status=done files: d5/g5 (43s)
+[10/10] vtx_8_E2 (칸 E) 시작 — 쇼핑 장바구니. 쿠폰 적용, 재고 확인, 장바구니 합계…
+      → exit=0 status=done files: d4/g4 (44s)
+
+=== batch 끝: 10/10 실행됨 ===
+
+--- 칸별 관측(화면용, runs.jsonl엔 사실만 따로 적힘) ---
+    A: ['exit0=', 'exit2=']
+    B: ['exit0=', 'exit0=']
+    C: ['exit0=', 'exit0=']
+    D: ['exit0=', 'exit0=']
+    E: ['exit0=', 'exit0=']
+
+    (exit0=정상종료지만 '동작'은 아닐 수 있음 — argparse 무동작 등. 줄 전문을 사람이 읽어라)
+    전체 로그: cat runs.jsonl  (또는 tail)
