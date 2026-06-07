@@ -57,3 +57,9 @@
 - 분포: C·D·E 편중, A·B 거의 없음.
 - 해석(Q5 답): 삼킴 = 숨은 H1b 아님. dict 수렴으로 H1b 애초 미발생(vtx1 E1 비재현과 일치). 표면 H1b 0은 채널 은폐보다 진짜 부재. §7 "예외→반환값" 가설은 H1c엔 맞지만 H1b 사례 0.
 - Q6 함의: 검증기로도 건질 숨은 H1b 없음 → "정상 거부 vs 진짜 깸" 구분 관측 도구로 재설정.
+
+## §9 Q6 — verify_channel.py 첫 실측 (2026-06-07)
+- 도구: 파이프라인 분리 관측기. generated_files 임시폴더 재생 + 로깅된 stdin 주입 → stdout/stderr/exit 실측, 4상태(alive/reject/broken/silent) + 채널(stderr-exc/stdout-return/silent) 판정.
+- vtx_2~10 exit0 79칸 전수: broken 0, reject 25(전부 stdout-return), alive 54(stdout-ok), silent 0.
+- 의미: §8의 "삼킨 ≈21~24 = 전부 정상 도메인 거부"를 추론→실측으로 확정. 깸 채널(broken) 비어 있음. progress §5 새 지표 첫 값.
+- 함의: 검증기는 H1b 사냥기 아님이 실증됨(잡을 broken 없음). "정상 거부 vs 진짜 깸" 구분 관측 도구로 위치 확정.
