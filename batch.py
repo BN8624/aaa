@@ -108,8 +108,8 @@ if __name__ == "__main__":
     import os
     import json
 
-    if not os.environ.get("GOOGLE_API_KEY"):
-        print("✗ GOOGLE_API_KEY 없음. .bashrc 확인.")
+    if not os.environ.get("VERTEX_API_KEY"):
+        print("✗ VERTEX_API_KEY 없음. .bashrc 확인.")
         raise SystemExit(1)
 
     # 실제 데이터는 ~/aaa/runs.jsonl에 쌓는다(.gitignore에 있어 커밋 안 됨 — §14).
