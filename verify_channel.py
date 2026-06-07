@@ -105,6 +105,18 @@ def run_cell(r, timeout=20):
         shutil.rmtree(wd, ignore_errors=True)
 
 
+INPUTMISMATCH_PAT = re.compile(
+    r"usage:|error: the following arguments are required"
+    r"|Invalid number of arguments|Expected \d+ .*?(values|arguments)"
+    r"|the following arguments|too few arguments", re.I)
+
+
+def _argv_based(code_all):
+    # code reads command-line args (argparse / sys.argv[1:]) rather than stdin input()
+    return bool(re.search(r"argparse|sys\.argv\[1", code_all)) and \
+        not re.search(r"\binput\s*\(", code_all)
+
+
 def classify(res, code_all):
     if res is None:
         return 'nofiles', '-'
@@ -112,6 +124,11 @@ def classify(res, code_all):
     # channel: where does anything show up
     if res['timeout']:
         return 'broken', 'timeout'
+    # input-channel mismatch: code expects argv, runner injected stdin → not a real break.
+    if res['exit'] not in (0, None) and (
+            INPUTMISMATCH_PAT.search(err) or
+            (_argv_based(code_all) and ('argument' in err.lower() or 'usage' in err.lower()))):
+        return 'inputmismatch', 'argv-vs-stdin'
     if TRACE_PAT.search(err) or (res['exit'] not in (0, None) and err.strip()):
         ch = 'stderr-exc'
         return 'broken', ch
