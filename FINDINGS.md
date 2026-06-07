@@ -40,3 +40,12 @@
 - H1b 표면상 0. 단 E1은 H1c(create_user가 role 도메인 {admin,user,guest}인데 main이 'editor'/'viewer' 주입→ValueError)이고, 그 뒤 user.get() vs dataclass 반환 불일치(H1b)가 잠복(도달 전 사망).
 - ★ 함의: H4(stdin 대본)이 Gemini에서 처음 쓸모 가능. B1은 데모형이 아닌 진짜 메뉴형이라, 대본 주입 시 EOF로 안 죽고 메뉴를 실제로 돌 가능성 → D·E 아닌 B·C에서도 계약 실행 관측 기회.
 - 주의: tag 'vtx1'은 analyze 정규식(_숫자_) 불일치로 rows.csv 빈값. 다음부터 'vtx_2' 형식.
+
+## §7 vtx_2~10 (Gemini 3.5 Flash 누적 9회차, 2026-06-06)
+- 데이터 무결성: runs.jsonl에 vtx_ 170행 중 80행이 VERTEX_API_KEY 미설정 가짜(files=[], exit=-1, stderr "VERTEX_API_KEY 환경변수가 없다"). 키 없이 한 번 돌고 export 후 재실행한 흔적(약 17분 간격). 가짜 걷으면 9회차x10칸=90 진짜 실행, 빠진 칸·중복 없음. vtx_2는 키실패 0. analysis_out/에 vtx_ 디렉토리 없음 = arun.sh 안 거치고 batch.py 직접 실행됨(rows.csv 미생성). 집계는 runs.jsonl 직접 계산.
+- 표면 H1b = 0/90. 분류: exit0 76 / H1c 7 / argparse 6 / timeout 1.
+- D·E exit0 34칸 전부 logged-stdin 재생 시 계약 가로질러 완주(삼켜진/도달전 H1b 없음).
+- vtx1 E1의 잠복 H1b(dict vs dataclass) 재현 안 됨: 9회차 E1 전부 @dataclass 미사용, dict 수렴으로 멤버 계약 충돌 자체가 발생 안 함. "더 깊이 숨긴다"(vtx1 가설)는 이번 누적으로 반증에 가까움.
+- 새 발견 — 오류의 채널 이동: exit0 79칸 중 24칸이 오류를 stderr 예외가 아니라 stdout 반환값으로 삼킴. 예: {'success':False,'error':...} / Unauthorized / Insufficient stock / Payment failed. 코드 신호: broad except Exception 47/90, except->print 62/90. 강한 모델은 계약위반·값오류를 raise가 아니라 return으로 처리. H1b/H1c가 사라진 게 아니라 예외->반환값, stderr->stdout으로 이동했을 가능성.
+- 관측 천장 3차 이동: (1)메뉴앞EOF(죽음) -> (2)exit0가짜(우아한 무동작, vtx1) -> (3)예외->반환값(오류 삼킴, vtx_2~10). 이제 반환값/stdout 의미검증 없이는 깸 관측 불가.
+- 인과 교란 명시: 모델(Gemma->Gemini)과 파이프라인(H4 대본·stdin로깅) 동시 변경. Gemma 대조회차 미수행 -> "H1b 감소가 모델 탓"이라 단정 못 함.
