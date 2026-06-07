@@ -49,3 +49,11 @@
 - 새 발견 — 오류의 채널 이동: exit0 79칸 중 24칸이 오류를 stderr 예외가 아니라 stdout 반환값으로 삼킴. 예: {'success':False,'error':...} / Unauthorized / Insufficient stock / Payment failed. 코드 신호: broad except Exception 47/90, except->print 62/90. 강한 모델은 계약위반·값오류를 raise가 아니라 return으로 처리. H1b/H1c가 사라진 게 아니라 예외->반환값, stderr->stdout으로 이동했을 가능성.
 - 관측 천장 3차 이동: (1)메뉴앞EOF(죽음) -> (2)exit0가짜(우아한 무동작, vtx1) -> (3)예외->반환값(오류 삼킴, vtx_2~10). 이제 반환값/stdout 의미검증 없이는 깸 관측 불가.
 - 인과 교란 명시: 모델(Gemma->Gemini)과 파이프라인(H4 대본·stdin로깅) 동시 변경. Gemma 대조회차 미수행 -> "H1b 감소가 모델 탓"이라 단정 못 함.
+
+## §8 Q5 — 삼킨 24칸 분류 (코드 변경 0, runs.jsonl 재생, 2026-06-07)
+- 방법: vtx_2~10 가짜 80행 제외 → 진짜 90칸, exit0 79칸. 삼킴 신호로 ≈21칸 좁힘(§7의 24와 동일 현상). generated_files 직독 + import 정합 대조로 H1b/H1c 분류.
+- 결과: 삼킨 오류 중 H1b = 0건. 자동분류 H1b 후보 2건은 다중행 import 괄호 오인 거짓양성(직독 시 계약 정합).
+- 나머지 전부 H1c/의도된 정상 도메인 거부(Unauthorized·Insufficient·not recognized). stdin이 실제 메뉴 주행이라 코드는 돌고 정당히 거부함.
+- 분포: C·D·E 편중, A·B 거의 없음.
+- 해석(Q5 답): 삼킴 = 숨은 H1b 아님. dict 수렴으로 H1b 애초 미발생(vtx1 E1 비재현과 일치). 표면 H1b 0은 채널 은폐보다 진짜 부재. §7 "예외→반환값" 가설은 H1c엔 맞지만 H1b 사례 0.
+- Q6 함의: 검증기로도 건질 숨은 H1b 없음 → "정상 거부 vs 진짜 깸" 구분 관측 도구로 재설정.
