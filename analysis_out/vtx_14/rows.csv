@@ -1,0 +1,21 @@
+task_id,round,cell,cat,sub,exit,g,stderr_full,created_at
+vtx_14_A1,14,A1,argparse,,2,3,"usage: main.py [-h] x1 y1 x2 y2
+main.py: error: the following arguments are required: x1, y1, x2, y2
+",2026-06-06T20:29:18.920782-08:00
+vtx_14_A2,14,A2,exit0가짜,,0,4,,2026-06-06T20:29:41.606585-08:00
+vtx_14_B1,14,B1,argparse,,2,4,"usage: main.py [-h] filepath {add,delete,list,sum} ...
+main.py: error: the following arguments are required: filepath, command
+",2026-06-06T20:30:15.440153-08:00
+vtx_14_B2,14,B2,exit0가짜,,0,3,,2026-06-06T20:31:00.496388-08:00
+vtx_14_C1,14,C1,메뉴앞EOF,,1,4,"Traceback (most recent call last):
+  File ""/tmp/aaa_run_5vr43hai/main.py"", line 121, in <module>
+    main()
+  File ""/tmp/aaa_run_5vr43hai/main.py"", line 20, in main
+    choice = input(""Select an option (1-8): "").strip()
+EOFError: EOF when reading a line
+",2026-06-06T20:31:55.681914-08:00
+vtx_14_C2,14,C2,exit0가짜,,0,3,,2026-06-06T20:33:12.560602-08:00
+vtx_14_D1,14,D1,exit0가짜,,0,3,,2026-06-06T20:34:18.406685-08:00
+vtx_14_D2,14,D2,exit0가짜,,0,3,,2026-06-06T20:35:16.634667-08:00
+vtx_14_E1,14,E1,exit0가짜,,0,3,,2026-06-06T20:35:59.648507-08:00
+vtx_14_E2,14,E2,exit0가짜,,0,5,,2026-06-06T20:36:51.510198-08:00

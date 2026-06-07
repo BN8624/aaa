@@ -1,0 +1,52 @@
+===== arun vtx_14  Sun Jun  7 04:29:18 UTC 2026 =====
+Already up to date.
+----- batch -----
+=== batch 시작: 10개 (A~E × 2) ===
+    runs_path=runs.jsonl, timeout=20s
+    stdin: 공통 더미 주입(길1) '1\n테스트\n2\n3\n2\n1\n0\n'
+    대본: 태스크별 생성(길B) — 실패 시 위로 fallback
+
+[1/10] vtx_14_A1 (칸 A) 시작 — 2D 점 사이 거리 계산 CLI. 두 점의 좌표를 받아…
+      → exit=2 status=failed files: d3/g3 (23s)
+      stderr: usage: main.py [-h] x1 y1 x2 y2
+main.py: error: the following arguments are required: x1, y1, x2, y2
+
+[2/10] vtx_14_A2 (칸 A) 시작 — 시각(시:분:초) 덧셈 CLI. 두 시각을 받아 합을 …
+      → exit=0 status=done files: d4/g4 (34s)
+[3/10] vtx_14_B1 (칸 B) 시작 — 2D 벡터 모음 관리. 벡터 추가/삭제/목록/합 벡터 …
+      → exit=2 status=failed files: d4/g4 (45s)
+      stderr: usage: main.py [-h] filepath {add,delete,list,sum} ...
+main.py: error: the following arguments are required: filepath, c
+[4/10] vtx_14_B2 (칸 B) 시작 — 색상 팔레트 관리. RGB 색 추가/수정/삭제/목록. …
+      → exit=0 status=done files: d3/g3 (55s)
+[5/10] vtx_14_C1 (칸 C) 시작 — 도형 캔버스. 원/사각형을 좌표·크기로 추가하고, 전체…
+      → exit=1 status=failed files: d4/g4 (77s)
+      stderr: Traceback (most recent call last):
+  File "/tmp/aaa_run_5vr43hai/main.py", line 121, in <module>
+    main()
+  File "/tmp
+[6/10] vtx_14_C2 (칸 C) 시작 — 일정 블록 관리. 시작·끝 시각 블록 추가, 겹치는 일…
+      → exit=0 status=done files: d3/g3 (66s)
+[7/10] vtx_14_D1 (칸 D) 시작 — 입자 이동 시뮬레이션 한 스텝. 위치·속도를 가진 입자…
+      → exit=0 status=done files: d3/g3 (58s)
+[8/10] vtx_14_D2 (칸 D) 시작 — 유한상태기계 실행기. 상태·전이 정의를 받아 이벤트 입…
+      → exit=0 status=done files: d3/g3 (43s)
+[9/10] vtx_14_E1 (칸 E) 시작 — 3D 변환 파이프라인. 이동/회전/스케일 행렬을 합성해…
+      → exit=0 status=done files: d3/g3 (52s)
+[10/10] vtx_14_E2 (칸 E) 시작 — 물리 충돌 해결. 질량·속도를 가진 물체들의 충돌을 운…
+      → exit=0 status=done files: d5/g5 (72s)
+
+=== batch 끝: 10/10 실행됨 ===
+
+--- 칸별 관측(화면용, runs.jsonl엔 사실만 따로 적힘) ---
+    A: ['exit2=', 'exit0=']
+    B: ['exit2=', 'exit0=']
+    C: ['exit1=', 'exit0=']
+    D: ['exit0=', 'exit0=']
+    E: ['exit0=', 'exit0=']
+
+    (exit0=정상종료지만 '동작'은 아닐 수 있음 — argparse 무동작 등. 줄 전문을 사람이 읽어라)
+    전체 로그: cat runs.jsonl  (또는 tail)
+----- analyze -----
+[완료] analysis_out/vtx_14/ 4파일
+  실행 10 | H1b 0 | 애매 0줄
