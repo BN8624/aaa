@@ -1,0 +1,8 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== vtx_12_C1 [기타예외] exit=1 g=3
+File "/tmp/aaa_run_b_hkpqye/main.py", line 32
+    print(Successfully added record: {args.type.capitalize()} of {args.amount} for '{args.description}')
+          ^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?
+

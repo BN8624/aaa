@@ -44,3 +44,12 @@ main.py: error: the following arguments are required: value, direction
 ----- analyze -----
 [완료] analysis_out/vtx_11/ 4파일
   실행 10 | H1b 0 | 애매 0줄
+[main bcc4366] run vtx_11
+ 6 files changed, 235 insertions(+)
+ create mode 100644 analysis_out/vtx_11/report.txt
+ create mode 100644 analysis_out/vtx_11/review.txt
+ create mode 100644 analysis_out/vtx_11/rows.csv
+ create mode 100644 analysis_out/vtx_11/summary.json
+ create mode 100644 runlog_vtx_11.txt
+To github.com:BN8624/aaa.git
+   01e05d9..bcc4366  main -> main
