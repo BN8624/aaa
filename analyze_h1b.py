@@ -17,12 +17,37 @@ def h1b_type(se):
     if "NameError" in se: return "계약(NameError)"
     return None
 
+def generated_main(rec):
+    gf = rec.get("generated_files") or {}
+    if isinstance(gf, dict):
+        return str(gf.get("main.py") or "")
+    if isinstance(gf, list):
+        for item in gf:
+            if isinstance(item, dict) and item.get("name") == "main.py":
+                return str(item.get("content") or item.get("code") or "")
+    return ""
+
+def stdin_text(rec):
+    stdin = rec.get("stdin")
+    if stdin is None: return ""
+    return stdin if isinstance(stdin, str) else str(stdin)
+
+def has_input_loop(code):
+    return bool(re.search(r"\binput\s*\(|while\s+(True|1)\s*:", code))
+
+def stdin_has_exit(stdin):
+    return any(line.strip().lower() in {"exit","quit"} for line in stdin.splitlines())
+
 def classify(rec):
     se = rec.get("stderr") or ""; so = rec.get("stdout") or ""
     ec = rec.get("exit_code"); g = len(rec.get("generated_files") or [])
     if g == 0: return ("코더빈손","")
     t = h1b_type(se)
     if t: return ("H1b", t)
+    if "Invalid JSON input" in se:
+        return ("STDIN_FORMAT_MISMATCH","Invalid JSON input")
+    if "TimeoutExpired" in se and has_input_loop(generated_main(rec)) and not stdin_has_exit(stdin_text(rec)):
+        return ("STDIN_EXIT_MISMATCH","input loop without exit/quit")
     if "EOFError" in se:
         return ("메뉴앞EOF","") if so.strip()=="" else ("메뉴중EOF","")
     if "usage:" in se or "the following arguments are required" in se \
@@ -50,7 +75,7 @@ def main():
     os.makedirs(outdir, exist_ok=True)
 
     rows=[]
-    for line in open("runs.jsonl"):
+    for line in open("runs.jsonl", encoding="utf-8"):
         line=line.strip()
         if not line: continue
         try: rec=json.loads(line)
@@ -69,14 +94,14 @@ def main():
     cells=sorted({r["cell"] for r in rows})
     rounds=sorted({r["round"] for r in rows}, key=int)
 
-    with open(os.path.join(outdir,"rows.csv"),"w",newline="") as f:
+    with open(os.path.join(outdir,"rows.csv"),"w",newline="",encoding="utf-8") as f:
         w=csv.writer(f)
         w.writerow(["task_id","round","cell","cat","sub","exit","g","stderr_full","created_at"])
         for r in sorted(rows,key=lambda x:(x["cell"],x["round"])):
             w.writerow([r["task_id"],r["round"],r["cell"],r["cat"],r["sub"],
                         r["exit"],r["g"],r["stderr_full"],r["created_at"]])
 
-    with open(os.path.join(outdir,"review.txt"),"w") as f:
+    with open(os.path.join(outdir,"review.txt"),"w",encoding="utf-8") as f:
         amb=[r for r in rows if r["cat"] in AMBIGUOUS]
         f.write(f"# 분류 애매/확인필요 {len(amb)}줄 (전문). 분류기 점검은 여기부터.\n\n")
         for r in amb:
@@ -108,7 +133,7 @@ def main():
             "h1b":sum(1 for r in lst if r["cat"]=="H1b"),
             "h1b_types":dict(Counter(r["sub"] for r in lst if r["cat"]=="H1b")),
             "cats":dict(Counter(r["cat"] for r in lst))}
-    with open(os.path.join(outdir,"summary.json"),"w") as f:
+    with open(os.path.join(outdir,"summary.json"),"w",encoding="utf-8") as f:
         json.dump(summary,f,ensure_ascii=False,indent=2)
 
     L=[f"분석: {label} | {len(rows)}실행 | 칸 {len(cells)} 회차 {rounds}",
@@ -137,7 +162,7 @@ def main():
         for k,v in sorted(exec_h1b_types.items(),key=lambda x:-x[1]):
             L.append(f"      {k:>18}: {v}")
     L+=["\n"+"="*50,"회차단위(칸×회차 H1b 노출)","="*50,f"  {rh}/{rt}"]
-    open(os.path.join(outdir,"report.txt"),"w").write("\n".join(L)+"\n")
+    open(os.path.join(outdir,"report.txt"),"w",encoding="utf-8").write("\n".join(L)+"\n")
 
     print(f"[완료] {outdir}/ 4파일")
     print(f"  실행 {len(rows)} | H1b {summary['exec']['h1b']} | 애매 {sum(1 for r in rows if r['cat'] in AMBIGUOUS)}줄")

@@ -19,8 +19,8 @@
   "exec": {
     "tally": {
       "exit0가짜": 8,
-      "timeout": 1,
-      "기타예외": 1
+      "STDIN_EXIT_MISMATCH": 1,
+      "STDIN_FORMAT_MISMATCH": 1
     },
     "h1b": 0,
     "h1b_types": {}
@@ -68,7 +68,7 @@
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "timeout": 1
+        "STDIN_EXIT_MISMATCH": 1
       }
     },
     "C2": {
@@ -108,7 +108,7 @@
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "기타예외": 1
+        "STDIN_FORMAT_MISMATCH": 1
       }
     }
   }
