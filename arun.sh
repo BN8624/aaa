@@ -7,6 +7,8 @@ log="runlog_${tag}.txt"
   echo "===== arun ${tag}  $(date -u) ====="
   git pull --rebase --autostash
   echo "----- batch -----"; python3 batch.py "$tag"
+  # analyze = 정적분류 + verify_channel 재실행(alive/reject/broken/silent/inputmismatch).
+  # 재실행 생략하려면 끝에 --no-replay.
   echo "----- analyze -----"; python3 analyze_h1b.py "$tag"
 } 2>&1 | tee "$log"
 git add -A
