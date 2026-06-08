@@ -1,0 +1,56 @@
+# 분류 애매/확인필요 6줄 (전문). 분류기 점검은 여기부터.
+
+=== vtx_21_A1 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+=== vtx_21_A2 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+=== vtx_21_B1 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+=== vtx_21_B2 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+=== vtx_21_C1 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+=== vtx_21_C2 [코더빈손] exit=-1 g=0
+RuntimeError: Vertex HTTPError: 429 {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+

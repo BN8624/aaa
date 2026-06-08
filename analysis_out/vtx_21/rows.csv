@@ -1,0 +1,53 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_21_A1,21,A1,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T05:58:07.431101-08:00
+vtx_21_A2,21,A2,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T05:59:16.306192-08:00
+vtx_21_B1,21,B1,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T05:59:49.028487-08:00
+vtx_21_B2,21,B2,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T06:00:21.766660-08:00
+vtx_21_C1,21,C1,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T06:00:54.497755-08:00
+vtx_21_C2,21,C2,코더빈손,,-1,fake,,,,0,"RuntimeError: Vertex HTTPError: 429 {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-08T06:01:27.242966-08:00
+vtx_21_D1,21,D1,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T06:01:59.990749-08:00
+vtx_21_D2,21,D2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T06:03:29.208248-08:00
+vtx_21_E1,21,E1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T06:05:37.895320-08:00
+vtx_21_E2,21,E2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T06:06:17.833777-08:00
