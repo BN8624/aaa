@@ -1,0 +1,12 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_20_A1,20,A1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T05:29:01.856986-08:00
+vtx_20_A2,20,A2,exit0가짜,,0,alive,stdout-ok,,0,2,,2026-06-08T05:29:52.452859-08:00
+vtx_20_B1,20,B1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T05:30:18.426585-08:00
+vtx_20_B2,20,B2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T05:31:15.195268-08:00
+vtx_20_C1,20,C1,기타예외,,1,broken,stderr-exc,,1,4,"Error: Unknown AST node structure: {'type': 'Program', 'body': [{'type': 'BinaryExpression', 'operator': '+', 'left': {'type': 'NumericLiteral', 'value': 3}, 'right': {'type': 'BinaryExpression', 'operator': '*', 'left': {'type': 'NumericLiteral', 'value': 5}, 'right': {'type': 'BinaryExpression', 'operator': '-', 'left': {'type': 'NumericLiteral', 'value': 10}, 'right': {'type': 'NumericLiteral', 'value': 2}}}}]}
+",2026-06-08T05:32:23.197305-08:00
+vtx_20_C2,20,C2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T05:33:32.527479-08:00
+vtx_20_D1,20,D1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T05:34:20.856127-08:00
+vtx_20_D2,20,D2,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T05:35:08.827828-08:00
+vtx_20_E1,20,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T05:36:26.405753-08:00
+vtx_20_E2,20,E2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T05:37:01.331627-08:00
