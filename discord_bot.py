@@ -36,6 +36,13 @@ import subprocess
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
+# Windows cp949 콘솔에서 한글/기호 print 크래시 방지(봇 진입점에서 1회).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 import discord
 from discord import app_commands
 from dotenv import load_dotenv

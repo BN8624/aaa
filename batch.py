@@ -15,6 +15,16 @@
 import time
 import sys
 
+# Windows 콘솔 기본 cp949에선 한글·화살표·em-dash 등 print가 즉시 크래시한다
+# (vtx_19 빈손 사고: batch.py:75 '\u2014'에서 UnicodeEncodeError로 생성 0칸).
+# 출력 스트림을 UTF-8로 재설정해 모든 진행 메시지를 안전하게(인코딩 무관) 만든다.
+# 관측·생성 로직 불변, 화면 출력 인코딩만 교정.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 from run import run_task
 from limiter import RPDExceeded
 

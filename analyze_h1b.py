@@ -11,6 +11,13 @@
 import json, re, sys, os, subprocess, csv
 from collections import defaultdict, Counter
 
+# Windows cp949 콘솔에서 한글/기호 print 크래시 방지(진입점에서 1회).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 # Q8 통합: 재실행 관측기. import 실패해도 정적 분석은 돌게 가드.
 try:
     import verify_channel as vc
