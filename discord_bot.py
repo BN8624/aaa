@@ -264,6 +264,70 @@ def start_background_task(task: str, channel: str = None, mode: str = "pipeline"
 # 파이프라인 러너 (별도 프로세스로 실행됨 -- arun.sh 6단계 재현)
 # ----------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------
+# 회차 완료 알림 (정본 §10: 판단 전달용 웹훅, 본문 20줄 이내, 의존성 0=urllib)
+#   - URL은 환경변수 DISCORD_WEBHOOK_URL (키처럼 취급, 커밋 금지).
+#   - 미설정이면 조용히 건너뜀(파이프라인 안 깨짐).
+#   - 본문은 로그가 아니라 "지금 가서 볼 가치 있나" 판단에 필요한 최소 정보.
+# ----------------------------------------------------------------------------
+
+def _build_run_summary(tag: str) -> str:
+    """analysis_out/<tag>/summary.json 을 읽어 폰 판단용 20줄 이내 요약 생성."""
+    import json as _json
+    sj = _CONFIG["root"] / "analysis_out" / tag / "summary.json"
+    try:
+        j = _json.loads(sj.read_text(encoding="utf-8"))
+    except Exception:
+        # 분석 산출 없음(예: batch 빈손) — 회차 자체가 비었음을 알린다.
+        return (f"⚠️ [{tag}] 분석 결과 없음 — batch가 0칸이거나 분석 실패.\n"
+                f"재시도 가치: 높음(빈손 원인 확인 필요). 추천: SSH에서 로그 확인.")
+    n = j.get("n_rows", 0)
+    h1b = j.get("exec", {}).get("h1b", 0)
+    rep = j.get("replay", {})
+    rs = rep.get("runstate", {})
+    broken = rs.get("broken", 0)
+    inmis = rs.get("inputmismatch", 0)
+    alive = rs.get("alive", 0)
+    reject = rs.get("reject", 0)
+    # retry_value / recommended_action: 규칙으로 가르고, 애매하면 사람 판단(§10·14장).
+    if n == 0:
+        retry, action = "높음", "빈손 — SSH 확인"
+    elif broken > 0:
+        retry, action = "높음(broken 발생)", "broken 칸 전수검토(채널불일치 vs 데이터계약 vs H1b)"
+    elif h1b > 0:
+        retry, action = "높음(H1b 노출)", "H1b 칸 코드 직독 — 가설 핵심"
+    else:
+        retry, action = "낮음(alive/reject뿐, 깸 없음)", "기록만 — 다음 회차로"
+    lines = [
+        f"✅ [{tag}] 회차 완료 · {n}실행",
+        f"H1b: {h1b}  |  재실행: alive {alive} / reject {reject} / broken {broken} / inputmismatch {inmis}",
+        f"재시도 가치: {retry}",
+        f"추천: {action}",
+        f"로그: analysis_out/{tag}/rows.csv (전문은 SSH)",
+    ]
+    return "\n".join(lines)
+
+
+def _notify_webhook(tag: str):
+    """회차 완료 시 디스코드 웹훅으로 요약 1회 POST. URL 없으면 건너뜀."""
+    import json as _json
+    import urllib.request as _ur
+    url = os.environ.get("DISCORD_WEBHOOK_URL", "").strip()
+    if not url:
+        print("[알림] DISCORD_WEBHOOK_URL 미설정 — 웹훅 건너뜀", flush=True)
+        return
+    body = _build_run_summary(tag)
+    payload = _json.dumps({"content": f"```\n{body}\n```"}).encode("utf-8")
+    req = _ur.Request(url, data=payload,
+                      headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with _ur.urlopen(req, timeout=15) as resp:
+            print(f"[알림] 웹훅 전송 완료 (HTTP {resp.status})", flush=True)
+    except Exception as e:
+        # 알림 실패가 회차 결과를 덮지 않게 — 로그만 남기고 통과.
+        print(f"[알림] 웹훅 전송 실패(무시): {type(e).__name__}: {e}", flush=True)
+
+
 def _run_step(args, label):
     print(f"\n----- {label} -----", flush=True)
     print(f"$ {' '.join(args)}", flush=True)
@@ -307,6 +371,8 @@ def run_pipeline(tag: str) -> int:
         push_rc = _run_step(["git", "push"], "git push (retry)")
 
     print(f"\n>>> DONE {tag} (읽을 것: analysis_out/{tag}/rows.csv)", flush=True)
+    # 정본 §10: 회차 끝나면 폰으로 판단 정보 통지(웹훅 미설정 시 자동 skip).
+    _notify_webhook(tag)
     return 0
 
 

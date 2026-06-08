@@ -96,3 +96,13 @@
     → §10 inputmismatch 관측의 연장. broken 라벨이 곧 깸 아님을 통합 분류기가 교차표(cat×runstate)로 노출. Q8 “실패=실행채널 문제?” 쪽 증거 누적.
 - 운영 발견(Windows): 통합 검증 중 verify_channel.load()가 Windows 기본 cp949로 runs.jsonl 읽다 한글에서 크래시 → 봇 /검증 그간 전면 불능이던 것 발견·수정(UTF-8 명시). 재실행 subprocess IO도 UTF-8 강제(PYTHONUTF8 주입) — 모델 코드 한글 출력이 cp949로 깨져 ‘가짜 broken’ 나던 것 차단. 수정 전 봇 vtx_17 broken×1 → 수정 후 alive7/reject3로 Linux와 일치(4중 검증: Win/Linux × 단독/통합 동일). 분류기 OS 무관 안정 확인.
 - 결론: vtx_14~17 닫음. H1b 0 유지(누적 강화), 비-alive는 전부 채널 불일치/정당 거부지 깸 아님. 통합 분류기로 broken을 채널 불일치와 분리 관측하는 체계 확립.
+
+## §12 vtx_20 — broken의 성격이 stdin채널 → 데이터계약으로 첫 이동 (2026-06-08)
+
+- 맥락: cp949 print 크래시 수정(batch/analyze/discord_bot 진입점 stdout UTF-8 강제) 후 봇에서 정상 완주한 첫 회차. vtx_19는 batch.py:75 em-dash print가 cp949에서 죽어 0칸 빈손(폐기, §3 tag 재사용 금지).
+- 결과: 정적 H1b 0/10 → vtx_13~20 누적 60칸 연속 H1b 0(dict 수렴 본성 계속). 재실행 alive 9 / broken 1.
+- ★ broken 1칸(C1, 산술식 평가기) = 지금까지와 다른 종류. 정적 cat ‘기타예외’(애매)였는데 통합 분류기가 broken/stderr-exc로 해소. run_h1b 플래그 없음 → H1b 아님.
+  - 정체: parser가 만든 AST 스키마(`{'type':'Program','body':[{'type':'BinaryExpression',...}]}`, ESTree류)를 evaluator가 다른 스키마(`{'type':'unary/binary','op','operand'}`)로 기대 → `ValueError: Unknown AST node structure`로 런타임 사망. import·시그니처는 통과, 주고받는 dict의 내부 구조(데이터 계약)가 불일치.
+  - §11까지 broken은 전부 stdin 채널(EOF/timeout/JSON포맷). vtx_20 broken은 채널이 아니라 **파일 간 자료구조 형식 불일치** — 정본 §5 “시그니처만으론 부족, 데이터 계약(input/output_schema)까지”가 예고한 실패의 첫 실측. 분류상 H1c(런타임 값/상태) 쪽.
+- ★ 해석(가설, 단일 사례 — 누적 필요): dict 수렴이 H1b(멤버계약 충돌)는 구조적으로 막지만, 그 대가로 깸이 H1c(dict 키 구조 불일치)로 옮겨갈 수 있다. H1b를 피한 비용이 데이터계약 쪽에 나타나는 모양새. Q8 “실패=실행채널 문제?”의 부분 반례 — 이 깸은 실행채널이 아니라 모델 간 설계(스키마) 불일치.
+- 미결/다음: 데이터계약 broken이 재현되는지(vtx_21+ 누적), C 도메인(파서/평가기류)에서 더 잦은지 관측. §3대로 단일 회차로 단정 금지.
