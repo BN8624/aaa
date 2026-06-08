@@ -23,6 +23,24 @@
     "h1b": 0,
     "h1b_types": {}
   },
+  "replay": {
+    "n_replayed": 10,
+    "runstate": {
+      "reject": 3,
+      "alive": 7
+    },
+    "runchannel": {
+      "stdout-return": 3,
+      "stdout-ok": 7
+    },
+    "run_h1b_flags": 0,
+    "cat_x_runstate": {
+      "exit0가짜": {
+        "reject": 3,
+        "alive": 7
+      }
+    }
+  },
   "round": {
     "h1b_cells": 0,
     "total_cells": 10

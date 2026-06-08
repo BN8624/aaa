@@ -1,0 +1,24 @@
+{
+  "label": "vtx_19",
+  "n_rows": 0,
+  "cells": [],
+  "rounds": [],
+  "exec": {
+    "tally": {},
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "replay": {
+    "n_replayed": 0,
+    "runstate": {},
+    "runchannel": {},
+    "run_h1b_flags": 0,
+    "cat_x_runstate": {}
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 0
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {}
+}
