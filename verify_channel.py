@@ -32,7 +32,7 @@ H1B_PAT = re.compile(
 
 def load(path):
     rows = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for ln in f:
             ln = ln.strip()
             if ln:
@@ -88,9 +88,16 @@ def run_cell(r, timeout=20):
         for name, content in fs.items():
             # only write plain .py-ish names; skip pathological names
             safe = os.path.join(wd, os.path.basename(name))
-            with open(safe, 'w') as f:
+            with open(safe, 'w', encoding='utf-8') as f:
                 f.write(content)
-        kw = dict(cwd=wd, capture_output=True, text=True, timeout=timeout)
+        # Windows(cp949)에서 모델 코드의 한글 출력/소스가 깨져 재실행이
+        # 가짜 broken으로 분류되는 것 방지: 자식 IO를 UTF-8로 강제하고,
+        # 디코딩 실패는 죽지 말고 치환(errors='replace').
+        env = dict(os.environ)
+        env['PYTHONIOENCODING'] = 'utf-8'
+        env['PYTHONUTF8'] = '1'
+        kw = dict(cwd=wd, capture_output=True, text=True, timeout=timeout,
+                  encoding='utf-8', errors='replace', env=env)
         if stdin_input is None:
             kw['stdin'] = subprocess.DEVNULL
         else:
