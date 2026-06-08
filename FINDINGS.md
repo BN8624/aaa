@@ -82,3 +82,17 @@
 - 결론: 표면 H1b 0은 “과제가 안 불러서”가 아니라 **모델이 어떤 도메인이든 원시 자료구조(dict/list)로 수렴하는 본성**. vtx1 “dict 수렴” 가설이 통제된 도메인 변경으로 재확인. → progress Q5/§3 “진짜 부재” 쪽 강화.
 - 새 관측 — 입력채널 선택: 타입계약 도메인에서 모델이 stdin 메뉴 대신 argv CLI(argparse/sys.argv)를 더 자주 고름(vtx_13 A1·A2·B1). runner의 stdin 대본과 불일치해 exit≠0로 죽지만 이는 깸이 아니라 측정기-코드 입력채널 불일치.
 - 도구: verify_channel.py에 ‘inputmismatch’(argv-vs-stdin) 상태 추가 — argv CLI에 stdin 주입돼 죽은 칸을 broken에서 분리. vtx_13: broken 0/alive 6/reject 1/inputmismatch 3. vtx_2~10 회귀 영향 없음(alive 54/reject 25 불변).
+
+## §11 vtx_14~17 + analyzer 통합 (40칸, 2026-06-07~08)
+
+- 동기: vtx_14~17(40칸, 타입계약 도메인 연장)이 §10 이후 runs.jsonl엔 쌓였으나 미반영. 닫고 기록. 동시에 분석 도구를 통합(아래)해 재실행 분류로 한 번에 본다.
+- ★ 도구 통합(Q8 다음 한 수): analyze_h1b.py가 매 행을 verify_channel로 재실행해 정적 cat 옆에 실측 runstate(alive/reject/broken/silent/inputmismatch)+channel을 붙임. rows.csv 4열 추가, summary.json에 replay 블록(runstate·channel·cat×runstate 교차표), report.txt에 “추측 라벨이 무엇으로 풀렸나” 교차표. verify_channel 로직 그대로 호출(분류 1곳 유지). arun.sh analyze 단계가 이제 재실행 포함(–no-replay로 정적만). 회귀 없음: vtx_2~10 exit0 = alive54/reject25(=§9), vtx_13 = alive6/reject1/inputmismatch3(=§10) 재현.
+- ★ 핵심 결과(40칸): 정적 H1b 0/40 — §10의 “dict 수렴 → H1b 진짜 부재” 더 누적(이제 vtx_13~17 50칸 연속 H1b 0). dataclass/class 멤버계약 충돌 여전히 0.
+- 40칸 runstate 합계: alive 29 / reject 6 / inputmismatch 2 / broken 3. 회차별 — vtx_14 alive7·inputmismatch2·broken1, vtx_15 alive8·reject2, vtx_16 alive7·reject1·broken2, vtx_17 alive7·reject3.
+- ★ broken 3칸 전수 검토 = 전부 입력채널 불일치, 진짜 깸 0(run_h1b 플래그 0). 정체:
+  - vtx_14_C1: input()+while, stdin 대본 일찍 고갈 → EOFError(메뉴 주행 중 입력 부족).
+  - vtx_16_C1: argv+input+while, argv 기대인데 stdin 주입 → 무한루프 20s timeout.
+  - vtx_16_E2: stdin JSON 한 줄 기대인데 대본 멀티라인 → “Invalid JSON input”(코드의 정당한 거부에 가까움).
+    → §10 inputmismatch 관측의 연장. broken 라벨이 곧 깸 아님을 통합 분류기가 교차표(cat×runstate)로 노출. Q8 “실패=실행채널 문제?” 쪽 증거 누적.
+- 운영 발견(Windows): 통합 검증 중 verify_channel.load()가 Windows 기본 cp949로 runs.jsonl 읽다 한글에서 크래시 → 봇 /검증 그간 전면 불능이던 것 발견·수정(UTF-8 명시). 재실행 subprocess IO도 UTF-8 강제(PYTHONUTF8 주입) — 모델 코드 한글 출력이 cp949로 깨져 ‘가짜 broken’ 나던 것 차단. 수정 전 봇 vtx_17 broken×1 → 수정 후 alive7/reject3로 Linux와 일치(4중 검증: Win/Linux × 단독/통합 동일). 분류기 OS 무관 안정 확인.
+- 결론: vtx_14~17 닫음. H1b 0 유지(누적 강화), 비-alive는 전부 채널 불일치/정당 거부지 깸 아님. 통합 분류기로 broken을 채널 불일치와 분리 관측하는 체계 확립.
