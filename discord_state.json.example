@@ -1,0 +1,11 @@
+{
+  "running": false,
+  "task": "run",
+  "channel": "vtx_18",
+  "pid": null,
+  "started_at": "2026-06-08T12:00:00+09:00",
+  "finished_at": "2026-06-08T12:31:00+09:00",
+  "log_file": "logs/discord/run_vtx_18_20260608_120000.log",
+  "last_command": "/실행 vtx_18",
+  "last_exit_code": 0
+}
