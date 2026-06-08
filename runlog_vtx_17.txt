@@ -1,0 +1,43 @@
+===== arun vtx_17  Mon Jun  8 04:31:21 UTC 2026 =====
+Already up to date.
+----- batch -----
+=== batch 시작: 10개 (A~E × 2) ===
+    runs_path=runs.jsonl, timeout=20s
+    stdin: 공통 더미 주입(길1) '1\n테스트\n2\n3\n2\n1\n0\n'
+    대본: 태스크별 생성(길B) — 실패 시 위로 fallback
+
+[1/10] vtx_17_A1 (칸 A) 시작 — 이진 탐색 트리 CLI. 정수 키를 insert/fin…
+      → exit=0 status=done files: d3/g3 (48s)
+[2/10] vtx_17_A2 (칸 A) 시작 — 괄호 짝 검사 CLI. 한 줄 문자열을 받아 (), […
+      → exit=0 status=done files: d3/g3 (30s)
+[3/10] vtx_17_B1 (칸 B) 시작 — 방향 그래프 관리. 정점·간선 추가/삭제/목록, 한 정…
+      → exit=0 status=done files: d3/g3 (54s)
+[4/10] vtx_17_B2 (칸 B) 시작 — 태그 계층 관리. 부모-자식 태그 추가/삭제/목록, 한…
+      → exit=0 status=done files: d3/g3 (49s)
+[5/10] vtx_17_C1 (칸 C) 시작 — 산술식 평가기. 괄호와 +,-,*,/ 를 포함한 식을 …
+      → exit=0 status=done files: d4/g4 (49s)
+[6/10] vtx_17_C2 (칸 C) 시작 — S-식 평가기. (add 1 (mul 2 3)) 같은 …
+      → exit=0 status=done files: d4/g4 (60s)
+[7/10] vtx_17_D1 (칸 D) 시작 — 들여쓰기 트리 처리. 들여쓰기 텍스트를 계층 구조로 읽…
+      → exit=0 status=done files: d4/g4 (41s)
+[8/10] vtx_17_D2 (칸 D) 시작 — 표현식 트리 재작성. 식을 트리로 파싱한 뒤, 상수 부…
+      → exit=0 status=done files: d4/g4 (86s)
+[9/10] vtx_17_E1 (칸 E) 시작 — 그래프 연결요소 파이프라인. 무방향 그래프에서 연결요소…
+      → exit=0 status=done files: d4/g4 (38s)
+[10/10] vtx_17_E2 (칸 E) 시작 — 의존성 해소. 모듈 간 의존을 받아 위상정렬로 빌드 순…
+      → exit=0 status=done files: d3/g3 (62s)
+
+=== batch 끝: 10/10 실행됨 ===
+
+--- 칸별 관측(화면용, runs.jsonl엔 사실만 따로 적힘) ---
+    A: ['exit0=', 'exit0=']
+    B: ['exit0=', 'exit0=']
+    C: ['exit0=', 'exit0=']
+    D: ['exit0=', 'exit0=']
+    E: ['exit0=', 'exit0=']
+
+    (exit0=정상종료지만 '동작'은 아닐 수 있음 — argparse 무동작 등. 줄 전문을 사람이 읽어라)
+    전체 로그: cat runs.jsonl  (또는 tail)
+----- analyze -----
+[완료] analysis_out/vtx_17/ 4파일
+  실행 10 | H1b 0 | 애매 0줄

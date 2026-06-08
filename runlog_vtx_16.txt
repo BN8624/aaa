@@ -45,3 +45,13 @@ Already up to date.
 ----- analyze -----
 [완료] analysis_out/vtx_16/ 4파일
   실행 10 | H1b 0 | 애매 1줄
+[main 8bc2fbb] run vtx_16
+ 8 files changed, 264 insertions(+)
+ create mode 100644 analysis_out/vtx_15/verify_channel.txt
+ create mode 100644 analysis_out/vtx_16/report.txt
+ create mode 100644 analysis_out/vtx_16/review.txt
+ create mode 100644 analysis_out/vtx_16/rows.csv
+ create mode 100644 analysis_out/vtx_16/summary.json
+ create mode 100644 runlog_vtx_16.txt
+To github.com:BN8624/aaa.git
+   a9adfd2..8bc2fbb  main -> main
