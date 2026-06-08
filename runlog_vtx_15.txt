@@ -41,3 +41,12 @@ Already up to date.
 ----- analyze -----
 [완료] analysis_out/vtx_15/ 4파일
   실행 10 | H1b 0 | 애매 0줄
+[main a9adfd2] run vtx_15
+ 6 files changed, 228 insertions(+)
+ create mode 100644 analysis_out/vtx_15/report.txt
+ create mode 100644 analysis_out/vtx_15/review.txt
+ create mode 100644 analysis_out/vtx_15/rows.csv
+ create mode 100644 analysis_out/vtx_15/summary.json
+ create mode 100644 runlog_vtx_15.txt
+To github.com:BN8624/aaa.git
+   a5ea4a2..a9adfd2  main -> main

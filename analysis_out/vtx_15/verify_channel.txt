@@ -1,0 +1,14 @@
+task_id    state    channel        logged_exit  flag
+vtx_15_A1  reject   stdout-return      0        
+vtx_15_A2  alive    stdout-ok          0        
+vtx_15_B1  alive    stdout-ok          0        
+vtx_15_B2  alive    stdout-ok          0        
+vtx_15_C1  alive    stdout-ok          0        
+vtx_15_C2  alive    stdout-ok          0        
+vtx_15_D1  alive    stdout-ok          0        
+vtx_15_D2  alive    stdout-ok          0        
+vtx_15_E1  alive    stdout-ok          0        
+vtx_15_E2  reject   stdout-return      0        
+
+observable: {'reject': 2, 'alive': 8}
+channel   : {'stdout-return': 2, 'stdout-ok': 8}

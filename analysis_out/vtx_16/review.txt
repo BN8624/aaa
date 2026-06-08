@@ -1,0 +1,5 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== vtx_16_E2 [기타예외] exit=1 g=3
+Error: Invalid JSON input (Extra data: line 2 column 1 (char 2))
+
