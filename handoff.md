@@ -11,19 +11,20 @@
 
 ## 1. 현재 위치
 
-- **H1 (a/b/c) 종료.** H1b = 부재(Gemini 누적 ~130칸 표면 0, 진짜 부재 3중 확인). → 정본 리스크 레지스터 / FINDINGS §1~10.
+- **H1 (a/b/c) 종료.** H1b = 부재(Gemini 누적 표면 0, 진짜 부재 다중 확인). 이제 vtx_13~17 50칸 연속 H1b 0. → 정본 리스크 레지스터 / FINDINGS §1~11.
 - **Q7 (왜 dict 수렴) 종료.** 객체를 파일 내부 격리, 경계는 dict → 멤버 계약 충돌 구조적 미발생.
-- **Q8 (실패=실행채널 문제?) 진행 중 — 현재 주 질문.** stdin 대본 불일치·JSON 포맷·timeout·argv/stdin 채널 불일치. analyzer가 STDIN_EXIT_MISMATCH·STDIN_FORMAT_MISMATCH 분류 중.
+- **Q8 (실패=실행채널 문제?) 진행 중 — 현재 주 질문.** stdin 대본 불일치·JSON 포맷·timeout·argv/stdin 채널 불일치. **도구 갖춰짐**: analyzer가 매 회차 verify_channel 재실행 분류(alive/reject/broken/silent/inputmismatch)+채널을 자동 부착, broken vs 채널불일치 자동 분리. → FINDINGS §11.
 - 보류: H2(모델 통일로 비교군 소멸), H4(도커 미구현). 미착수: H3. → 정본 리스크 레지스터.
 
 ## 2. 다음 한 수 (하나만 고르고 그것만)
 
+직전 완료(2026-06-08): ①analyzer+verify_channel 통합 ✅ ②FINDINGS §11(vtx_14~17 닫음) ✅. 통합 검증 중 Windows cp949 버그(verify_channel) 발견·수정 → 분류기 OS 무관 안정.
+
 후보:
 
-1. **analyzer + verify_channel 통합** ★ 추천. 현재 analyze_h1b.py 단독은 `exit0가짜`로 뭉뚱그려 Q8 관점에서 거의 무의미. verify_channel(stdout 재생)을 매 회차 자동으로 태워 alive/reject/silent/broken로 풀어야 “Q8 실행 실패 분석기”가 완성. 도구 통합이라 절대 제약 무관(§3).
-- 남은 분류 갭: `H1B_IMPORT`/`H1B_SIGNATURE` 분리, `TIMEOUT_REAL`(무한루프 vs STDIN_EXIT), `RUNTIME_EXCEPTION` 통일.
-1. **FINDINGS §11 작성** — vtx_14~17(40칸, H1b 0) 아직 미반영. 닫고 기록.
-1. **Q8 새 회차** — vtx_19부터(키 확인 → arun.sh). vtx_18은 봇 테스트 잔재(빈손), 폐기.
+1. **Q8 새 회차 — vtx_19부터** ★ 추천. 이제 통합 분류기로 매 회차 broken vs 채널불일치가 자동 분리되니, 누적해 “실패=실행채널 문제?”에 답한다. 키 확인 → 봇 `/실행 vtx_19`(또는 arun.sh). vtx_18은 빈손 잔재, 폐기.
+1. **남은 분류 갭 메우기** — `H1B_IMPORT`/`H1B_SIGNATURE` 분리, `TIMEOUT_REAL`(무한루프) vs STDIN_EXIT, `RUNTIME_EXCEPTION` 통일. 정적 cat 쪽이라 데이터가 호명할 때만(§3).
+1. **stdin 대본/채널 정합** — §11 broken 3칸이 전부 채널 불일치였음. runner stdin 주입을 코드 입력방식(argv/stdin/json)에 맞출지 여부는 ‘깸 줄이는 수정’ 경계(§3) 검토 후 정본에서 결정.
 
 ## 3. 작업 체크리스트 (까먹지 말 것 — 정의는 정본/아래 참조)
 
@@ -47,9 +48,9 @@
 
 ## 4. repo 상태 · 읽는 법
 
-- `github.com/BN8624/aaa` (main). tip = `57cde53` (vtx_18 — 잔재).
+- `github.com/BN8624/aaa` (main). tip은 웹 Edit로 자주 바뀜 → 폰 `git fetch && git reset --hard origin/main`로 맞출 것. 직전 작업: analyze_h1b/verify_channel/arun.sh/FINDINGS 갱신(2026-06-08).
 - 모델: 전 역할 gemini-3.5-flash, Vertex REST, 키 VERTEX_API_KEY. → 정본 3장.
-- 핵심 도구: `analyze_h1b.py`(관측, rows.csv), `verify_channel.py`(stdout 재생→alive/reject/broken/silent/inputmismatch), `arun.sh`(회차 자동화+pull+analyze).
+- 핵심 도구: `analyze_h1b.py`(관측 — 정적 cat + **verify_channel 재실행 runstate 통합**, rows.csv/summary.json/report.txt에 alive/reject/broken/silent/inputmismatch+채널+cat×runstate 교차표; `--no-replay`로 정적만), `verify_channel.py`(재실행 분류 본체, 단독도 가능), `arun.sh`(회차 자동화+pull+analyze, analyze가 재실행 포함). ★Windows는 UTF-8 강제됨(cp949 크래시 수정 완료).
 - 읽기: repo 검색 안 됨 → `git clone` 후 task_id로 runs.jsonl grep (가장 확실), 또는 raw URL(push 후 1~2분 CDN 지연).
 
 -----
