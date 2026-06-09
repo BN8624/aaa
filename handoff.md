@@ -33,7 +33,8 @@
 
 후보:
 
-1. **H4 추가 회차(h4_6~) 누적** ★ 추천. 현재 20칸(h4_3+h4_5). 최소 3~5회차 더 쌓아야 비결정적 패턴 강화. `/도커실행 h4_6` 등. 봇 재시작 필요 시 사용자가 직접 PS 터미널에서 restart_bot2.ps1 실행 필수.
+1. **H4 추가 회차(h4_6~) 누적** ★ 추천. 현재 20칸(h4_3+h4_5). 최소 3~5회차 더 쌓아야 비결정적 패턴 강화. `/도커실행 h4_6` 등. 봇 재시작 필요 시 `/업데이트`(Docker 권한 유지) 또는 사용자 직접 PS에서 restart_bot2.ps1.
+   - **보류: argparse/sys.argv inputmismatch** — runner가 `python main.py` 인수 없이 실행 → argparse 프로그램 항상 exit=1 inputmismatch. vtx(host)도 동일 한계. 빈도 관측 후 수정 판단.
 1. **★ 인증경로/쿼터 확정(§13 미결, 근본 원인 후보)** — client.py가 `aiplatform.googleapis.com`에 `?key=`로 호출 중. 정식 Vertex는 OAuth/서비스계정 요구 → 이 키 경로가 유료 1티어 project quota를 안 타고 별도 버킷에 묶였을 가능성. GCP 콘솔 Quotas 확인.
 1. **H3/known_failures 실험 설계** — 되돌림 루프를 켜야 하므로 Docker 관측층 뒤가 자연스럽다.
 
