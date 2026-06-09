@@ -70,19 +70,24 @@ TASKS = [
 
 def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
               timeout: int = 20, tag: str = None,
-              stdin_input: str = DUMMY_STDIN, gen_stdin: bool = False) -> list:
+              stdin_input: str = DUMMY_STDIN, gen_stdin: bool = False,
+              use_docker: bool = False, docker_image: str = "python:3.11-slim",
+              docker_network: str = "none") -> list:
     """TASKS를 순서대로 run_task로 실행. 각 결과 요약을 모아 반환하고, runs.jsonl엔 run_task가 한 줄씩 쌓는다.
     tag가 있으면 task_id 앞에 붙여 회차를 구분(예 tag='r1' → r1_A1).
     stdin_input: 모든 태스크에 흘릴 공통 stdin(H2_RUN 길1). 기본 DUMMY_STDIN. None으로 주면 H1과 동일(EOF).
     gen_stdin: True면 H4_RUN 길B — 태스크별로 생성된 코드+acceptance에서 stdin 대본을 만들어 주입.
-               대본 생성 실패 시 위 stdin_input(=DUMMY_STDIN)으로 fallback."""
+               대본 생성 실패 시 위 stdin_input(=DUMMY_STDIN)으로 fallback.
+    use_docker: True면 H4 Docker 실측 runner를 사용. 기본 False는 기존 subprocess 실측."""
     results = []
     n = len(TASKS)
     print(f"=== batch 시작: {n}개 (A~E × 2) ===")
     print(f"    runs_path={runs_path}, timeout={timeout}s")
     print(f"    stdin: {'공통 더미 주입(길1)' if stdin_input is not None else 'EOF(H1 동일)'} "
           f"{repr(stdin_input) if stdin_input is not None else ''}")
-    print(f"    대본: {'태스크별 생성(길B) — 실패 시 위로 fallback' if gen_stdin else '고정(생성 없음)'}\n")
+    print(f"    대본: {'태스크별 생성(길B) — 실패 시 위로 fallback' if gen_stdin else '고정(생성 없음)'}")
+    print(f"    runner: {'docker' if use_docker else 'subprocess'}"
+          f"{f' image={docker_image} network={docker_network}' if use_docker else ''}\n")
 
     for i, (label, etype, req) in enumerate(TASKS, 1):
         task_id = f"{tag}_{label}" if tag else label
@@ -91,7 +96,9 @@ def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
         try:
             summary = run_task(req, expected_type=etype, task_id=task_id,
                                save_dir=save_dir, runs_path=runs_path, timeout=timeout,
-                               stdin_input=stdin_input, gen_stdin=gen_stdin)
+                               stdin_input=stdin_input, gen_stdin=gen_stdin,
+                               use_docker=use_docker, docker_image=docker_image,
+                               docker_network=docker_network)
             dt = time.time() - t0
             designed = summary["designed_files"]
             generated = summary["generated_files"]
@@ -123,6 +130,7 @@ def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
 if __name__ == "__main__":
     import os
     import json
+    import argparse
 
     if not os.environ.get("VERTEX_API_KEY"):
         print("✗ VERTEX_API_KEY 없음. .bashrc 확인.")
@@ -130,8 +138,21 @@ if __name__ == "__main__":
 
     # 실제 데이터는 ~/aaa/runs.jsonl에 쌓는다(.gitignore에 있어 커밋 안 됨 — §14).
     # 회차 태그를 시각으로 붙여 재실행해도 task_id가 안 겹치게.
-    tag = sys.argv[1] if len(sys.argv) > 1 else "r" + time.strftime("%m%d")
-    results = run_batch(runs_path="runs.jsonl", tag=tag, gen_stdin=True)   # H4 길B 켬
+    parser = argparse.ArgumentParser(description="Run aaa batch measurements.")
+    parser.add_argument("tag", nargs="?", default="r" + time.strftime("%m%d"))
+    parser.add_argument("--docker", action="store_true", help="use Docker runner for H4 measurement")
+    parser.add_argument("--docker-image", default="python:3.11-slim")
+    parser.add_argument("--docker-network", default="none")
+    args = parser.parse_args()
+
+    results = run_batch(
+        runs_path="runs.jsonl",
+        tag=args.tag,
+        gen_stdin=True,
+        use_docker=args.docker,
+        docker_image=args.docker_image,
+        docker_network=args.docker_network,
+    )   # H4 길B 켬
 
     # 끝나고 분포를 칸별로 한눈에(이건 화면 요약 — 로그엔 비율 저장 안 함, §3).
     # '사실 나열'이지 성공률 계산이 아니다: 칸별로 exit_code와 d/g 일치만 보여준다.

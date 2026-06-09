@@ -1,0 +1,135 @@
+{
+  "label": "h4_1",
+  "n_rows": 10,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
+  ],
+  "rounds": [
+    "1"
+  ],
+  "exec": {
+    "tally": {
+      "기타예외": 10
+    },
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "replay": {
+    "n_replayed": 10,
+    "runstate": {
+      "reject": 1,
+      "inputmismatch": 1,
+      "alive": 8
+    },
+    "runchannel": {
+      "stdout-return": 1,
+      "argv-vs-stdin": 1,
+      "stdout-ok": 8
+    },
+    "run_h1b_flags": 0,
+    "static_h1b_false_positive": 0,
+    "cat_x_runstate": {
+      "기타예외": {
+        "reject": 1,
+        "inputmismatch": 1,
+        "alive": 8
+      }
+    }
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 10
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "A2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "B1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "B2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "C1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "C2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "D1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "D2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "E1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "E2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    }
+  }
+}

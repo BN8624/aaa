@@ -20,13 +20,15 @@ from limiter import Limiter
 from state import TaskState
 from planner import make_design
 from coder import coding_stage
-from runner import run_in_subprocess
+from runner import run_in_docker, run_in_subprocess
 
 
 def run_task(requirement: str, *, expected_type: str = None,
              task_id: str = None, save_dir: str = ".",
              runs_path: str = "runs.jsonl", timeout: int = 20,
-             stdin_input: str = None, gen_stdin: bool = False) -> dict:
+             stdin_input: str = None, gen_stdin: bool = False,
+             use_docker: bool = False, docker_image: str = "python:3.11-slim",
+             docker_network: str = "none") -> dict:
     """한 태스크를 직진 1회 실행하고 runs.jsonl에 결과 한 줄을 남긴다.
 
     requirement:   사용자 요구사항 텍스트(planner에 넘어가는 유일한 입력).
@@ -74,12 +76,23 @@ def run_task(requirement: str, *, expected_type: str = None,
             from scripter import make_input
             stdin_input = make_input(design, codes, limiter=limiter) or stdin_input
 
-        # ④ 실행 (subprocess, 격리 아님 §1) — 실측. ③ 정합성검토는 v0 밖이라 건너뜀.
-        state.stage = "run"
+        # ④ 실행 — H4는 Docker 실측을 선택적으로 켠다. 기본값은 기존 subprocess라
+        # 이전 vtx 계열 측정과 비교 가능성을 유지한다.
+        state.stage = "docker" if use_docker else "run"
         state.save()
         entry = design.get("entry_point") or "main.py"
-        run_result = run_in_subprocess(codes, entry, timeout=timeout,
-                                       stdin_input=stdin_input)
+        requirements = design.get("requirements", [])
+        if use_docker:
+            run_result = run_in_docker(
+                codes, requirements, entry,
+                timeout=timeout,
+                stdin_input=stdin_input,
+                image=docker_image,
+                network=docker_network,
+            )
+        else:
+            run_result = run_in_subprocess(codes, entry, timeout=timeout,
+                                           stdin_input=stdin_input)
 
         exit_code = run_result["exit_code"]
         stderr = run_result["stderr"]

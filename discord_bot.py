@@ -214,6 +214,7 @@ def start_background_task(task: str, channel: str = None, mode: str = "pipeline"
     백그라운드 작업 시작. 즉시 (state, log_path) 반환.
     mode:
       "pipeline" : /실행 - arun.sh 6단계 재현 (runner 스크립트를 subprocess로 기동)
+      "pipeline_docker" : /도커실행 - batch.py --docker 를 쓰는 H4 실측 파이프라인
       "pipeline_many" : /연속실행 - 여러 태그를 같은 러너에서 순차 실행
       "analyze"  : /분석 - analyze_h1b.py
       "verify"   : /검증 - verify_channel.py runs.jsonl <tag>
@@ -225,6 +226,8 @@ def start_background_task(task: str, channel: str = None, mode: str = "pipeline"
         # arun.sh 6단계를 재현하는 러너를 별도 프로세스로 띄운다.
         # 이 파일(discord_bot.py) 자신을 러너 모드로 재실행 -> bash 불필요.
         cmd = [sys.executable, str(Path(__file__).resolve()), "--pipeline", channel]
+    elif mode == "pipeline_docker":
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--pipeline-docker", channel]
     elif mode == "pipeline_many":
         tags = [t for t in str(channel or "").split() if t]
         cmd = [sys.executable, str(Path(__file__).resolve()), "--pipeline-many", *tags]
@@ -354,7 +357,7 @@ def _run_step(args, label):
     return r.returncode
 
 
-def run_pipeline(tag: str) -> int:
+def run_pipeline(tag: str, *, use_docker: bool = False) -> int:
     """
     arun.sh 와 동일한 의미의 전체 파이프라인.
       1. git pull --rebase --autostash
@@ -367,12 +370,16 @@ def run_pipeline(tag: str) -> int:
     stdout/stderr는 호출 측에서 로그 파일로 리다이렉트된다.
     """
     py = sys.executable
-    print(f"===== 실행 파이프라인 {tag}  {datetime.now(timezone.utc).isoformat()} =====", flush=True)
+    mode_label = "도커 실행 파이프라인" if use_docker else "실행 파이프라인"
+    print(f"===== {mode_label} {tag}  {datetime.now(timezone.utc).isoformat()} =====", flush=True)
 
     # 1. git pull --rebase --autostash
     _run_step(["git", "pull", "--rebase", "--autostash"], "git pull")
     # 2. batch.py
-    _run_step([py, "batch.py", tag], "batch")
+    batch_args = [py, "batch.py", tag]
+    if use_docker:
+        batch_args.insert(2, "--docker")
+    _run_step(batch_args, "batch")
     # 3. analyze_h1b.py
     _run_step([py, "analyze_h1b.py", tag], "analyze")
     # 4. git add -A
@@ -416,7 +423,7 @@ def run_pipeline_many(tags: list[str]) -> int:
 def _finalize_pipeline_state(exit_code: int):
     """파이프라인 러너 종료 직전 state 갱신."""
     st = load_state()
-    if st and st.get("task") in ("run", "run_many"):
+    if st and st.get("task") in ("run", "docker_run", "run_many"):
         st["running"] = False
         st["pid"] = None
         st["finished_at"] = _now_iso()
@@ -544,6 +551,34 @@ async def 실행(interaction: discord.Interaction, 채널: str):
         f"pid: {state['pid']}\n"
         f"log: {log_path.name}\n\n"
         "단계: git pull → batch → analyze → add → commit → push\n"
+        "진행은 `/상태`, `/로그`로 확인하라."
+    )
+    await interaction.followup.send(f"```\n{msg}\n```")
+
+
+# ---- /도커실행 ----
+@tree.command(name="도커실행", description="AAA H4 Docker 실측 파이프라인 실행 (pull→batch --docker→analyze→commit→push)")
+@app_commands.describe(채널="실행할 채널/태그 (예: h4_1)")
+async def 도커실행(interaction: discord.Interaction, 채널: str):
+    if not _channel_allowed(interaction):
+        return await interaction.response.send_message("이 채널에서는 사용할 수 없다.", ephemeral=True)
+    if not validate_channel_name(채널):
+        return await interaction.response.send_message(
+            f"잘못된 채널명: `{채널}`\n허용: 영문/숫자/_/- 만 가능", ephemeral=True)
+    busy = _busy_state()
+    if busy:
+        return await interaction.response.send_message(
+            f"이미 실행 중이다: {busy.get('task')} {busy.get('channel')} (pid {busy.get('pid')})\n"
+            f"`/상태`로 확인하라.", ephemeral=True)
+
+    await interaction.response.defer()
+    state, log_path = start_background_task("docker_run", 채널, mode="pipeline_docker")
+    msg = (
+        "Started AAA Docker run (H4 실측 파이프라인)\n\n"
+        f"channel: {채널}\n"
+        f"pid: {state['pid']}\n"
+        f"log: {log_path.name}\n\n"
+        "단계: git pull → batch --docker → analyze → add → commit → push\n"
         "진행은 `/상태`, `/로그`로 확인하라."
     )
     await interaction.followup.send(f"```\n{msg}\n```")
@@ -757,6 +792,19 @@ def main():
         rc = 0
         try:
             rc = run_pipeline(tag)
+        finally:
+            _finalize_pipeline_state(rc)
+        raise SystemExit(rc)
+
+    if len(sys.argv) >= 3 and sys.argv[1] == "--pipeline-docker":
+        tag = sys.argv[2]
+        if not validate_channel_name(tag):
+            print(f"[error] invalid tag: {tag}", file=sys.stderr)
+            _finalize_pipeline_state(2)
+            raise SystemExit(2)
+        rc = 0
+        try:
+            rc = run_pipeline(tag, use_docker=True)
         finally:
             _finalize_pipeline_state(rc)
         raise SystemExit(rc)
