@@ -220,3 +220,10 @@ __marimo__/
 task_*.json
 usage.json
 discord_state.json
+
+# Vertex 서비스계정 키 (§30) — 개인키, 절대 커밋 금지. 파이프라인 git add -A에 안 걸리게.
+vertex-sa.json
+*-sa.json
+*service-account*.json
+*service_account*.json
+gcp-key*.json
