@@ -8,5 +8,5 @@ vtx_24_C2,24,C2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:31:11.491476-
 vtx_24_D1,24,D1,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T17:32:20.262048-08:00
 vtx_24_D2,24,D2,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T17:33:16.499797-08:00
 vtx_24_E1,24,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:34:35.150145-08:00
-vtx_24_E2,24,E2,기타예외,,1,broken,stderr-exc,,1,3,"Error: Failed to parse input as JSON. Extra data: line 2 column 1 (char 2)
+vtx_24_E2,24,E2,STDIN_FORMAT_MISMATCH,Error: Failed to parse input as JSON. Extra d,1,inputmismatch,STDIN_FORMAT_MISMATCH,,1,3,"Error: Failed to parse input as JSON. Extra data: line 2 column 1 (char 2)
 ",2026-06-08T17:35:49.448052-08:00

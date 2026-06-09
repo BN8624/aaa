@@ -1,8 +1,2 @@
-# 분류 애매/확인필요 2줄 (전문). 분류기 점검은 여기부터.
-
-=== vtx_23_D2 [기타예외] exit=1 g=4
-Error processing expression: Unexpected character: x
-
-=== vtx_23_E2 [기타예외] exit=1 g=3
-Error parsing JSON from stdin: Extra data: line 2 column 1 (char 2)
+# 분류 애매/확인필요 0줄 (전문). 분류기 점검은 여기부터.
 

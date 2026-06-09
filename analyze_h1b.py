@@ -67,8 +67,10 @@ def classify(rec):
     if g == 0: return ("코더빈손","")
     t = h1b_type(se)
     if t: return ("H1b", t)
-    if "Invalid JSON input" in se:
-        return ("STDIN_FORMAT_MISMATCH","Invalid JSON input")
+    if _HAS_VC and vc.STDIN_JSON_PAT.search(se):
+        return ("STDIN_FORMAT_MISMATCH", se.strip().splitlines()[-1][:45])
+    if _HAS_VC and vc.DATA_CONTRACT_GRAMMAR_PAT.search(se):
+        return ("DATA_CONTRACT_GRAMMAR", se.strip().splitlines()[-1][:45])
     if "TimeoutExpired" in se and has_input_loop(generated_main(rec)) and not stdin_has_exit(stdin_text(rec)):
         return ("STDIN_EXIT_MISMATCH","input loop without exit/quit")
     if "EOFError" in se:
@@ -102,7 +104,7 @@ def replay_state(rec):
         res = vc.run_cell(rec)
         code_all = "\n".join(vc.files(rec).values())
         state, channel = vc.classify(res, code_all)
-        h1b = "H1b?" if vc.H1B_PAT.search(((res.get("stderr") if res else "") or "") + code_all) else ""
+        h1b = vc.h1b_flag(res, code_all)
         return (state, channel, h1b, (res.get("exit") if res else None))
     except Exception as e:
         return ("replayerr", str(e)[:30], "", None)
@@ -180,7 +182,8 @@ def main():
         "n_replayed":len(replayed),
         "runstate":dict(runstate_tally),
         "runchannel":dict(runchannel_tally),
-        "run_h1b_flags":sum(1 for r in replayed if r["run_h1b"]),
+        "run_h1b_flags":sum(1 for r in replayed if r["run_h1b"] == "H1b?"),
+        "static_h1b_false_positive":sum(1 for r in replayed if r["run_h1b"] == "STATIC_H1B_FALSE_POSITIVE"),
         "cat_x_runstate":{k:dict(v) for k,v in crosstab.items()}}
     split=[]; rh=rt=0
     for c in cells:
@@ -236,8 +239,12 @@ def main():
             L.append("  └ 채널:")
             for k,v in sorted(runchannel_tally.items(),key=lambda x:-x[1]):
                 L.append(f"      {k:>16}: {v}")
-        if any(r["run_h1b"] for r in replayed):
-            L.append(f"  └ 재실행 H1b? 플래그: {sum(1 for r in replayed if r['run_h1b'])}")
+        h1b_flags = sum(1 for r in replayed if r["run_h1b"] == "H1b?")
+        static_fp = sum(1 for r in replayed if r["run_h1b"] == "STATIC_H1B_FALSE_POSITIVE")
+        if h1b_flags:
+            L.append(f"  └ 재실행 H1b? 플래그: {h1b_flags}")
+        if static_fp:
+            L.append(f"  └ 정적 H1b false positive: {static_fp}")
         L+=["\n"+"-"*50,"정적 cat × 재실행 runstate (추측 라벨이 무엇으로 풀렸나)","-"*50]
         for cat in sorted(crosstab, key=lambda c:-sum(crosstab[c].values())):
             inner=", ".join(f"{s}×{n}" for s,n in sorted(crosstab[cat].items(),key=lambda x:-x[1]))

@@ -136,13 +136,13 @@
 
 - 사건: vtx_23·24·25 모두 10/10칸 생성·실행·분석 완료. 429/RESOURCE_EXHAUSTED 오염 없음. `analysis_out/vtx_23~25` 모두 존재.
 - 결과: 세 회차 정적 H1b 0/30. vtx_13~25 유효 타입계약 도메인 누적은 이제 **100칸 연속 H1b 0**(vtx_18·19·21 폐기). 표면 H1b 부재 결론은 더 강화.
-- 재실행 합계(30칸): alive 21 / reject 2 / silent 2 / inputmismatch 1 / broken 4. run_h1b 플래그는 vtx_25 D2 silent 1건뿐이나, 실제 실패가 아니라 정적 과잉신호.
-  - vtx_23: alive 6 / reject 1 / silent 1 / broken 2.
-  - vtx_24: alive 8 / reject 1 / broken 1.
-  - vtx_25: alive 7 / inputmismatch 1 / silent 1 / broken 1.
-- broken 4칸 전수:
+- 분류기 갭 보강 후 재실행 합계(30칸): alive 21 / reject 2 / silent 2 / inputmismatch 4 / broken 1. `run_h1b_flags` 0, `static_h1b_false_positive` 1(vtx_25_D2).
+  - vtx_23: alive 6 / reject 1 / silent 1 / broken 1 / inputmismatch 1.
+  - vtx_24: alive 8 / reject 1 / inputmismatch 1.
+  - vtx_25: alive 7 / inputmismatch 2 / silent 1.
+- 라벨 분리 결과:
   - vtx_23_D2: `Unexpected character: x`. main 기본식은 `3 + 5 * 2 + x`인데 parser tokenizer는 숫자·연산자만 허용하고 식별자 `x`를 거부. 채널 문제가 아니라 **문법/데이터계약 불일치**. 다만 파일 간 AST 스키마 불일치(§12·§14 C1류)는 아님.
   - vtx_23_E2 / vtx_24_E2 / vtx_25_E2: 모두 stdin 대본 멀티라인을 JSON으로 읽다가 `Extra data: line 2 column 1`. 이는 dependency graph 프로그램이 JSON stdin을 기대한 데 반해 공통 대본을 주입한 **STDIN_FORMAT_MISMATCH** 쪽. 모델 내부 깸으로 세면 안 됨.
 - ★ vtx_20·22의 C AST 스키마 불일치는 vtx_23~25에서 직접 재현 안 됨. C1/C2는 세 회차 모두 alive/silent. 따라서 “C 파서/평가기류에서 반복” 가설은 아직 강한 결론 금지. 대신 더 넓은 “데이터계약/문법계약 H1c가 드문드문 발생”으로 완화.
 - ★ 새 관측: vtx_25_D2가 `nodes.Node` 클래스를 별도 파일에서 만들고 parser/folder/serializer/main이 속성(`.type/.value/.left/.right`)으로 공유했지만 실행은 silent/exit0. 즉 “항상 dict/list만”은 약간 깨짐. 그러나 공유 생성자·동일 클래스 import로 계약이 맞아 H1b는 발생하지 않음. Q7 결론은 “객체가 나와도 경계 계약이 일관되면 H1b가 안 난다”로 미세 수정 필요.
-- 다음: 데이터가 이미 호명했으므로 분류기 갭을 메울 가치가 생김. `DATA_CONTRACT_GRAMMAR`(vtx_23_D2), `STDIN_FORMAT_MISMATCH`(JSON stdin), `STATIC_H1B_FALSE_POSITIVE`(vtx_25_D2 class 경계지만 정상)를 별도 라벨로 분리하면 Q8 기록이 더 깨끗해진다.
+- 도구 수정 완료: analyzer/verify에 `DATA_CONTRACT_GRAMMAR`, `STDIN_FORMAT_MISMATCH`, `STATIC_H1B_FALSE_POSITIVE` 라벨 분리. 기존 broken 4칸 중 JSON 3칸은 inputmismatch로 이동했고, vtx_25_D2는 H1b?가 아니라 static false positive로 분리됨. Q8 표에서 모델 내부 깸은 vtx_23_D2 1칸만 남음.

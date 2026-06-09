@@ -54,19 +54,18 @@
 ★ 재실행 관측 (verify_channel 통합, 10/10행)
 ==================================================
           alive: 7
-  inputmismatch: 1
+  inputmismatch: 2
          silent: 1
-         broken: 1
   └ 채널:
              stdout-ok: 7
          argv-vs-stdin: 1
                   none: 1
-            stderr-exc: 1
-  └ 재실행 H1b? 플래그: 1
+      STDIN_FORMAT_MISMATCH: 1
+  └ 정적 H1b false positive: 1
 
 --------------------------------------------------
 정적 cat × 재실행 runstate (추측 라벨이 무엇으로 풀렸나)
 --------------------------------------------------
        exit0가짜 → alive×7, silent×1
       argparse → inputmismatch×1
-  STDIN_FORMAT_MISMATCH → broken×1
+  STDIN_FORMAT_MISMATCH → inputmismatch×1

@@ -28,6 +28,12 @@ H1B_PAT = re.compile(
     r"(AttributeError|has no attribute|not subscriptable|unhashable type"
     r"|NameError|is not defined|unexpected keyword argument"
     r"|missing \d+ required positional|takes \d+ positional)", re.I)
+STDIN_JSON_PAT = re.compile(
+    r"(Invalid JSON input|Failed to parse input as JSON|Error parsing JSON from stdin"
+    r"|JSONDecodeError|Extra data: line \d+ column \d+)", re.I)
+DATA_CONTRACT_GRAMMAR_PAT = re.compile(
+    r"(Unexpected character:|Unexpected token:|Unexpected trailing tokens|Unmatched parenthesis)",
+    re.I)
 
 
 def load(path):
@@ -124,6 +130,15 @@ def _argv_based(code_all):
         not re.search(r"\binput\s*\(", code_all)
 
 
+def h1b_flag(res, code_all):
+    err = (res.get('stderr') if res else '') or ''
+    if H1B_PAT.search(err):
+        return 'H1b?'
+    if H1B_PAT.search(code_all):
+        return 'STATIC_H1B_FALSE_POSITIVE'
+    return ''
+
+
 def classify(res, code_all):
     if res is None:
         return 'nofiles', '-'
@@ -136,6 +151,10 @@ def classify(res, code_all):
             INPUTMISMATCH_PAT.search(err) or
             (_argv_based(code_all) and ('argument' in err.lower() or 'usage' in err.lower()))):
         return 'inputmismatch', 'argv-vs-stdin'
+    if res['exit'] not in (0, None) and STDIN_JSON_PAT.search(err):
+        return 'inputmismatch', 'STDIN_FORMAT_MISMATCH'
+    if res['exit'] not in (0, None) and DATA_CONTRACT_GRAMMAR_PAT.search(err):
+        return 'broken', 'DATA_CONTRACT_GRAMMAR'
     if TRACE_PAT.search(err) or (res['exit'] not in (0, None) and err.strip()):
         ch = 'stderr-exc'
         return 'broken', ch
@@ -177,8 +196,7 @@ def main():
         res = run_cell(r)
         code_all = "\n".join(files(r).values())
         state, channel = classify(res, code_all)
-        h1b = 'H1b?' if H1B_PAT.search(
-            (res['stderr'] if res else '') + code_all) else ''
+        h1b = h1b_flag(res, code_all)
         obs[state] += 1
         ch[channel] += 1
         rows_out.append((tid, state, channel, h1b,
