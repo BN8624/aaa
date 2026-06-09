@@ -1,5 +1,5 @@
-﻿=== restart_bot2.ps1 started 06/09/2026 15:12:09 ===
-Killing PID=344
+﻿=== restart_bot2.ps1 started 06/09/2026 17:03:07 ===
+Killing PID=9208
 No pythonw process or error: "0"개의 인수가 있는 "Kill"을(를) 호출하는 동안 예외가 발생했습니다. "액세스가 거부되었습니다"
-Started new bot PID=30272
-=== Done 06/09/2026 15:12:11 ===
+Started new bot PID=11136
+=== Done 06/09/2026 17:03:09 ===

@@ -1,0 +1,148 @@
+{
+  "label": "h4_10",
+  "n_rows": 10,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
+  ],
+  "rounds": [
+    "10"
+  ],
+  "exec": {
+    "tally": {
+      "exit0가짜": 5,
+      "메뉴앞EOF": 1,
+      "DATA_CONTRACT_GRAMMAR": 1,
+      "기타예외": 2,
+      "코더빈손": 1
+    },
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "replay": {
+    "n_replayed": 10,
+    "runstate": {
+      "alive": 8,
+      "broken": 1,
+      "fake": 1
+    },
+    "runchannel": {
+      "stdout-ok": 8,
+      "stderr-exc": 1
+    },
+    "run_h1b_flags": 0,
+    "static_h1b_false_positive": 0,
+    "cat_x_runstate": {
+      "exit0가짜": {
+        "alive": 5
+      },
+      "메뉴앞EOF": {
+        "broken": 1
+      },
+      "DATA_CONTRACT_GRAMMAR": {
+        "alive": 1
+      },
+      "기타예외": {
+        "alive": 2
+      },
+      "코더빈손": {
+        "fake": 1
+      }
+    }
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 10
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "A2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "B1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 1
+      }
+    },
+    "B2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "C1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "DATA_CONTRACT_GRAMMAR": 1
+      }
+    },
+    "C2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "D1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "D2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "E1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "E2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    }
+  }
+}

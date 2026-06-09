@@ -1,0 +1,37 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_10_A1,10,A1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T00:07:39.400777-08:00
+h4_10_A2,10,A2,exit0가짜,,0,alive,stdout-ok,,0,2,"
+",2026-06-09T00:08:17.511132-08:00
+h4_10_B1,10,B1,메뉴앞EOF,,1,broken,stderr-exc,,1,3,"
+Traceback (most recent call last):
+  File ""/workspace/main.py"", line 102, in <module>
+    main()
+  File ""/workspace/main.py"", line 32, in main
+    choice = input(""Enter choice (1-10): "").strip()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+",2026-06-09T00:08:39.718814-08:00
+h4_10_B2,10,B2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T00:09:22.576693-08:00
+h4_10_C1,10,C1,DATA_CONTRACT_GRAMMAR,Error: Unexpected character: 't',1,alive,stdout-ok,,0,4,"
+Error: Unexpected character: 't'
+",2026-06-09T00:10:11.213836-08:00
+h4_10_C2,10,C2,기타예외,,1,alive,stdout-ok,,0,3,"
+Error: unexpected extra tokens after expression
+",2026-06-09T00:12:17.661523-08:00
+h4_10_D1,10,D1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T00:13:31.121921-08:00
+h4_10_D2,10,D2,기타예외,,1,alive,stdout-ok,,0,4,"
+Error: Invalid token: test input
+",2026-06-09T00:16:40.048377-08:00
+h4_10_E1,10,E1,exit0가짜,,0,alive,stdout-ok,,0,5,"
+",2026-06-09T00:18:53.787192-08:00
+h4_10_E2,10,E2,코더빈손,,-1,fake,,,,0,"RateLimitError: 429 RESOURCE_EXHAUSTED after 5 retries: {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-09T00:19:42.876787-08:00

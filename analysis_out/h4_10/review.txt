@@ -1,0 +1,17 @@
+# 분류 애매/확인필요 3줄 (전문). 분류기 점검은 여기부터.
+
+=== h4_10_C2 [기타예외] exit=1 g=3
+Error: unexpected extra tokens after expression
+
+=== h4_10_D2 [기타예외] exit=1 g=4
+Error: Invalid token: test input
+
+=== h4_10_E2 [코더빈손] exit=-1 g=0
+RateLimitError: 429 RESOURCE_EXHAUSTED after 5 retries: {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
