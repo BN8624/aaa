@@ -33,6 +33,7 @@
   - **429 본문에 metric·limit 없음**: `{"code":429,"message":"Resource has been exhausted","status":"RESOURCE_EXHAUSTED"}`만, Retry-After도 없음. → Vertex(aiplatform+`?key=`) 경로는 generic 응답이라 **콘솔 없이 본문으로 한도 숫자 못 얻음**. 경험적 측정값(~6 버스트)이 우리가 가진 전부.
   - **정체 확정**: `?key=`→aiplatform은 **Vertex 저(低)quota 접근(express-mode류)**이고 빌링으로 안 올라감. 크레딧 차감되나 throughput 한도 낮음. §13 "무료버킷" 가설은 폐기, **"저quota express 접근" 가설로 정정.** h4_12~15 429가 limiter rpm=15 밑에서도 난 이유 = 실제 천장(~6)이 limiter 가정보다 훨씬 낮아 회차 내 콜 버스트가 초과.
   - **조치(B 채택, 코드 수정)**: ①`limiter.py`에 `min_interval`(콜 간 최소 간격) 추가 — RPM 카운트로 못 막는 버스트를 끊음. 기본 0(회귀 보존), 자가검증 [9][10] 추가(10/10 통과). ②`run.py` production limiter = `Limiter(rpm=8, rpd_limit=1450, min_interval=4.0)`. ③`client.py` `max_retries` 5→8(저quota 일시 429를 backoff로 더 오래 흡수, 배치 중단 빈도↓). 모델 동작·프롬프트 불변(인프라만) — 절대 제약 무관.
+  - **★★ B 재검증 → 버스트 가설 반증, 캡으로 정정(probe_quota.py 페이싱 모드)**: `python probe_quota.py 20 4`(4초 간격 20콜)도 **7번째에서 429**(성공 6 / 30.5s). 연사(14.8s)와 막힌 지점이 동일(6) — 시간만 늘었다. → **"버스트라 페이싱으로 끊긴다"는 틀렸고, 한도는 분당 ~6 고정 저캡**(60초 롤링 ~6/min에 부합). 본문 여전히 generic(metric/Retry-After 없음). **함의: B의 `rpm=8`·`min_interval=4.0`(≈8~15/min)은 ~6 캡 위라 회차 중 깨짐.** → **B 정정: `run.py` = `Limiter(rpm=5, rpd_limit=1450, min_interval=12.0)`(≈5/min, 캡 밑).** min_interval=12로 재프로브(`probe_quota.py 10 12`)해 지속 통과 확인 후 h4_16 진행. 통과 못 하면(창>60s) 페이싱으로 못 살림 → 정식 Vertex 인증(C안)이 유일.
   - **근본책(보류)**: 정식 Vertex 인증(서비스계정 OAuth + `projects/<id>/locations/<region>/...`)으로 프로젝트 실제 quota 획득. 콘솔/SA 필요해 미착수(C안).
 
 ## §27 H4 Docker h4_11 유효 회차 — argv=["1"] 검증 + E 도메인 데이터계약 H1c 첫 관측 (2026-06-09)

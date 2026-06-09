@@ -5,7 +5,7 @@
 - 최신 커밋: `fd8d3df`. 봇 현재 생존·Discord 연결됨(예약 작업 경유, Docker 권한 보장).
 - **유효 Docker 누적 70칸 H1b=0**(h4_11까지). vtx 150 + Docker 70 = **220칸 H1b=0.**
 - **h4_12~15 = 무효/폐기(§28)**: 일시적 429로 중단. h4_12 부분(5칸)·13~15 전량 무효. 429는 회복됨(프로브 확정). 누적 증가 없음.
-- **저quota 대응 B 적용·커밋(§28)**: `limiter min_interval=4.0·rpm=8`, `client max_retries=8`. Vertex 실측 한도 ~6콜 버스트(express 저quota, 빌링 무관·본문에 숫자 없음). → **`/도커실행` 1개씩**, /연속도커 남발 금지. 근본책(보류) = 정식 Vertex 인증(SA+OAuth).
+- **저quota 대응 B → 재검증으로 정정(§28)**: 4초 페이싱 재프로브도 7번째 429(6건/30.5s) → **버스트 아니라 분당 ~6 고정 저캡** 확정. B의 rpm=8/min_interval=4는 캡 위라 부족 → **`Limiter(rpm=5, min_interval=12.0)`로 정정**(≈5/min). `client max_retries=8`. **h4_16 전 `python probe_quota.py 10 12`로 12초 지속 통과 먼저 확인.** 통과 못 하면(창>60s) 정식 Vertex 인증(SA+OAuth, C안)이 유일. → **`/도커실행` 1개씩**, /연속도커 금지.
 - **봇 2중 사망버그 수정(§29)**: 작업 `StopOnIdleEnd=false`(PC 유휴해제 시 ~30초 사망) + `MultipleInstances=Parallel`(/재시작봇이 자기만 죽이던 IgnoreNew). Task Scheduler 설정이라 repo 밖이었으나 → **`register_bot_task.ps1`로 백업 완료**(작업 삭제/기계 재구성 시 한 줄 복구, §29).
 - **관측 본류(§26·§27)**: `DUMMY_ARGV=["1"]`로 C lexer→parser→evaluator 채널 개방(C1·C2·A2·D2 alive 회복). **E1 데이터계약 H1c 첫 관측**(§12·§14 패밀리 E 도메인 출현) — 아직 단일 사례, C 채널 다회차 재현이 h4_16+의 핵심 관측 목표.
 
