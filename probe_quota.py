@@ -6,12 +6,18 @@
 # 토큰 최소(maxOutputTokens=16)라 '요청 횟수(RPM)' 차원만 건드린다(토큰 차원 격리).
 #
 # 사용:  export VERTEX_API_KEY="..."
-#        python probe_quota.py [최대콜수=80]
+#        python probe_quota.py [최대콜수=80] [콜간격초=0]
 #
-# 해석:
-#   429 나옴   → body의 metric/limit이 진짜 한도. Retry-After도 같이.
-#   429 안 나옴 → 한도 ≥ (성공수)/창. h4_12 429는 고정 RPM 아니라 공유quota(DSQ) 순간 혼잡
-#                 → 고정 숫자 쫓을 것 없이 §13 backoff로 충분. /연속도커만 끊어 돌리면 됨.
+#   콜간격초=0  → 연사(버스트 한도만 건드림). "성공 N건"은 콜당 지연 누적일 뿐,
+#                 분당 지속 한도는 말해주지 않음(FINDINGS §28의 약한 고리).
+#   콜간격초>0  → 그 간격으로 페이싱. run.py의 min_interval(현재 4.0)을 그대로 넣어
+#                 "이 페이싱이면 429 안 나는가"를 직접 검증한다.
+#
+# 해석(★ B 검증):
+#   `python probe_quota.py 20 4` 처럼 돌려서 —
+#     20콜 다 통과 → min_interval=4.0이 버스트를 끊는다(=버스트 가설). B 정당.
+#     여전히 ~6에서 429 → 분당 고정 저(低)캡 → rpm을 ≤5로 더 낮추거나 정식 Vertex 인증(C안).
+#   429 본문에 metric/limit 있으면 그게 진짜 한도(Retry-After도). 없으면(generic) 경험값이 전부.
 
 import os
 import sys
@@ -24,6 +30,7 @@ MODEL = "gemini-3.5-flash"
 KEY = os.environ.get("VERTEX_API_KEY")
 BASE = f"https://aiplatform.googleapis.com/v1/publishers/google/models/{MODEL}:generateContent"
 MAX_CALLS = int(sys.argv[1]) if len(sys.argv) > 1 else 80
+INTERVAL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.0  # 콜 간 sleep(초). 0=연사.
 
 BODY = json.dumps({
     "contents": [{"role": "user", "parts": [{"text": "ok"}]}],
@@ -59,10 +66,13 @@ def main():
     if not KEY:
         raise SystemExit("VERTEX_API_KEY 없음. export VERTEX_API_KEY=... 먼저.")
     url = f"{BASE}?key={KEY}"
-    print(f"=== quota probe: {MODEL} 에 최대 {MAX_CALLS}콜 연사 ===")
+    mode = f"{INTERVAL}초 간격 페이싱" if INTERVAL > 0 else "연사(간격 0)"
+    print(f"=== quota probe: {MODEL} 에 최대 {MAX_CALLS}콜 / {mode} ===")
     t0 = time.time()
     n_ok = 0
     for i in range(MAX_CALLS):
+        if INTERVAL > 0 and i > 0:
+            time.sleep(INTERVAL)
         req = urllib.request.Request(
             url, data=BODY,
             headers={"Content-Type": "application/json"}, method="POST",
@@ -87,8 +97,12 @@ def main():
             print(f"\n[ERROR] {type(e).__name__}: {e}")
             return
     print(f"\n=== {MAX_CALLS}콜 전부 통과 ({time.time()-t0:.1f}s), 429 없음 ===")
-    print(f"→ per-minute 요청 한도 ≥ {MAX_CALLS} (이 창에서). h4_12 429는 고정 RPM 아닌")
-    print("  공유quota(DSQ) 순간 혼잡으로 추정 → 고정 숫자 불필요, §13 backoff로 충분.")
+    if INTERVAL > 0:
+        print(f"→ {INTERVAL}초 간격이면 {MAX_CALLS}콜까지 429 없음. **이 페이싱이 버스트를 끊는다(B 검증).**")
+        print(f"  run.py min_interval={INTERVAL}로 회차 돌려도 안전하다는 직접 근거. → h4_16 진행 OK.")
+    else:
+        print(f"→ per-minute 요청 한도 ≥ {MAX_CALLS} (이 창에서). h4_12 429는 고정 RPM 아닌")
+        print("  공유quota(DSQ) 순간 혼잡으로 추정 → 고정 숫자 불필요, §13 backoff로 충분.")
 
 
 if __name__ == "__main__":
