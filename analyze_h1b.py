@@ -28,6 +28,23 @@ except Exception as _e:
 
 TID = re.compile(r"(\w+?)_([0-9]+)_([A-E][12])")   # 세션태그 무관(r0605b·h4b 등 모두). 회차=\d+, 칸=[A-E][12]
 
+# 인프라 가짜행(코더 행동이 아닌 API/인증 실패) 판별. 이런 행은 H1b/H1c 측정의
+# 데이터가 아니라 '호출 자체가 실패'한 흔적이라 분모에서 빼야 한다(§30 데이터정책).
+# 예: 옛 403 PermanentHTTPError, VERTEX_API_KEY 부재, exit=-1·생성파일 0.
+# verify_channel.is_fake와 같은 기준 + 403/RESOURCE_EXHAUSTED를 명시적으로 포함하되,
+# vc import 실패해도 독립적으로 동작하게 자체 구현한다.
+def is_infra_fake(rec):
+    se = str(rec.get("stderr") or "")
+    gf = rec.get("generated_files") or {}
+    if "VERTEX_API_KEY" in se:
+        return True
+    if "PermanentHTTPError" in se and any(
+        tok in se for tok in ("403", "PERMISSION_DENIED", "RESOURCE_EXHAUSTED")):
+        return True
+    if rec.get("exit_code") == -1 and not gf:
+        return True
+    return False
+
 def h1b_type(se):
     if "ImportError" in se or "cannot import name" in se or "ModuleNotFoundError" in se:
         return "import불일치"
@@ -120,7 +137,9 @@ def main():
     if "--no-replay" not in flags and not _HAS_VC:
         print(f"[경고] verify_channel import 실패 → 재실행 생략(정적만): {_VC_ERR}")
 
-    rows=[]
+    keep_fakes = "--keep-fakes" in flags
+
+    rows=[]; excluded=[]
     for line in open("runs.jsonl", encoding="utf-8"):
         line=line.strip()
         if not line: continue
@@ -130,6 +149,11 @@ def main():
         if tagfilter and not tid.startswith(tagfilter + "_"): continue
         m=TID.search(tid)
         if not m: continue
+        # 인프라 가짜행은 기본 제외(분모 오염 방지). --keep-fakes 로 옛 동작 복원.
+        if is_infra_fake(rec) and not keep_fakes:
+            excluded.append((tid, (rec.get("stderr") or "").strip().splitlines()[:1],
+                             rec.get("created_at","")))
+            continue
         cat,sub=classify(rec)
         se=(rec.get("stderr") or "")
         if do_replay:
@@ -156,6 +180,13 @@ def main():
                         r["exit"],r["runstate"],r["runchannel"],r["run_h1b"],
                         r["replay_exit"],r["g"],r["stderr_full"],r["created_at"]])
 
+    # 제외한 인프라 가짜행을 투명하게 남긴다(분모에서 왜 빠졌는지 추적용).
+    with open(os.path.join(outdir,"excluded.txt"),"w",encoding="utf-8") as f:
+        f.write(f"# 인프라 가짜행 제외 {len(excluded)}줄 "
+                f"(API/인증 실패 — 코더 데이터 아님). --keep-fakes 로 포함 가능.\n\n")
+        for tid, head, ca in excluded:
+            f.write(f"{ca[:19]:19} {tid:16} | {(head[0] if head else '(stderr 없음)')[:80]}\n")
+
     with open(os.path.join(outdir,"review.txt"),"w",encoding="utf-8") as f:
         amb=[r for r in rows if r["cat"] in AMBIGUOUS]
         f.write(f"# 분류 애매/확인필요 {len(amb)}줄 (전문). 분류기 점검은 여기부터.\n\n")
@@ -165,7 +196,8 @@ def main():
 
     cell_round=defaultdict(lambda: defaultdict(list))
     for r in rows: cell_round[r["cell"]][r["round"]].append(r["cat"])
-    summary={"label":label,"n_rows":len(rows),"cells":cells,"rounds":rounds}
+    summary={"label":label,"n_rows":len(rows),"cells":cells,"rounds":rounds,
+             "excluded_infra_fakes":len(excluded),"keep_fakes":keep_fakes}
     exec_tally=Counter(r["cat"] for r in rows)
     exec_h1b_types=Counter(r["sub"] for r in rows if r["cat"]=="H1b")
     summary["exec"]={"tally":dict(exec_tally),
@@ -253,9 +285,10 @@ def main():
         L.append("\n(재실행 생략: --no-replay)")
     open(os.path.join(outdir,"report.txt"),"w",encoding="utf-8").write("\n".join(L)+"\n")
 
-    print(f"[완료] {outdir}/ 4파일")
+    print(f"[완료] {outdir}/ 5파일")
+    exnote = f" | 인프라가짜 제외 {len(excluded)}" if excluded else (" | --keep-fakes" if keep_fakes else "")
     rs = (" | 재실행 " + ", ".join(f"{k}×{v}" for k,v in runstate_tally.most_common())) if replayed else ""
-    print(f"  실행 {len(rows)} | H1b {summary['exec']['h1b']} | 애매 {sum(1 for r in rows if r['cat'] in AMBIGUOUS)}줄{rs}")
+    print(f"  실행 {len(rows)} | H1b {summary['exec']['h1b']} | 애매 {sum(1 for r in rows if r['cat'] in AMBIGUOUS)}줄{exnote}{rs}")
 
     if "--push" in flags:
         try:

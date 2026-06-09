@@ -35,16 +35,33 @@
 
 - Do not discard the whole `h4_16` round.
 - Use it as: `h4_16 valid after excluding old 403 duplicate A1`.
-- If automated aggregation cannot exclude duplicate A1 cleanly, run a clean `h4_17` for a no-footnote round.
+- RESOLVED in tool: `analyze_h1b.py` now auto-excludes infra-fake rows
+  (`is_infra_fake`: missing `VERTEX_API_KEY` / `PermanentHTTPError 403` /
+  `exit=-1` + 0 generated files). Default excludes; `--keep-fakes` restores old
+  behavior; excluded rows logged to `analysis_out/<tag>/excluded.txt` and
+  counted in `summary.json:excluded_infra_fakes`. So the duplicate A1 is now
+  dropped cleanly — no need to re-collect `h4_16`.
+
+## Status (updated 2026-06-10)
+
+- `h4_16` is FINALIZED and recorded in `FINDINGS.md` §31:
+  - H1b 0/10; replay alive 6 / reject 2 / inputmismatch 2 (fake excluded).
+  - C1 = C-domain AST schema mismatch (`Unknown AST node type: Program`),
+    §12·§14·§22 family — H1c-side, not H1b.
+  - Cumulative valid-Docker count kept conservatively at 70 (no h4_16 runlog
+    captured this session); h4_16's 10 cells tallied separately.
+- This container has NO Vertex creds (`.env`/`vertex-sa.json` gitignored,
+  absent on fresh clone) → live collection impossible here.
 
 ## Next Action
 
-Recommended next step:
+`h4_17` will be collected by the user on the SA-credentialed machine. Then:
 
-1. If continuing data collection, run the next clean round as `h4_17`.
-2. Then run:
-   - `python analyze_h1b.py h4_17`
-3. Compare with `h4_16` and keep tracking H1b/H1c, especially C/E-domain data contract failures.
+1. `python analyze_h1b.py h4_17` (auto-excludes any infra fakes).
+2. Compare with `h4_16`; keep tracking H1b/H1c, especially C/E-domain data
+   contract failures (AST schema / dict-key / stdin-format).
+3. Capture the Docker runlog for the round so the valid-Docker cumulative can
+   advance past 70.
 
 Operational note:
 

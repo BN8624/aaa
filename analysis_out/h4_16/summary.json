@@ -1,6 +1,6 @@
 {
   "label": "h4_16",
-  "n_rows": 11,
+  "n_rows": 10,
   "cells": [
     "A1",
     "A2",
@@ -16,9 +16,10 @@
   "rounds": [
     "16"
   ],
+  "excluded_infra_fakes": 1,
+  "keep_fakes": false,
   "exec": {
     "tally": {
-      "코더빈손": 1,
       "exit0가짜": 7,
       "argparse": 1,
       "기타예외": 1,
@@ -28,9 +29,8 @@
     "h1b_types": {}
   },
   "replay": {
-    "n_replayed": 11,
+    "n_replayed": 10,
     "runstate": {
-      "fake": 1,
       "reject": 2,
       "alive": 6,
       "inputmismatch": 2
@@ -44,9 +44,6 @@
     "run_h1b_flags": 0,
     "static_h1b_false_positive": 0,
     "cat_x_runstate": {
-      "코더빈손": {
-        "fake": 1
-      },
       "exit0가짜": {
         "reject": 1,
         "alive": 6
@@ -69,11 +66,10 @@
   "nondeterministic_splits": [],
   "per_cell": {
     "A1": {
-      "n_exec": 2,
+      "n_exec": 1,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "코더빈손": 1,
         "exit0가짜": 1
       }
     },
