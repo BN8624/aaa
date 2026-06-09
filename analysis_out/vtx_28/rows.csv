@@ -1,0 +1,11 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_28_A1,28,A1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:36:28.365949-08:00
+vtx_28_A2,28,A2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:37:17.174471-08:00
+vtx_28_B1,28,B1,exit0가짜,,0,reject,stdout-return,,0,3,,2026-06-08T19:37:48.690697-08:00
+vtx_28_B2,28,B2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:38:42.455695-08:00
+vtx_28_C1,28,C1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:39:38.516476-08:00
+vtx_28_C2,28,C2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:40:42.122273-08:00
+vtx_28_D1,28,D1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:41:30.526921-08:00
+vtx_28_D2,28,D2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:42:28.752240-08:00
+vtx_28_E1,28,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:44:24.154576-08:00
+vtx_28_E2,28,E2,exit0가짜,,0,alive,stdout-ok,,0,2,,2026-06-08T19:45:09.025025-08:00
