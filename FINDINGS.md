@@ -1,5 +1,15 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §18 H4 Docker 최초 유효 회차 h4_3 (2026-06-09)
+
+- commit `0261462 run h4_3`. h4_1·h4_2의 Docker Access Denied 해소 후 봇 재시작 → 최초 유효 H4 Docker 실측.
+- **원 실행 Docker exit**: 9칸 exit=0, C2 exit=1. exit=125/Access denied 0건 → Docker 환경 정상 작동 확인.
+- **H1b = 0 / 10칸 모두.** vtx 시리즈(host subprocess)와 동일. Docker 격리 환경에서도 파일 간 계약 파괴 미관측.
+- **분류**: exit0가짜 9(A1·A2·B1·B2·C1·D1·D2·E1·E2) / H1c런타임값 1(C2). runstate: alive 8 / reject 1(A1) / broken 1(C2).
+- **C2 broken 상세**: S-expression 평가기. `main.py:18 print(run(expression))` → `evaluator.py:23` `ValueError: First element of S-expression must be an operator string, got <class 'int'>`. main.py가 `(5 + 3)` 형태 중위식을 넘겨 첫 원소가 정수(5)가 됨. 평가기는 폴란드 표기법 기대(첫 원소 = 연산자 문자열). 파일 간 인터페이스 계약(함수 시그니처)은 멀쩡하고 입력 값 형식이 어긋남 → H1c 분류 유지. H1b 아님.
+- **exit0가짜 alive 해석 주의**: Docker는 stdin 미연결(EOF 즉시) → B·C 메뉴형도 Gemini의 `try/except EOFError` 패턴으로 exit=0 후 종료. "alive stdout-ok"는 코드가 실행됐다는 증거이지, 메뉴 루프를 실제로 돌았다는 증거가 아님. 관측 천장 여전히 유효.
+- A1 reject(stdout-return): 출력 없이 즉시 반환. stdin EOF 또는 빈 분기.
+
 ## §17 H4 Docker runner / h4_1~h4_2 invalid env runs (2026-06-09)
 
 - 구현: `runner.py`에 `run_in_docker`, `run.py`에 `use_docker`, `batch.py --docker`, Discord `/도커실행`을 추가했다. Docker 설치 후 관리자 권한 검증에서는 `python:3.11-slim` 컨테이너 실행 및 `run_in_docker({'main.py':'print(123)'})`가 성공했다.

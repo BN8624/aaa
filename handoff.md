@@ -1,17 +1,12 @@
 # aaa — HANDOFF (작업용)
 
-## 2026-06-09 H4 Docker handoff (next session first)
+## 2026-06-09 H4 Docker h4_3 완료 — 최초 유효 회차
 
-- 현재 최신 커밋은 `d1f6880 run h4_2`이다. 직전 `3d37694 run h4_1`도 있음.
-- `h4_1`, `h4_2`는 둘 다 파이프라인/commit/push는 성공했지만 **유효한 H4 Docker 실측이 아니다**. 10/10 모두 `docker: Error response from daemon: Access is denied.` / exit `125`로 Docker 실행 단계에서 실패했다.
-- `analysis_out/h4_2/summary.json`의 replay `alive 8 / reject 2`는 `verify_channel`이 생성 파일을 host subprocess로 재실행한 분류라서 Docker 성공 신호가 아니다. H4 판정에는 rows/log의 원 실행 `exit=125`와 `stderr_full`을 우선해야 한다.
-- 원인: Discord bot 프로세스/현재 로그온 세션이 Docker pipe 권한을 아직 못 받은 상태. 관리자 권한/별도 검증에서는 Docker 자체와 `python:3.11-slim` 컨테이너 실행이 성공했었다. 설치 직후 세션 권한 반영 문제로 보이며 로그아웃/재부팅 후 봇 재시작 필요.
-- 다음 세션 첫 액션:
-  1. 일반 PowerShell에서 `docker run --rm python:3.11-slim python -c "print('ok')"`가 `ok`를 내는지 확인.
-  2. Docker Desktop이 running인지 확인. 안 되면 Docker Desktop 실행 또는 재부팅.
-  3. Discord bot을 재시작해 새 로그온 토큰/권한을 받게 한다.
-  4. 새 태그 `h4_3`으로 `/도커실행 h4_3`.
-  5. `analysis_out/h4_3/rows.csv`에서 원 실행 exit가 125가 아닌지, `stderr_full`에 Docker daemon Access denied가 없는지 먼저 확인.
+- 최신 커밋: `0261462 run h4_3`.
+- h4_3: Docker 정상 작동. exit=125/Access denied 0건. **최초 유효 H4 Docker 실측.**
+- 결과: H1b=0/10, exit0가짜 9 / H1c 1(C2 broken). alive 8 / reject 1 / broken 1.
+- C2 broken = H1c (S-expression 평가기, 중위식 입력→폴란드식 기대 불일치, H1b 아님). → FINDINGS §18.
+- **관측 천장 주의**: Docker도 stdin 미연결 → B·C 메뉴형이 EOF 즉시 종료 후 exit=0(alive로 분류). 메뉴 루프 실제 실행 여부는 미확인. vtx와 동일한 관측 천장.
 
 > 이 문서 = 살아있는 현재 상태만. **얇게 유지(1~2화면).** 정의·명세·근거는 베끼지 않고 가리킨다.
 > 
@@ -24,22 +19,23 @@
 
 ## 1. 현재 위치
 
-- **H1 (a/b/c) 종료.** H1b = 부재(Gemini 누적 표면 0, 진짜 부재 다중 확인). 이제 vtx_13~30 유효 회차 **150칸 연속 H1b 0**(vtx_18·19·21 폐기). → 정본 리스크 레지스터 / FINDINGS §1~16.
-- **Q7 (왜 dict 수렴) 종료, 단 미세수정.** 주류는 dict/list 경계라 멤버 계약 충돌 구조적 미발생. vtx_25_D2처럼 class `Node`가 파일 경계를 넘어도 공유 생성자/동일 클래스 import로 계약이 맞으면 H1b 없이 완주.
-- **Q8 (실패=실행채널 문제?) 종료.** vtx_26~30 50칸 회귀에서 broken 0, H1b 0, alive/reject/inputmismatch만 관측. 결론: 실패 대부분은 정상 reject 또는 실행채널/포맷 불일치. 드문 데이터계약 H1c(vtx_20·22·23)는 남지만 H1b로 번지지 않음. → FINDINGS §16.
-- 보류: H2(모델 통일로 비교군 소멸). 다음 후보: H4(도커 미구현). 미착수: H3. → 정본 리스크 레지스터.
+- **H1 (a/b/c) 종료.** H1b = 부재(Gemini 누적 표면 0, 진짜 부재 다중 확인). vtx_13~30 유효 회차 **150칸 연속 H1b 0** + **h4_3 Docker 10칸 H1b 0 추가** → 총 160칸. → FINDINGS §1~18.
+- **Q7 (왜 dict 수렴) 종료, 단 미세수정.** 주류는 dict/list 경계라 멤버 계약 충돌 구조적 미발생. → FINDINGS §15.
+- **Q8 (실패=실행채널 문제?) 종료.** vtx_26~30 50칸 회귀, broken 0, H1b 0. → FINDINGS §16.
+- **H4 Docker 최초 유효 회차 완료(h4_3).** Docker 정상 작동, H1b=0. 관측 천장(stdin 미연결) 여전히 유효 — B·C 메뉴형 관측 미완. → FINDINGS §18.
+- 보류: H2(모델 통일로 비교군 소멸). 미착수: H3. → 정본 리스크 레지스터.
 
 ## 2. 다음 한 수 (하나만 고르고 그것만)
 
-직전 완료(2026-06-09): ①analyzer+verify_channel 통합 ✅ ②FINDINGS §11(vtx_14~17 닫음) ✅ ③Windows cp949 버그 수정 ✅ ④FINDINGS §12(vtx_20 닫음) ✅ ⑤회차완료 디스코드 웹훅 알림 구현/환경 우선순위/User-Agent 수정 ✅ ⑥vtx_21 429 사건 → client 에러분류·429복구 재설계(FINDINGS §13) ✅ ⑦vtx_22~30 완주(FINDINGS §14~16) ✅ ⑧분류 갭 보강 ✅ ⑨Discord `/업데이트`, `/연속실행` 운영 개선 ✅.
+직전 완료(2026-06-09): ①~⑨(vtx 시리즈, Q8 종료) ✅ ⑩H4 Docker 구현(runner/run/batch/Discord) ✅ ⑪Docker Access Denied 해소·봇 재시작 ✅ ⑫h4_3 최초 유효 Docker 회차 완료(H1b=0, C2 H1c) ✅ ⑬FINDINGS §18 기록 ✅.
 
 ★ §13 수정 핵심(client.py·limiter.py·run.py·batch.py): 400/401/403/404=재시도금지(`PermanentHTTPError`), 429=`RateLimitError`로 분리·재시도, Retry-After 우선+없으면 지수백오프+jitter(cap60), model별 global cooldown(`limiter.set_cooldown`)로 연쇄429 차단, 최종실패 로그에 본문·모델·attempt·sleep. 그리고 ★ 쿼터/권한 최종실패는 `RPDExceeded`처럼 회차를 멈춤 — 가짜 exit=-1 칸으로 데이터 오염하던 것 차단(§3). limiter 자가검증 8케이스 통과. 단 실호출 HTTP 분기는 미실행(키·네트워크 부재, 코드리뷰만).
 
 후보:
 
-1. **다음 스텝 선택 — H4 도커 실측 구현** ★ 추천. Q8은 닫혔고, 이제 “살아있어 보이는 코드가 실제 요구를 만족하나”를 보려면 도커/격리 실행 + acceptance 기반 관측이 필요. 단, 깸을 줄이는 프롬프트 수정이 아니라 **관측 계층 구현**으로만 시작.
-1. **★ 인증경로/쿼터 확정(§13 미결, 근본 원인 후보)** — client.py가 `aiplatform.googleapis.com`에 `?key=`로 호출 중. 정식 Vertex는 OAuth/서비스계정 요구 → 이 키 경로가 유료 1티어 project quota를 안 타고 별도 버킷에 묶였을 가능성. GCP 콘솔 Quotas에서 generativelanguage vs aiplatform 어디에 사용량 찍히는지 + 1티어 결제프로젝트와 키 발급프로젝트 일치 여부 확인. 필요시 client.py를 OAuth+`projects/<id>/locations/<region>/...` 정식 경로로 전환(인증 수정은 §3 ‘깸 줄이는 수정’ 경계 밖 — 인프라).
-1. **H3/known_failures 실험 설계** — 되돌림 루프를 켜야 하므로 H4/runner 관측층 뒤가 자연스럽다.
+1. **H4 추가 회차(h4_4~) 누적** ★ 추천. 1회차(10칸)만으로는 비결정적 판정 불가. Docker 정상 확인됐으니 `/도커실행 h4_4` 등 최소 3~5회차 더 쌓아 H1b=0 패턴 강화. 또한 stdin 주입(대본) 병행 실험 시 B·C 메뉴형 관측 천장 해소 가능.
+1. **★ 인증경로/쿼터 확정(§13 미결, 근본 원인 후보)** — client.py가 `aiplatform.googleapis.com`에 `?key=`로 호출 중. 정식 Vertex는 OAuth/서비스계정 요구 → 이 키 경로가 유료 1티어 project quota를 안 타고 별도 버킷에 묶였을 가능성. GCP 콘솔 Quotas 확인.
+1. **H3/known_failures 실험 설계** — 되돌림 루프를 켜야 하므로 Docker 관측층 뒤가 자연스럽다.
 
 ## 3. 작업 체크리스트 (까먹지 말 것 — 정의는 정본/아래 참조)
 
