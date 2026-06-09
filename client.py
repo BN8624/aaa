@@ -60,7 +60,7 @@ def _get_key() -> str:
 
 
 def call_model(model: str, contents, *, limiter, system: str = None,
-               max_retries: int = 5) -> dict:
+               max_retries: int = 8) -> dict:
     """모델 1회 호출(Vertex REST). 순서:
        acquire(한도 슬롯) → time 시작 → POST generateContent → 경과초 계산·record_call
        → 5xx/429면 backoff 후 재시도.

@@ -19,6 +19,11 @@
     - → aiplatform이 프로브 시점 200 = **h4_12~15 429는 일시적이었고 이미 회복.** /연속도커 4회차 연속 기동 시 Vertex 측 순간 한도(공유/지역 quota 혼잡 추정)에 잠깐 막힌 것.
   - **조치**: 그냥 재개(새 tag h4_16+). §13 backoff/cooldown이 일시 429 흡수. 다회차는 2개씩 끊어 돌려 순간 한도 회피. 재발 시에만 **Vertex 콘솔 quota**(online_prediction/generate_content per-minute, 지역별 — AI Studio 페이지 아님) 확인 + 지역고정/증액.
   - 부수 관측: aiplatform 200 응답이 `finishReason=MAX_TOKENS`·text=''(maxOutputTokens=16을 thinking이 다 소진) — gemini-3.5-flash가 thinking 모델임 재확인(프로덕션 32000은 충분).
+- **★ Vertex 실측 한도(probe_quota.py, 연사 측정)**: aiplatform에 16토큰 콜 연사 → **7번째에서 429(성공 6건 / 14.8초)**. ~2.5초 간격에도 6콜에 막힘 = **실제 한도가 매우 낮음(버스트 ~6)**, 빠르게 회복.
+  - **429 본문에 metric·limit 없음**: `{"code":429,"message":"Resource has been exhausted","status":"RESOURCE_EXHAUSTED"}`만, Retry-After도 없음. → Vertex(aiplatform+`?key=`) 경로는 generic 응답이라 **콘솔 없이 본문으로 한도 숫자 못 얻음**. 경험적 측정값(~6 버스트)이 우리가 가진 전부.
+  - **정체 확정**: `?key=`→aiplatform은 **Vertex 저(低)quota 접근(express-mode류)**이고 빌링으로 안 올라감. 크레딧 차감되나 throughput 한도 낮음. §13 "무료버킷" 가설은 폐기, **"저quota express 접근" 가설로 정정.** h4_12~15 429가 limiter rpm=15 밑에서도 난 이유 = 실제 천장(~6)이 limiter 가정보다 훨씬 낮아 회차 내 콜 버스트가 초과.
+  - **조치(B 채택, 코드 수정)**: ①`limiter.py`에 `min_interval`(콜 간 최소 간격) 추가 — RPM 카운트로 못 막는 버스트를 끊음. 기본 0(회귀 보존), 자가검증 [9][10] 추가(10/10 통과). ②`run.py` production limiter = `Limiter(rpm=8, rpd_limit=1450, min_interval=4.0)`. ③`client.py` `max_retries` 5→8(저quota 일시 429를 backoff로 더 오래 흡수, 배치 중단 빈도↓). 모델 동작·프롬프트 불변(인프라만) — 절대 제약 무관.
+  - **근본책(보류)**: 정식 Vertex 인증(서비스계정 OAuth + `projects/<id>/locations/<region>/...`)으로 프로젝트 실제 quota 획득. 콘솔/SA 필요해 미착수(C안).
 
 ## §27 H4 Docker h4_11 유효 회차 — argv=["1"] 검증 + E 도메인 데이터계약 H1c 첫 관측 (2026-06-09)
 

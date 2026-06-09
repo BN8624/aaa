@@ -7,8 +7,9 @@
 - **유효 Docker 누적: 70칸 유지(h4_11까지), 증가 없음.** H1b=0.
 - **§13 쿼터 정지 실호출 첫 발화 확인**: 429 fake가 `코더빈손`/fake로 분류, run_h1b 0 — H1b 오염 0. 인프라 거부를 모델 실패로 위장 안 함이 실전 작동.
 - **★ 429 진단 해소(§28, probe_endpoints.py)**: **일시적 429였음 확정 — 영구 벽 아님.** 프로브: generativelanguage(AI Studio)=403 blocked, aiplatform(Vertex, 현재 코드)=200 정상. → 엔드포인트 교체·무료버킷 가설 폐기, 코드 경로 맞음. AI Studio quota(RPM1k 등)는 미적용 숫자(403). 실제 한도=Vertex quota(미확인). **aiplatform 200 = 이미 회복.**
-  - **조치: 그냥 재개**(새 tag h4_16+). §13 backoff가 일시 429 흡수. /연속도커는 2개씩 끊어 순간 한도 회피. 재발 시에만 Vertex 콘솔 quota 확인(AI Studio 아님)·지역고정/증액.
-  - limiter rpm15/rpd1450 = Gemma 무료 잔재, 실제보다 수십배 보수적 → 429 유발 불가(위생상 갱신 대상일 뿐, Vertex 실RPM 확인 전엔 보수적 유지).
+  - **Vertex 실측 한도 매우 낮음(probe_quota.py)**: 16토큰 콜 연사 → 7번째 429(성공 6 / 14.8s). 429 본문에 metric·limit 없음(generic) → 콘솔 없이 숫자 못 얻음, 경험값 ~6 버스트가 전부. 정체 = `?key=`→aiplatform 저quota express 접근(빌링으로 안 올라감). "무료버킷"→"저quota" 정정.
+  - **조치(B 적용, 커밋됨)**: limiter에 `min_interval`(콜 간 간격) 추가, production = `Limiter(rpm=8, min_interval=4.0)`; client `max_retries` 5→8. 버스트 차단 + 잔여 429를 backoff로 흡수 → 회차 안 죽고 완주. limiter 자가검증 [9][10] 추가, 10/10 통과. 인프라만, 모델 동작 불변.
+  - **운영**: `/도커실행 h4_16` 한 개씩(여전히 /연속도커 남발 금지). 근본책(C, 보류) = 정식 Vertex 인증(SA+OAuth+projects/locations 경로)로 실제 quota 획득.
 - **§26 argv=["1"] 검증 성공(§27)**: A2·C1·C2·D2 alive 회복, DATA_CONTRACT_GRAMMAR 부작용 0. C lexer→parser→evaluator 채널 개방.
 - **E1 데이터계약 H1c 첫 관측(§27)**: summarize_components dict 키 ↔ main 'representative' 기대 불일치 → KeyError. §12·§14 패밀리 E 도메인 첫 출현. H1b 아님. **아직 단일 사례**(C 채널 열린 뒤 재현 관측은 쿼터로 중단됨).
 - **B1·B2 메뉴앞EOF 반복(§28)**: DUMMY_STDIN(12행) 긴 메뉴에 소진. 깸 아님이나 반복 패턴 → 확장 호명됨.

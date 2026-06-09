@@ -47,7 +47,9 @@ def run_task(requirement: str, *, expected_type: str = None,
     if task_id is None:
         task_id = time.strftime("%Y%m%d_%H%M%S")
 
-    limiter = Limiter()   # 토대 기본값(rpm=15, rpd_limit=1450)
+    # Vertex(aiplatform) 실측 한도가 낮음(~6콜 버스트면 429 — FINDINGS §28).
+    # rpm 하향 + 콜 간 4초 페이싱으로 버스트를 안 만든다. 잔여 429는 client backoff(8회)가 흡수.
+    limiter = Limiter(rpm=8, rpd_limit=1450, min_interval=4.0)
     state = TaskState(task_id, expected_type=expected_type, save_dir=save_dir)
 
     # 실행 결과(runner가 못 가면 기본값) — runs.jsonl에 넣을 '사실'

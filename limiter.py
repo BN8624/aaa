@@ -40,9 +40,16 @@ class Limiter:
     rpd_limit: 하루 안전선(1500이 천장, 안전선 1450 — 6장).
     """
 
-    def __init__(self, rpm: int = 15, rpd_limit: int = 1450):
+    def __init__(self, rpm: int = 15, rpd_limit: int = 1450,
+                 min_interval: float = 0.0):
         self.rpm = rpm
         self.rpd_limit = rpd_limit
+        # min_interval: 연속 호출 사이 강제 최소 간격(초). RPM(분당 횟수)만으론 못 막는
+        #   '버스트'를 끊는다. Vertex(aiplatform) 실측 한도가 매우 낮아(~6콜 버스트면 429,
+        #   본문에 metric 없음 — FINDINGS §28) RPM 카운트보다 콜 간 간격이 결정적.
+        #   0이면 비활성(기존 동작·자가검증 보존). production은 run.py가 값을 준다.
+        self.min_interval = min_interval
+        self._last_grant = -1e9   # 마지막으로 슬롯을 내준 monotonic 시각(첫 콜은 즉시 통과)
         self._calls = []          # 최근 호출 타임스탬프(메모리, RPM용) — monotonic 초
         self._lock = threading.Lock()   # 워커 병렬 대비(슬롯 경쟁 보호)
         # 모델별 global cooldown: 429를 맞은 모델은 이 시각(monotonic)까지 새 호출 금지.
@@ -72,6 +79,13 @@ class Limiter:
                 f"today={today_calls(model)}. 자정(PT)까지 대기 대신 멈춤(6장)."
             )
 
+        # --- 1.5) min_interval: 직전 슬롯으로부터 최소 간격이 지나도록 (버스트 차단) ---
+        if self.min_interval > 0:
+            with self._lock:
+                wait = (self._last_grant + self.min_interval) - time.monotonic()
+            if wait > 0:
+                time.sleep(wait)
+
         # --- 2) RPM: 최근 60초 창이 rpm개 미만이 될 때까지 ---
         while True:
             with self._lock:
@@ -81,6 +95,7 @@ class Limiter:
                 if len(self._calls) < self.rpm:
                     # 슬롯 있음 → 지금 호출로 기록하고 통과
                     self._calls.append(now)
+                    self._last_grant = now
                     return
                 # 슬롯 꽉 참 → 가장 오래된 호출이 60초를 넘길 때까지의 대기시간 계산
                 oldest = min(self._calls)
@@ -220,6 +235,25 @@ if __name__ == "__main__":
     lim3.acquire("other-model")         # 다른 모델 → 즉시 통과
     assert fake["slept"] == [], f"무관 모델이 쿨다운에 걸림: {fake['slept']}"
     print("[8] cooldown: 모델별 격리(무관 모델 즉시 통과) ✓")
+
+    # ---------- [9] min_interval: 콜 간 최소 간격 강제(버스트 차단) ----------
+    fake["slept"] = []
+    fake["t"] = 0.0
+    rpd_value["n"] = 0
+    lim5 = limiter_mod.Limiter(rpm=15, rpd_limit=1450, min_interval=5.0)
+    lim5.acquire(M)                     # 첫 콜 → 페이싱 없이 즉시
+    assert fake["slept"] == [], f"첫 콜이 페이싱에 걸림: {fake['slept']}"
+    lim5.acquire(M)                     # 둘째 콜 → 5초 간격 강제
+    assert 5.0 in fake["slept"], f"min_interval 대기 안 함: {fake['slept']}"
+    print("[9] min_interval: 둘째 콜이 5초 페이싱 대기 ✓")
+
+    # ---------- [10] min_interval=0(기본)이면 페이싱 없음(기존 동작 보존) ----------
+    fake["slept"] = []
+    fake["t"] = 0.0
+    lim6 = limiter_mod.Limiter(rpm=15, rpd_limit=1450)   # min_interval 기본 0
+    lim6.acquire(M); lim6.acquire(M)
+    assert fake["slept"] == [], f"min_interval=0인데 페이싱 발생: {fake['slept']}"
+    print("[10] min_interval=0 기본: 페이싱 없음(회귀 보존) ✓")
 
     print("\n=== 전체 통과 ✓ ===")
     print("    (RPM은 메모리 타임스탬프, RPD는 usage.json — 성격이 달라 저장 위치 분리)")
