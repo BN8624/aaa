@@ -1,14 +1,34 @@
 task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
 h4_3_A1,3,A1,exit0가짜,,0,reject,stdout-return,,0,2,"
 ",2026-06-08T21:47:39.434293-08:00
+h4_3_A1,3,A1,기타예외,,125,reject,stdout-return,,0,2,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T21:59:18.061808-08:00
 h4_3_A2,3,A2,exit0가짜,,0,alive,stdout-ok,,0,3,"
 ",2026-06-08T21:48:25.366758-08:00
+h4_3_A2,3,A2,기타예외,,125,alive,stdout-ok,,0,2,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T21:59:57.151747-08:00
 h4_3_B1,3,B1,exit0가짜,,0,alive,stdout-ok,,0,3,"
 ",2026-06-08T21:48:57.507503-08:00
+h4_3_B1,3,B1,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:00:33.488147-08:00
 h4_3_B2,3,B2,exit0가짜,,0,alive,stdout-ok,,0,3,"
 ",2026-06-08T21:49:51.781705-08:00
+h4_3_B2,3,B2,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:01:26.464034-08:00
 h4_3_C1,3,C1,exit0가짜,,0,alive,stdout-ok,,0,4,"
 ",2026-06-08T21:50:51.742704-08:00
+h4_3_C1,3,C1,기타예외,,125,broken,stderr-exc,,1,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:02:20.264230-08:00
 h4_3_C2,3,C2,H1c런타임값,ValueError: First element of S-expression mus,1,broken,stderr-exc,,1,4,"
 Traceback (most recent call last):
   File ""/workspace/main.py"", line 18, in <module>
@@ -21,11 +41,31 @@ Traceback (most recent call last):
     raise ValueError(f""First element of S-expression must be an operator string, got {type(op)}"")
 ValueError: First element of S-expression must be an operator string, got <class 'int'>
 ",2026-06-08T21:52:00.626422-08:00
+h4_3_C2,3,C2,기타예외,,125,alive,stdout-ok,,0,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:03:44.830467-08:00
 h4_3_D1,3,D1,exit0가짜,,0,alive,stdout-ok,,0,5,"
 ",2026-06-08T21:53:26.794341-08:00
+h4_3_D1,3,D1,기타예외,,125,alive,stdout-ok,,0,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:04:43.630904-08:00
 h4_3_D2,3,D2,exit0가짜,,0,alive,stdout-ok,,0,5,"
 ",2026-06-08T21:55:34.763664-08:00
+h4_3_D2,3,D2,기타예외,,125,alive,stdout-ok,,0,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:05:32.759150-08:00
 h4_3_E1,3,E1,exit0가짜,,0,alive,stdout-ok,,0,4,"
 ",2026-06-08T21:57:30.707616-08:00
+h4_3_E1,3,E1,기타예외,,125,alive,stdout-ok,,0,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:07:03.153514-08:00
 h4_3_E2,3,E2,exit0가짜,,0,alive,stdout-ok,,0,2,"
 ",2026-06-08T21:58:46.275550-08:00
+h4_3_E2,3,E2,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T22:07:39.884640-08:00

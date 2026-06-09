@@ -1,6 +1,6 @@
 {
   "label": "h4_3",
-  "n_rows": 10,
+  "n_rows": 20,
   "cells": [
     "A1",
     "A2",
@@ -19,22 +19,23 @@
   "exec": {
     "tally": {
       "exit0가짜": 9,
-      "H1c런타임값": 1
+      "H1c런타임값": 1,
+      "기타예외": 10
     },
     "h1b": 0,
     "h1b_types": {}
   },
   "replay": {
-    "n_replayed": 10,
+    "n_replayed": 20,
     "runstate": {
-      "reject": 1,
-      "alive": 8,
-      "broken": 1
+      "reject": 2,
+      "alive": 16,
+      "broken": 2
     },
     "runchannel": {
-      "stdout-return": 1,
-      "stdout-ok": 8,
-      "stderr-exc": 1
+      "stdout-return": 2,
+      "stdout-ok": 16,
+      "stderr-exc": 2
     },
     "run_h1b_flags": 0,
     "static_h1b_false_positive": 0,
@@ -44,6 +45,11 @@
         "alive": 8
       },
       "H1c런타임값": {
+        "broken": 1
+      },
+      "기타예외": {
+        "reject": 1,
+        "alive": 8,
         "broken": 1
       }
     }
@@ -55,83 +61,93 @@
   "nondeterministic_splits": [],
   "per_cell": {
     "A1": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "A2": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "B1": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "B2": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "C1": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "C2": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "H1c런타임값": 1
+        "H1c런타임값": 1,
+        "기타예외": 1
       }
     },
     "D1": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "D2": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "E1": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     },
     "E2": {
-      "n_exec": 1,
+      "n_exec": 2,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "exit0가짜": 1
+        "exit0가짜": 1,
+        "기타예외": 1
       }
     }
   }
