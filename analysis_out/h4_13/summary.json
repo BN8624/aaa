@@ -1,0 +1,46 @@
+{
+  "label": "h4_13",
+  "n_rows": 1,
+  "cells": [
+    "A1"
+  ],
+  "rounds": [
+    "13"
+  ],
+  "exec": {
+    "tally": {
+      "코더빈손": 1
+    },
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "replay": {
+    "n_replayed": 1,
+    "runstate": {
+      "fake": 1
+    },
+    "runchannel": {},
+    "run_h1b_flags": 0,
+    "static_h1b_false_positive": 0,
+    "cat_x_runstate": {
+      "코더빈손": {
+        "fake": 1
+      }
+    }
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 1
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    }
+  }
+}
