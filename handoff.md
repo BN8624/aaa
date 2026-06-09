@@ -6,7 +6,7 @@
 - **유효 Docker 누적 70칸 H1b=0**(h4_11까지). vtx 150 + Docker 70 = **220칸 H1b=0.**
 - **h4_12~15 = 무효/폐기(§28)**: 일시적 429로 중단. h4_12 부분(5칸)·13~15 전량 무효. 429는 회복됨(프로브 확정). 누적 증가 없음.
 - **저quota 대응 B 적용·커밋(§28)**: `limiter min_interval=4.0·rpm=8`, `client max_retries=8`. Vertex 실측 한도 ~6콜 버스트(express 저quota, 빌링 무관·본문에 숫자 없음). → **`/도커실행` 1개씩**, /연속도커 남발 금지. 근본책(보류) = 정식 Vertex 인증(SA+OAuth).
-- **봇 2중 사망버그 수정(§29)**: 작업 `StopOnIdleEnd=false`(PC 유휴해제 시 ~30초 사망) + `MultipleInstances=Parallel`(/재시작봇이 자기만 죽이던 IgnoreNew). Task Scheduler 설정이라 **repo 밖** — 재등록 시 재적용 필요(§29).
+- **봇 2중 사망버그 수정(§29)**: 작업 `StopOnIdleEnd=false`(PC 유휴해제 시 ~30초 사망) + `MultipleInstances=Parallel`(/재시작봇이 자기만 죽이던 IgnoreNew). Task Scheduler 설정이라 repo 밖이었으나 → **`register_bot_task.ps1`로 백업 완료**(작업 삭제/기계 재구성 시 한 줄 복구, §29).
 - **관측 본류(§26·§27)**: `DUMMY_ARGV=["1"]`로 C lexer→parser→evaluator 채널 개방(C1·C2·A2·D2 alive 회복). **E1 데이터계약 H1c 첫 관측**(§12·§14 패밀리 E 도메인 출현) — 아직 단일 사례, C 채널 다회차 재현이 h4_16+의 핵심 관측 목표.
 
 > 이 문서 = 살아있는 현재 상태만. **얇게 유지(1~2화면).** 정의·명세·근거는 베끼지 않고 가리킨다.
@@ -47,6 +47,7 @@
 - [ ] **새 tag**: `<세션>_<회차>` 형식, `_숫자_` 유지(analyze 정규식 요구). 부분/실패 tag 재사용 금지 → 새 번호.
 - [ ] **봇 재시작 필요 시**: `/업데이트`(pull+재시작) 또는 `/재시작봇`(재시작만). 둘 다 예약 작업 경유 → Docker 권한 보장.
 - [ ] **봇 완전사망(무응답) 시**: `/재시작봇`·`/업데이트`는 봇이 처리하는 명령이라 **못 씀**(닭-달걀). → Windows에서 직접 `schtasks /run /tn AAABotRestart`. (§29 — StopOnIdleEnd가 봇을 ~30초 만에 죽이던 건 수정 완료.)
+- [ ] **작업 자체가 사라졌거나 설정이 틀어졌을 때**: 관리자 PowerShell에서 `powershell -ExecutionPolicy Bypass -File .\register_bot_task.ps1 -Run` — 올바른 설정(§29: StopOnIdleEnd/RunOnlyIfIdle/RestartOnIdle=false, MultipleInstances=Parallel, LogonType Interactive)으로 재등록+기동.
 - [ ] **한글 파일(batch.py TASKS) 편집은 GitHub 웹 Edit** — 폰 sed 금지(인코딩 깨짐).
 
 돌리기:

@@ -7,7 +7,8 @@
 - 수정: `Set-ScheduledTask`로 `IdleSettings.StopOnIdleEnd=$false`, `RestartOnIdle=$false`, `RunOnlyIfIdle=$false`. 이후 작업 launch 봇이 100초+ 생존·Discord 443 연결 확인.
 - **운영 추가**: 봇 완전사망 시 `/재시작봇`·`/업데이트` 못 씀 → **Windows에서 직접 `schtasks /run /tn AAABotRestart`**가 유일 확실 부팅 경로(§23 작업 경유라 Docker 권한도 보장).
 - **★ 둘째 버그 — MultipleInstancesPolicy=IgnoreNew로 `/재시작봇` 자체가 봇을 죽이고 새 봇 안 띄움**: 봇이 *예약 작업으로 떠 있는 상태*에서 `/재시작봇`→`schtasks /run AAABotRestart` 호출 시, 그 작업 인스턴스가 이미 실행 중(=현재 봇)이라 **IgnoreNew가 새 실행을 무시**(성공 반환하나 새 봇 안 뜸) → 핸들러가 곧 `sys.exit(0)` → 새 봇 없이 죽기만 함. (작업 Last Run이 트리거 없이 또 찍힌 걸로 확진.) **수정: `MultipleInstances=Parallel`** → 재시작 시 새 인스턴스 기동(구 인스턴스는 sys.exit로 퇴장, 토큰 ~2s 겹침은 무해). 이후 단독 생존·Discord 연결 확인.
-- 두 수정 모두 Task Scheduler 설정 변경(코드 무관, repo에 없음). 작업 재등록 시 재적용 필요: StopOnIdleEnd=false, RunOnlyIfIdle=false, MultipleInstances=Parallel.
+- 두 수정 모두 Task Scheduler 설정 변경(코드 무관, 원래 repo에 백업 없던 단일 실패점). 작업 재등록 시 재적용 필요: StopOnIdleEnd=false, RunOnlyIfIdle=false, RestartOnIdle=false, MultipleInstances=Parallel, LogonType Interactive(§23).
+- **백업 추가**: `register_bot_task.ps1`(repo) — 위 설정 전부를 멱등 등록하는 복구 스크립트. 작업 삭제/기계 재구성 시 `powershell -ExecutionPolicy Bypass -File .\register_bot_task.ps1 -Run` 한 줄로 복구. 등록 후 박힌 값을 Get-ScheduledTask로 즉시 검증 출력. (작업 액션 = `pythonw.exe discord_bot.py`, 작업 인스턴스 수명 = 봇 수명.)
 
 ## §28 H4 Docker h4_12(부분)·h4_13~15(무효) — 쿼터 소진, §13 정지 메커니즘 실전 첫 발화 (2026-06-09)
 
