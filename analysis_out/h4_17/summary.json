@@ -16,6 +16,8 @@
   "rounds": [
     "17"
   ],
+  "excluded_infra_fakes": 0,
+  "keep_fakes": false,
   "exec": {
     "tally": {
       "exit0가짜": 8,

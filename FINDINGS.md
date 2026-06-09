@@ -1,5 +1,18 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §32 h4_17·h4_18 — ★ 실험 첫 H1b 관측(h4_17 B1, import 환각) + h4_18 H1b 0 (2026-06-10)
+
+- **데이터 출처/처리**: 봇이 정식 Vertex(SA OAuth) 경로로 수집, `origin/main`에 push(`39d9b38 run h4_17`, `24b9912 run h4_18`). 각 10칸, **인프라가짜 0**(정식경로 안정 — §31 검증과 일치). 분석은 §31 수정 분석기(인프라가짜 자동제외)로 재생성. **이번 세션부터 작업을 main으로 통합**(분석기 수정·§31을 main에 병합 후 분석).
+- **★★ h4_17 = H1b 1/10 — vtx_13 이후 처음으로 H1b 출현.** (그간 vtx_13~17 50칸 + h4_3~h4_16 전부 H1b 0이었음.) 재실행 runstate: alive 6 / reject 2 / broken 1 / inputmismatch 1.
+  - **B1 import불일치**: `graph.py:1`의 `from typing import dict, list, Union` → `ImportError: cannot import name 'dict' from 'typing'`. `main.py`가 `import graph as graph_ops` 하는 순간 import 체인이 깨짐(파일 로드 전 사망). 3파일(storage/graph/main) 체인의 import 계약 파괴 → **H1b(import불일치)**, run=broken/stderr-exc.
+  - **★ 메커니즘 주의 — dict 수렴 가설과 무모순**: 이 H1b는 파일 간 *커스텀 타입/시그니처* 불일치가 아니라 **모델이 stdlib에서 없는 이름을 환각**한 것(`typing`엔 소문자 `dict`/`list` 없음 — `Dict`/`List`이거나 빌트인 직접 사용이 맞음). 즉 §10·§15·§27의 "dict 수렴 → 타입계약 H1b 구조적 부재"는 여전히 성립하고, H1b는 **import 레이어 환각이라는 별도 경로**로 들어왔다. → "표면 H1b 0 = 진짜 부재" 결론을 *타입계약* 한정으로 좁히고, **import 환각이 드물게 H1b를 만든다**를 새 경로로 추가.
+  - 나머지 9칸 H1b 아님: B2·C2 reject(stdout-return), E2 STDIN_FORMAT_MISMATCH(inputmismatch), A1·A2·C1·D1·D2·E1 alive(stdout-ok).
+- **h4_18 = H1b 0/10.** 재실행 alive 8 / broken 1 / inputmismatch 1.
+  - **B1 메뉴앞EOF**(broken, stderr-exc): 메뉴형 프로그램에 DUMMY_STDIN 소진 → `EOFError`. 입력채널 문제, H1b 아님. §25·§28의 **B칸 메뉴-EOF 패턴 계속**(DUMMY_STDIN 길이 부족 누적 호명).
+  - **D2 기타예외**(정적): 5파일 파서(models/parser/rewriter/serializer/main)에서 `Error: redefinition of group name 'LPAREN' as group 8; was group 7` — 토크나이저 정규식 중복 named group(모델 버그). 단 **재실행=alive**라 데이터로는 alive 처리, H1b 아님.
+  - E2 STDIN_FORMAT_MISMATCH(inputmismatch): `Invalid JSON input - Extra data`. 입력형식 거부.
+- **해석/누적**: **H1b 0 연속 종료**(h4_17 B1). 단 1/10·메커니즘이 import 환각이라 비결정적·드문 사건 — 단발 단정 금지(§3). dict 수렴 본성은 유지. C·E 도메인 *파일간* 데이터계약 깸(§31 C1 `Unknown AST node type`류)은 이번 두 회차에선 명시 재현 없음(D2 정규식·E2 stdin형식은 채널/입력 쪽). **다음 한 수**: (1) import 환각 H1b 재현 빈도(h4_19+), (2) B칸 메뉴-EOF 입력채널 누적 → DUMMY_STDIN 확장 검토, (3) C·E 파일간 데이터계약 재현 추적.
+
 ## §31 정식 Vertex 경로 검증 완료 + h4_16 첫 정식경로 유효 회차(H1b 0/10) + 분석기 인프라가짜 자동제외 (2026-06-09~10)
 
 - **§30 C안 검증 완료(SA OAuth 경로 실작동)**: `.env` `VERTEX_PROJECT=ocr-project-496308`·`VERTEX_LOCATION=global`, SA `ocr-pj@ocr-project-496308.iam.gserviceaccount.com`, 역할 `roles/aiplatform.user`. `python client.py`(gemini-3.5-flash) 통과, `python probe_quota.py 8 0`(연사 8콜) **429 0건**. → §28의 express `?key=` ~6 저캡(연사 7번째 429)이 정식 OAuth 경로에선 사라짐 확인. **express 경로는 저quota 테스트 외 사용 금지**(§30 운영수칙). 사용량은 Agent Platform 메뉴 가시성 말고 **Cloud Monitoring Metrics Explorer**로 관찰.
