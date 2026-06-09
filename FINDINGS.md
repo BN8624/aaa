@@ -1,5 +1,13 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §17 H4 Docker runner / h4_1~h4_2 invalid env runs (2026-06-09)
+
+- 구현: `runner.py`에 `run_in_docker`, `run.py`에 `use_docker`, `batch.py --docker`, Discord `/도커실행`을 추가했다. Docker 설치 후 관리자 권한 검증에서는 `python:3.11-slim` 컨테이너 실행 및 `run_in_docker({'main.py':'print(123)'})`가 성공했다.
+- h4_1: pipeline/commit/push 성공(`3d37694 run h4_1`)이나 10/10 모두 Docker 원 실행이 `exit=125`, `docker: Error response from daemon: Access is denied.`. 무효 회차.
+- h4_2: pipeline/commit/push 성공(`d1f6880 run h4_2`)이나 h4_1과 동일하게 10/10 모두 `exit=125`, `Access is denied.`. 무효 회차.
+- 분석 주의: `summary.json` replay의 `alive/reject`는 생성 파일을 host subprocess로 다시 실행한 분류라 Docker 성공을 뜻하지 않는다. H4에서는 원 실행 rows/log의 `exit`와 `stderr_full`이 우선이다.
+- 결론: 아직 Docker 실측 데이터 없음. 문제는 모델/생성 코드가 아니라 Discord bot/로그온 세션의 Docker pipe 권한 반영 문제. 재부팅 또는 로그아웃/로그인 후 Docker Desktop running 확인, bot 재시작, `h4_3` 재시도 필요.
+
 > 날 사실만. 해석·가설은 aaa_progress.md. 기준 2026-06-06(PT).
 
 ## §1 정의

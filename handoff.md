@@ -1,5 +1,18 @@
 # aaa — HANDOFF (작업용)
 
+## 2026-06-09 H4 Docker handoff (next session first)
+
+- 현재 최신 커밋은 `d1f6880 run h4_2`이다. 직전 `3d37694 run h4_1`도 있음.
+- `h4_1`, `h4_2`는 둘 다 파이프라인/commit/push는 성공했지만 **유효한 H4 Docker 실측이 아니다**. 10/10 모두 `docker: Error response from daemon: Access is denied.` / exit `125`로 Docker 실행 단계에서 실패했다.
+- `analysis_out/h4_2/summary.json`의 replay `alive 8 / reject 2`는 `verify_channel`이 생성 파일을 host subprocess로 재실행한 분류라서 Docker 성공 신호가 아니다. H4 판정에는 rows/log의 원 실행 `exit=125`와 `stderr_full`을 우선해야 한다.
+- 원인: Discord bot 프로세스/현재 로그온 세션이 Docker pipe 권한을 아직 못 받은 상태. 관리자 권한/별도 검증에서는 Docker 자체와 `python:3.11-slim` 컨테이너 실행이 성공했었다. 설치 직후 세션 권한 반영 문제로 보이며 로그아웃/재부팅 후 봇 재시작 필요.
+- 다음 세션 첫 액션:
+  1. 일반 PowerShell에서 `docker run --rm python:3.11-slim python -c "print('ok')"`가 `ok`를 내는지 확인.
+  2. Docker Desktop이 running인지 확인. 안 되면 Docker Desktop 실행 또는 재부팅.
+  3. Discord bot을 재시작해 새 로그온 토큰/권한을 받게 한다.
+  4. 새 태그 `h4_3`으로 `/도커실행 h4_3`.
+  5. `analysis_out/h4_3/rows.csv`에서 원 실행 exit가 125가 아닌지, `stderr_full`에 Docker daemon Access denied가 없는지 먼저 확인.
+
 > 이 문서 = 살아있는 현재 상태만. **얇게 유지(1~2화면).** 정의·명세·근거는 베끼지 않고 가리킨다.
 > 
 > - 왜·무엇·구현 명세·가설 정의 → **정본 `work_unified.md`**
