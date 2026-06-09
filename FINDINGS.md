@@ -120,3 +120,14 @@
 - 검증: limiter 자가검증 8케이스로 확장(Retry-After 우선·cap·쿨다운 대기·모델별 격리 추가) 전부 통과. RPM 로직 불변(15개 즉시·16번째 60초 대기 회귀 없음). 실호출 HTTP 분기는 키·네트워크 부재로 코드리뷰로만 검증(미실행).
 - 목표 달성: RPM 안 낮춤. 순간 429는 재시도+쿨다운으로 흡수돼 run 전체가 안 죽음. 지속 429는 가짜 데이터 없이 전체 진단과 함께 깨끗이 멈춤.
 - 미결/다음: (1) 인증경로/쿼터 확인(콘솔) — 1티어가 실제 적용되는지. (2) vtx_22로 429 복구가 실호출에서 도는지 + §12 데이터계약 broken 재현 관측. (3) 핸드오프 §2에 본 수정 반영.
+
+## §14 vtx_22 — 429 복구 확인 + 데이터계약 broken 재현 (2026-06-09)
+
+- 사건: vtx_22가 10/10칸 전부 생성·실행·분석 완료. vtx_21의 429 오염은 재현 안 됨. `analysis_out/vtx_22` 생성 완료, rows 기준 A1~E2 빠진 칸 없음.
+- 결과: 정적 H1b 0/10. vtx_13~22 유효 타입계약 도메인 누적은 이제 **70칸 연속 H1b 0**(vtx_21 폐기). dict/list 수렴으로 멤버계약 충돌이 구조적으로 안 나는 흐름 유지.
+- 재실행 runstate: alive 7 / reject 1 / silent 1 / broken 1. 채널: stdout-ok 7 / stdout-return 1 / none 1 / stderr-exc 1. run_h1b 플래그 0.
+- ★ broken 1칸(C1, 산술식 평가기) = §12 데이터계약 broken 재현. parser는 AST 타입을 `BinaryOp`/`Number`/`UnaryOp`(PascalCase)로 만들고, evaluator는 `binary_op`/`number`/`unary_op`(snake_case)을 기대 → `Error: Unknown AST node type: BinaryOp`.
+  - import·시그니처는 통과. 실패 지점은 파일 간 dict 내부 스키마의 문자열 계약 불일치.
+  - §12 vtx_20 C1의 `Unknown AST node structure`와 같은 계열. 이제 단일 사례가 아니라 **C 도메인에서 2회 관측**.
+- 해석(가설 강화, 아직 단정 금지): Q8 “실패=실행채널 문제?”는 더 좁혀짐. §11의 broken은 채널 문제였지만, §12·§14의 broken은 채널이 아니라 데이터계약(H1c 쪽)이다. dict 수렴은 H1b를 막는 대신, 파서/평가기류 C 도메인에서 AST 스키마 불일치로 새 깸을 만든다는 쪽으로 증거가 쌓인다.
+- 429 쪽 해석: vtx_22에서 429 fake가 없어서 §13 수정이 최소한 실호출 회차를 방해하지 않음은 확인. 다만 실제 429를 다시 맞아 재시도·cooldown·회차중단이 작동한 사례는 아직 없음. 인증경로/쿼터 의심은 여전히 미결.
