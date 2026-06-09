@@ -1,0 +1,28 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_17_A1,17,A1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T07:59:11.261809-08:00
+h4_17_A2,17,A2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T08:00:03.763068-08:00
+h4_17_B1,17,B1,H1b,import불일치,1,broken,stderr-exc,,1,3,"
+Traceback (most recent call last):
+  File ""/workspace/main.py"", line 3, in <module>
+    import graph as graph_ops
+  File ""/workspace/graph.py"", line 1, in <module>
+    from typing import dict, list, Union
+ImportError: cannot import name 'dict' from 'typing' (/usr/local/lib/python3.11/typing.py)
+",2026-06-09T08:00:27.736456-08:00
+h4_17_B2,17,B2,exit0가짜,,0,reject,stdout-return,,0,3,"
+",2026-06-09T08:01:12.655934-08:00
+h4_17_C1,17,C1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T08:02:06.066466-08:00
+h4_17_C2,17,C2,exit0가짜,,0,reject,stdout-return,,0,3,"
+",2026-06-09T08:03:15.718490-08:00
+h4_17_D1,17,D1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T08:04:01.308559-08:00
+h4_17_D2,17,D2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T08:04:58.502184-08:00
+h4_17_E1,17,E1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T08:06:18.158983-08:00
+h4_17_E2,17,E2,STDIN_FORMAT_MISMATCH,Error: Invalid JSON input - Extra data: line ,1,inputmismatch,STDIN_FORMAT_MISMATCH,,1,2,"
+Error: Invalid JSON input - Extra data: line 2 column 1 (char 3)
+",2026-06-09T08:06:52.741794-08:00
