@@ -1,0 +1,36 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_11_A1,11,A1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T00:32:25.259817-08:00
+h4_11_A2,11,A2,exit0가짜,,0,alive,stdout-ok,,0,2,"
+",2026-06-09T00:33:14.761558-08:00
+h4_11_B1,11,B1,exit0가짜,,0,reject,stdout-return,,0,3,"
+",2026-06-09T00:33:59.745848-08:00
+h4_11_B2,11,B2,메뉴앞EOF,,1,broken,stderr-exc,,1,3,"
+Traceback (most recent call last):
+  File ""/workspace/main.py"", line 102, in <module>
+    main()
+  File ""/workspace/main.py"", line 34, in main
+    choice = input(""Select an option (1-7): "").strip()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+",2026-06-09T00:36:35.148004-08:00
+h4_11_C1,11,C1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T00:37:24.684990-08:00
+h4_11_C2,11,C2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T00:38:33.731183-08:00
+h4_11_D1,11,D1,exit0가짜,,0,alive,stdout-ok,,0,5,"
+",2026-06-09T00:39:30.966561-08:00
+h4_11_D2,11,D2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T00:41:02.230275-08:00
+h4_11_E1,11,E1,H1c런타임값,"KeyError: ""Could not find 'representative' ke",1,broken,stderr-exc,,1,4,"
+Traceback (most recent call last):
+  File ""/workspace/main.py"", line 47, in <module>
+    result = run_pipeline(sample_edges)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/workspace/main.py"", line 36, in run_pipeline
+    raise KeyError(""Could not find 'representative' key in component summary."")
+KeyError: ""Could not find 'representative' key in component summary.""
+",2026-06-09T00:42:22.887142-08:00
+h4_11_E2,11,E2,기타예외,,1,broken,stderr-exc,,1,4,"
+Error: Graph must be a dictionary representing adjacency list.
+",2026-06-09T00:43:10.268595-08:00
