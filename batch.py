@@ -26,7 +26,7 @@ except Exception:
     pass
 
 from run import run_task
-from limiter import RPDExceeded
+from limiter import RPDExceeded, RateLimitError, PermanentHTTPError
 
 
 # ★ H2_RUN 길1(a): 태스크 무관 '공통 더미 입력' 하나.
@@ -103,10 +103,12 @@ def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
                 print(f"      stderr: {summary['stderr_head'][:120]}")
             results.append(summary)
 
-        except RPDExceeded as e:
-            # 오늘 호출 한도 소진 — 더 못 간다. 여기까지 쌓인 건 runs.jsonl에 이미 있다.
-            print(f"\n[중단] RPD 안전선 도달 — 오늘은 여기까지. ({e})")
-            print(f"       지금까지 {len(results)}개 완료. 자정(PT) 지나 이어서 돌려라.")
+        except (RPDExceeded, RateLimitError, PermanentHTTPError) as e:
+            # 진행 불가 인프라 사실(RPD 소진 / 429 지속 거부 / 키·권한 문제) — 더 못 간다.
+            # 여기까지 쌓인 건 runs.jsonl에 이미 있다. 남은 칸을 fake로 채우지 않고 멈춘다(§3).
+            kind = type(e).__name__
+            print(f"\n[중단] {kind} — 진행 불가. ({e})")
+            print(f"       지금까지 {len(results)}개 완료. 원인 해소 후 이어서 돌려라.")
             break
         except Exception as e:
             # 예상 못 한 예외도 멈추지 않고 다음으로(단 화면엔 남긴다)

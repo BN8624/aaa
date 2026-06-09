@@ -17,11 +17,37 @@
 import os
 import json
 import time
+import sys
 import urllib.request
 import urllib.error
 
+from limiter import RateLimitError, PermanentHTTPError
+
 
 _BASE = "https://aiplatform.googleapis.com/v1/publishers/google/models"
+
+
+def _parse_retry_after(headers) -> float:
+    """Retry-After 헤더를 초(float)로. 정수 초만 신뢰(HTTP-date 형식은 무시→None).
+    헤더 없거나 파싱 불가면 None을 반환해 호출부가 지수 백오프로 넘어가게 한다."""
+    if headers is None:
+        return None
+    val = headers.get("Retry-After")
+    if not val:
+        return None
+    try:
+        return float(int(str(val).strip()))
+    except (ValueError, TypeError):
+        return None   # HTTP-date 등은 다루지 않는다 — 지수 백오프로 대체
+
+
+def _log_call_failure(model, attempt, code, body, *, slept, kind) -> None:
+    """최종 실패(또는 영구거부)를 stderr에 한 줄 요약 + 본문으로 남긴다.
+    이전엔 본문이 잘려 어떤 한도인지 안 보였다 → 모델·attempt·kind·본문을 통째로 찍는다."""
+    head = (f"[client] CALL FAILED kind={kind} model={model} "
+            f"code={code} attempts={attempt} slept={slept:.1f}s")
+    print(head, file=sys.stderr, flush=True)
+    print(f"[client] body: {body}", file=sys.stderr, flush=True)
 
 
 def _get_key() -> str:
@@ -88,29 +114,53 @@ def call_model(model: str, contents, *, limiter, system: str = None,
                 raw = resp.read().decode("utf-8")
             response = json.loads(raw)
         except urllib.error.HTTPError as e:
-            # 응답 본문(에러 메시지)을 읽어 재시도 여부 판단
+            # 응답 본문(에러 메시지)을 읽어 둔다 — 분류와 최종 로깅 양쪽에 쓴다
             try:
                 err_body = e.read().decode("utf-8")
             except Exception:
                 err_body = ""
-            msg = f"{e.code} {err_body}"
-            is_retryable = (
-                e.code in (429, 500, 503)
-                or "RESOURCE_EXHAUSTED" in err_body
-                or "INTERNAL" in err_body
-                or "UNAVAILABLE" in err_body
-            )
-            if is_retryable and attempt < max_retries:
-                limiter.backoff(attempt)
+
+            # --- 분류: 영구거부 / 일시한도(429) / 일시오류(5xx) ---
+            #   400/401/403/404 = 재시도해도 의미 없는 클라이언트 오류 → 즉시 멈춤.
+            #   단, 403+RESOURCE_EXHAUSTED는 '쿼터 거부'라 일시한도(429)와 같은 줄로 본다.
+            is_quota = ("RESOURCE_EXHAUSTED" in err_body) or (e.code == 429)
+            is_permanent = (e.code in (400, 401, 403, 404)) and not is_quota
+            is_transient = (e.code in (500, 503)
+                            or "INTERNAL" in err_body
+                            or "UNAVAILABLE" in err_body)
+
+            if is_permanent:
+                # 재시도 금지 — 키/권한/요청 자체 문제. 본문째로 올려 호출부가 멈추게.
+                _log_call_failure(model, attempt, e.code, err_body, slept=0.0,
+                                  kind="permanent")
+                raise PermanentHTTPError(f"{e.code}: {err_body[:500]}")
+
+            if (is_quota or is_transient) and attempt < max_retries:
+                # Retry-After 헤더 우선(초 단위 정수 또는 HTTP-date — 정수만 신뢰)
+                retry_after = _parse_retry_after(e.headers)
+                slept = limiter.backoff(attempt, retry_after=retry_after)
+                if is_quota:
+                    # 같은 모델 다음 칸이 곧장 같은 429를 맞지 않게 global cooldown.
+                    limiter.set_cooldown(model, slept)
                 attempt += 1
                 continue
-            raise RuntimeError(f"Vertex HTTPError: {msg}")
+
+            # 재시도 소진 — 최종 실패. 본문·모델·attempt·누적대기까지 남기고 분리해 올린다.
+            _log_call_failure(model, attempt, e.code, err_body, slept=0.0,
+                              kind="quota" if is_quota else "transient")
+            if is_quota:
+                raise RateLimitError(f"{e.code} RESOURCE_EXHAUSTED after "
+                                     f"{attempt} retries: {err_body[:500]}")
+            raise RuntimeError(f"Vertex HTTPError {e.code} after "
+                               f"{attempt} retries: {err_body[:500]}")
         except (urllib.error.URLError, TimeoutError) as e:
-            # 네트워크/타임아웃도 재시도
+            # 네트워크/타임아웃도 일시오류로 재시도(서버 헤더 없음 → 지수+jitter)
             if attempt < max_retries:
-                limiter.backoff(attempt)
+                slept = limiter.backoff(attempt)
                 attempt += 1
                 continue
+            _log_call_failure(model, attempt, "NET", repr(e), slept=0.0,
+                              kind="network")
             raise
 
         sec = time.time() - start

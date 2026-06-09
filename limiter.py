@@ -14,6 +14,7 @@
 
 import time
 import threading
+import random
 
 from usage import today_calls
 
@@ -21,6 +22,15 @@ from usage import today_calls
 class RPDExceeded(Exception):
     """오늘(PT) RPD 안전선을 넘었을 때. 자동 루프에서 자정까지 대기는 위험하므로(6장)
     대기하지 않고 이 예외로 멈춘다 — 상위(loop)가 받아 사람에게 넘긴다(디스코드 통지)."""
+
+
+class RateLimitError(Exception):
+    """429(RESOURCE_EXHAUSTED) 최종 실패. 4xx 영구거부(400/401/403/404)와 명확히 구분한다.
+    호출부가 '일시적 한도'와 '재시도 무의미한 거부'를 다르게 다룰 수 있게 별도 타입으로 올린다."""
+
+
+class PermanentHTTPError(Exception):
+    """400/401/403/404 등 재시도해도 의미 없는 클라이언트 오류. 즉시 멈춘다(재시도 금지)."""
 
 
 class Limiter:
@@ -35,6 +45,9 @@ class Limiter:
         self.rpd_limit = rpd_limit
         self._calls = []          # 최근 호출 타임스탬프(메모리, RPM용) — monotonic 초
         self._lock = threading.Lock()   # 워커 병렬 대비(슬롯 경쟁 보호)
+        # 모델별 global cooldown: 429를 맞은 모델은 이 시각(monotonic)까지 새 호출 금지.
+        # 한 칸이 429를 맞으면 같은 모델 다음 칸들이 줄줄이 처박히던 문제(vtx_21 A/B/C)를 막는다.
+        self._cooldown_until = {}   # {model: monotonic_deadline}
 
     def acquire(self, model: str) -> None:
         """호출 가능해질 때까지 블록 후 리턴. 순서:
@@ -44,6 +57,14 @@ class Limiter:
         ※ RPD를 먼저 본다 — RPM은 '기다리면 풀리는' 한도지만 RPD는 '오늘은 끝'이라,
           괜히 RPM에서 잠들었다 깨어나 RPD에 막히느니 먼저 끊는 게 맞다.
         """
+        # --- 0) global cooldown: 이 모델이 직전에 429를 맞아 쉬는 중이면 그만큼 잔다 ---
+        #     (RPD/RPM 검사보다 먼저 — 429 직후 곧장 다음 칸이 같은 한도로 돌진하는 걸 끊는다)
+        with self._lock:
+            deadline = self._cooldown_until.get(model, 0.0)
+            wait = deadline - time.monotonic()
+        if wait > 0:
+            time.sleep(wait)
+
         # --- 1) RPD: 기다려도 안 풀리는 한도라 먼저, 락 밖에서 본다 ---
         if today_calls(model) >= self.rpd_limit:
             raise RPDExceeded(
@@ -69,13 +90,31 @@ class Limiter:
                 time.sleep(wait)
             # 깨어나면 다시 while 처음으로 — 창을 새로 정리하고 재확인
 
-    def backoff(self, attempt: int, cap: float = 60.0) -> None:
-        """429(Too Many Requests) 시 지수 백오프. 2**attempt 초, 상한 cap.
-        대시보드 표시값과 실제가 어긋나 429가 나는 사례 대비 안전망(6장).
-        (attempt는 0,1,2,... → 1초, 2초, 4초, ... cap에서 멈춤)
+    def backoff(self, attempt: int, retry_after: float = None,
+                cap: float = 60.0) -> float:
+        """429/5xx 재시도 전 대기. 반환값은 실제로 잔 초(로깅용).
+
+        우선순위:
+          1) retry_after(서버 Retry-After 헤더)가 있으면 그 값을 그대로 따른다(상한 cap).
+          2) 없으면 지수 백오프 2**attempt + jitter(0~1초 무작위), 상한 cap.
+             (jitter는 여러 칸이 동시에 깨어나 같은 순간 재돌진하는 thundering herd를 흩는다)
+        attempt는 0,1,2,... → 1, 2, 4, ... cap에서 멈춤.
         """
-        wait = min(2.0 ** attempt, cap)
+        if retry_after is not None and retry_after >= 0:
+            wait = min(float(retry_after), cap)
+        else:
+            wait = min(2.0 ** attempt, cap) + random.random()
+            wait = min(wait, cap)
         time.sleep(wait)
+        return wait
+
+    def set_cooldown(self, model: str, seconds: float) -> None:
+        """이 모델을 앞으로 seconds초 동안 global cooldown 상태로 둔다(429 직후 호출).
+        같은 모델의 다음 acquire가 그 시간만큼 자도록 만들어, 연쇄 429를 끊는다."""
+        if seconds <= 0:
+            return
+        with self._lock:
+            self._cooldown_until[model] = time.monotonic() + seconds
 
 
 # ======================================================================
@@ -144,14 +183,43 @@ if __name__ == "__main__":
     lim2.acquire(M)   # 1449 < 1450 → 통과해야
     print("[4] RPD: 1449 < 1450 통과 ✓")
 
-    # ---------- [5] backoff: 지수적으로 늘고 cap에서 멈추나 ----------
+    # ---------- [5] backoff: 지수적으로 늘고 cap에서 멈추나 (jitter 0~1초 포함) ----------
     fake["slept"] = []
     for a in range(8):
         lim.backoff(a, cap=60.0)
-    # 1,2,4,8,16,32,(64->cap 60),(128->cap 60)
-    expected = [1, 2, 4, 8, 16, 32, 60, 60]
-    assert fake["slept"] == [float(x) for x in expected], f"backoff 곡선 이상: {fake['slept']}"
-    print(f"[5] backoff: 지수 증가 후 cap=60 고정 ✓ {fake['slept']}")
+    # base = 1,2,4,8,16,32, 그 뒤 cap=60. 각 항에 0~1초 jitter가 붙되 cap은 안 넘는다.
+    base = [1, 2, 4, 8, 16, 32, 60, 60]
+    assert len(fake["slept"]) == 8, f"8회 안 잠: {fake['slept']}"
+    for got, b in zip(fake["slept"], base):
+        if b < 60:
+            assert b <= got < b + 1.0 + 1e-9, f"jitter 범위 벗어남: {got} (base {b})"
+        else:
+            assert got == 60.0, f"cap 초과/미달: {got}"
+    print(f"[5] backoff: 지수+jitter 후 cap=60 고정 ✓")
+
+    # ---------- [6] backoff: Retry-After가 있으면 그 값을 따른다(jitter 무시) ----------
+    fake["slept"] = []
+    w = lim.backoff(0, retry_after=12.0, cap=60.0)
+    assert w == 12.0 and fake["slept"] == [12.0], f"Retry-After 무시됨: {fake['slept']}"
+    w2 = lim.backoff(0, retry_after=999.0, cap=60.0)   # cap으로 잘려야
+    assert w2 == 60.0, f"Retry-After가 cap 안 넘김: {w2}"
+    print("[6] backoff: Retry-After 우선 + cap 적용 ✓")
+
+    # ---------- [7] set_cooldown: 모델이 쿨다운 중이면 acquire가 그만큼 잔다 ----------
+    fake["slept"] = []
+    rpd_value["n"] = 0
+    lim3 = limiter_mod.Limiter(rpm=15, rpd_limit=1450)
+    lim3.set_cooldown(M, 30.0)          # 이 모델 30초 쿨다운
+    lim3.acquire(M)                     # 쿨다운만큼(30초) 자고 통과해야
+    assert 30.0 in fake["slept"], f"쿨다운 대기 안 함: {fake['slept']}"
+    print("[7] set_cooldown: 쿨다운 중 acquire가 대기 ✓")
+
+    # ---------- [8] 다른 모델은 쿨다운에 안 걸린다 ----------
+    fake["slept"] = []
+    lim3.set_cooldown(M, 30.0)
+    lim3.acquire("other-model")         # 다른 모델 → 즉시 통과
+    assert fake["slept"] == [], f"무관 모델이 쿨다운에 걸림: {fake['slept']}"
+    print("[8] cooldown: 모델별 격리(무관 모델 즉시 통과) ✓")
 
     print("\n=== 전체 통과 ✓ ===")
     print("    (RPM은 메모리 타임스탬프, RPD는 usage.json — 성격이 달라 저장 위치 분리)")

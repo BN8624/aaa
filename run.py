@@ -103,9 +103,12 @@ def run_task(requirement: str, *, expected_type: str = None,
         state.add_failure(state.stage, stderr[:2000])
         state.save()
 
-        from limiter import RPDExceeded
-        if isinstance(e, RPDExceeded):
-            # 기록은 남기고(아래 dump) 멈춤 신호로 올린다
+        from limiter import RPDExceeded, RateLimitError, PermanentHTTPError
+        # '오늘 더는 못 함'(RPD), '한도가 지속 거부'(429 재시도 소진),
+        # '키/권한/요청 자체 문제'(4xx)는 모델의 코드 산출 실패가 아니라 인프라 사실이다.
+        # 이런 칸을 exit=-1 '실패'로 데이터에 남기면 자연발생량이 오염된다(§3, vtx_21 교훈).
+        # → 기록은 남기되 그대로 올려 상위(batch)가 회차를 멈추고 사람이 보게 한다.
+        if isinstance(e, (RPDExceeded, RateLimitError, PermanentHTTPError)):
             state.dump_to_dataset(exit_code=exit_code, stderr=stderr, runtime=runtime, path=runs_path, stdin=stdin_input)
             raise
 

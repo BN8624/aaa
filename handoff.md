@@ -19,13 +19,16 @@
 
 ## 2. 다음 한 수 (하나만 고르고 그것만)
 
-직전 완료(2026-06-08): ①analyzer+verify_channel 통합 ✅ ②FINDINGS §11(vtx_14~17 닫음) ✅ ③Windows cp949 버그 수정(verify_channel.load + 재실행/진입점 stdout UTF-8 강제) — 분류기 OS 무관 안정, vtx_19 빈손 원인이던 em-dash print 크래시 해소 ✅ ④FINDINGS §12(vtx_20 닫음 — broken이 stdin채널→데이터계약으로 첫 이동) ✅ ⑤회차완료 디스코드 웹훅 알림 구현(discord_bot `_notify_webhook`, urllib, `DISCORD_WEBHOOK_URL` 미설정 시 자동 skip) ✅.
+직전 완료(2026-06-08): ①analyzer+verify_channel 통합 ✅ ②FINDINGS §11(vtx_14~17 닫음) ✅ ③Windows cp949 버그 수정(verify_channel.load + 재실행/진입점 stdout UTF-8 강제) — 분류기 OS 무관 안정, vtx_19 빈손 원인이던 em-dash print 크래시 해소 ✅ ④FINDINGS §12(vtx_20 닫음 — broken이 stdin채널→데이터계약으로 첫 이동) ✅ ⑤회차완료 디스코드 웹훅 알림 구현(discord_bot `_notify_webhook`, urllib, `DISCORD_WEBHOOK_URL` 미설정 시 자동 skip) ✅ ⑥vtx_21 429 사건 → client 에러분류·429복구 재설계(FINDINGS §13) ✅ — vtx_21은 A·B·C 6칸 429 fake로 폐기(tag 소진, 다음 vtx_22).
+
+★ §13 수정 핵심(client.py·limiter.py·run.py·batch.py): 400/401/403/404=재시도금지(`PermanentHTTPError`), 429=`RateLimitError`로 분리·재시도, Retry-After 우선+없으면 지수백오프+jitter(cap60), model별 global cooldown(`limiter.set_cooldown`)로 연쇄429 차단, 최종실패 로그에 본문·모델·attempt·sleep. 그리고 ★ 쿼터/권한 최종실패는 `RPDExceeded`처럼 회차를 멈춤 — 가짜 exit=-1 칸으로 데이터 오염하던 것 차단(§3). limiter 자가검증 8케이스 통과. 단 실호출 HTTP 분기는 미실행(키·네트워크 부재, 코드리뷰만).
 
 후보:
 
-1. **Q8 새 회차 — vtx_21부터** ★ 추천. §12 broken=데이터계약 불일치가 **재현되는지**, 특히 C 도메인(파서/평가기류)에서 더 잦은지 누적 관측. 단일 사례라 vtx_20만으론 단정 금지(§3). 키 확인 → 봇 `/실행 vtx_21`(또는 arun.sh). vtx_18·19는 빈손 잔재, 폐기.
-1. **남은 분류 갭 메우기** — `H1B_IMPORT`/`H1B_SIGNATURE` 분리, `TIMEOUT_REAL`(무한루프) vs STDIN_EXIT, `RUNTIME_EXCEPTION` 통일, 그리고 §12류 **데이터계약 broken** 별도 라벨화. 정적 cat 쪽이라 데이터가 호명할 때만(§3).
-1. **stdin 대본/채널 정합** — §11 broken 3칸이 전부 채널 불일치였음. runner stdin 주입을 코드 입력방식(argv/stdin/json)에 맞출지 여부는 ‘깸 줄이는 수정’ 경계(§3) 검토 후 정본에서 결정.
+1. **Q8 새 회차 — vtx_22** ★ 추천. 겸사겸사 §13 429복구가 실호출에서 도는지 첫 확인. §12 broken=데이터계약 불일치가 **재현되는지**, C 도메인(파서/평가기류)에서 더 잦은지 누적. 단일 사례라 vtx_20만으론 단정 금지(§3). 키 확인 → 봇 `/실행 vtx_22`. vtx_18·19·21은 빈손/오염 잔재, 폐기.
+   - ⚠ 출발 전 키: `/명령 echo $VERTEX_API_KEY`. 또 6칸 429 fake면 이제 회차가 **멈춘다**(가짜칸 안 쌓임) — 그럼 아래 2번(인증/쿼터)으로.
+1. **★ 인증경로/쿼터 확정(§13 미결, 근본 원인 후보)** — client.py가 `aiplatform.googleapis.com`에 `?key=`로 호출 중. 정식 Vertex는 OAuth/서비스계정 요구 → 이 키 경로가 유료 1티어 project quota를 안 타고 별도 버킷에 묶였을 가능성. GCP 콘솔 Quotas에서 generativelanguage vs aiplatform 어디에 사용량 찍히는지 + 1티어 결제프로젝트와 키 발급프로젝트 일치 여부 확인. 필요시 client.py를 OAuth+`projects/<id>/locations/<region>/...` 정식 경로로 전환(인증 수정은 §3 ‘깸 줄이는 수정’ 경계 밖 — 인프라).
+1. **남은 분류 갭 메우기** — `H1B_IMPORT`/`H1B_SIGNATURE` 분리, `TIMEOUT_REAL`(무한루프) vs STDIN_EXIT, `RUNTIME_EXCEPTION` 통일, §12류 **데이터계약 broken** 별도 라벨화. 정적 cat 쪽이라 데이터가 호명할 때만(§3).
 
 ## 3. 작업 체크리스트 (까먹지 말 것 — 정의는 정본/아래 참조)
 

@@ -106,3 +106,17 @@
   - §11까지 broken은 전부 stdin 채널(EOF/timeout/JSON포맷). vtx_20 broken은 채널이 아니라 **파일 간 자료구조 형식 불일치** — 정본 §5 “시그니처만으론 부족, 데이터 계약(input/output_schema)까지”가 예고한 실패의 첫 실측. 분류상 H1c(런타임 값/상태) 쪽.
 - ★ 해석(가설, 단일 사례 — 누적 필요): dict 수렴이 H1b(멤버계약 충돌)는 구조적으로 막지만, 그 대가로 깸이 H1c(dict 키 구조 불일치)로 옮겨갈 수 있다. H1b를 피한 비용이 데이터계약 쪽에 나타나는 모양새. Q8 “실패=실행채널 문제?”의 부분 반례 — 이 깸은 실행채널이 아니라 모델 간 설계(스키마) 불일치.
 - 미결/다음: 데이터계약 broken이 재현되는지(vtx_21+ 누적), C 도메인(파서/평가기류)에서 더 잦은지 관측. §3대로 단일 회차로 단정 금지.
+## §13 vtx_21 429 사건 + client 에러분류·429복구 재설계 (2026-06-08)
+
+- 사건: vtx_21 회차에서 A·B·C 6칸이 `429 RESOURCE_EXHAUSTED`(Vertex)로 exit=-1, files d0/g0. analyze가 `재실행 fake×6`으로 정확히 잡음. 유효 데이터는 D·E 4칸뿐이라 회차로 못 침 → 폐기(§3, vtx_18·19와 동급 처리). tag vtx_21 소진, 다음은 vtx_22.
+- ★ 원인은 RPM 부족 아님(유료 1티어 1K RPM): 순간 429를 맞았을 때 client.py가 ①Retry-After 무시 ②모델 cooldown 부재로 같은 모델 다음 칸들이 줄줄이 같은 429에 처박힘 ③분류가 뭉개져 영구거부(403)와 일시거부(429)를 못 가름. 즉 에러분류·복구정책 문제.
+- ★ 인증경로 의심(미해소): client.py가 Vertex 호스트(`aiplatform.googleapis.com`)에 `?key=`(Gemini API 인증)를 섞어 호출. Google 공식 문서상 정식 Vertex는 OAuth/서비스계정 + `projects/<id>/locations/<region>/...` 경로를 요구. 이 키 경로가 1티어 project quota를 안 타고 별도(무료/기본) 버킷에 묶였을 가능성. 콘솔 Quotas에서 generativelanguage vs aiplatform 어디에 사용량이 찍히는지 확인 필요. 이번 수정은 429를 견디게만 하지 이 근본 질문은 못 푼다.
+- 수정(client.py + limiter.py + run.py + batch.py):
+  - 분류 3분기 — 400/401/403/404=`PermanentHTTPError`(재시도 금지). 단 403+RESOURCE_EXHAUSTED는 쿼터로 취급. 429/RESOURCE_EXHAUSTED=쿼터(재시도, 최종실패 시 `RateLimitError`로 분리). 500/503/INTERNAL/UNAVAILABLE/URLError/Timeout=일시오류(재시도).
+  - Retry-After 우선: 헤더의 정수 초를 그대로 따름(상한 cap). 없으면 `2**attempt + jitter(0~1초)`, cap 60. jitter는 여러 칸 동시 재돌진(thundering herd) 분산.
+  - model별 global cooldown: 429 맞은 모델은 `limiter.set_cooldown`으로 park, 다음 acquire가 RPD/RPM 검사 전에 그만큼 잠. 모델별 격리(무관 모델 즉시 통과). ← vtx_21 연쇄 429의 직접 차단.
+  - 최종실패 로그: 본문(안 자름)+모델명+attempt+잔시간+kind를 stderr에. 이전엔 본문이 잘려(`(e.g. ch`) 어느 한도인지 안 보였음.
+  - ★ 오염 차단(설계 판단): 기존엔 쿼터 최종실패가 가짜 exit=-1 칸이 되고 회차 계속 → vtx_21 오염의 정체. 이제 `RateLimitError`·`PermanentHTTPError`는 `RPDExceeded`처럼 회차를 멈춤(사실 기록 후 정지). 인프라 거부를 모델의 코드 산출 실패로 위장하지 않음.
+- 검증: limiter 자가검증 8케이스로 확장(Retry-After 우선·cap·쿨다운 대기·모델별 격리 추가) 전부 통과. RPM 로직 불변(15개 즉시·16번째 60초 대기 회귀 없음). 실호출 HTTP 분기는 키·네트워크 부재로 코드리뷰로만 검증(미실행).
+- 목표 달성: RPM 안 낮춤. 순간 429는 재시도+쿨다운으로 흡수돼 run 전체가 안 죽음. 지속 429는 가짜 데이터 없이 전체 진단과 함께 깨끗이 멈춤.
+- 미결/다음: (1) 인증경로/쿼터 확인(콘솔) — 1티어가 실제 적용되는지. (2) vtx_22로 429 복구가 실호출에서 도는지 + §12 데이터계약 broken 재현 관측. (3) 핸드오프 §2에 본 수정 반영.
