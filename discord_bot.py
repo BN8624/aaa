@@ -751,11 +751,27 @@ async def 업데이트(interaction: discord.Interaction):
         return await interaction.followup.send(
             f"`git pull --rebase --autostash` 실패 (exit {proc.returncode})\n```\n{out or '(출력 없음)'}\n```")
 
+    # 예약 작업으로 재시작 — 사용자 로그온 세션 토큰 사용 → Docker 권한 보장.
+    # os.execv는 현재 봇이 Docker 권한 없으면 그대로 전파되므로 폐기.
+    task_rc = subprocess.run(
+        ["schtasks", "/run", "/tn", "AAABotRestart"],
+        capture_output=True, text=True,
+    ).returncode
+    if task_rc != 0:
+        # 작업 실패 시 os.execv 폴백 (Docker 권한 미보장이지만 일단 재시작)
+        await interaction.followup.send(
+            f"`git pull` 완료. AAABotRestart 작업 실패(exit {task_rc}) — os.execv 폴백.\n"
+            f"```\n{out or '(출력 없음)'}\n```")
+        await client.close()
+        os.execv(sys.executable, [sys.executable, str(Path(__file__).resolve())])
+        return
     await interaction.followup.send(
-        "`git pull --rebase --autostash` 완료. 봇 프로세스를 재시작한다.\n"
+        "`git pull` 완료. AAABotRestart 예약 작업 실행 → Docker 권한 있는 새 봇 시작.\n"
         f"```\n{out or '(출력 없음)'}\n```")
+    import asyncio as _aio
+    await _aio.sleep(2)
     await client.close()
-    os.execv(sys.executable, [sys.executable, str(Path(__file__).resolve())])
+    sys.exit(0)
 
 
 # ---- /명령 (관리자 전용 임의 명령 실행) ----
