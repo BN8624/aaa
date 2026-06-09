@@ -1,0 +1,11 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_27_A1,27,A1,exit0가짜,,0,reject,stdout-return,,0,3,,2026-06-08T19:16:03.417298-08:00
+vtx_27_A2,27,A2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:16:47.729775-08:00
+vtx_27_B1,27,B1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:17:19.138259-08:00
+vtx_27_B2,27,B2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:18:19.950552-08:00
+vtx_27_C1,27,C1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:19:18.503972-08:00
+vtx_27_C2,27,C2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:20:37.187346-08:00
+vtx_27_D1,27,D1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T19:21:51.111616-08:00
+vtx_27_D2,27,D2,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T19:22:31.436639-08:00
+vtx_27_E1,27,E1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:23:46.992662-08:00
+vtx_27_E2,27,E2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:24:31.314819-08:00
