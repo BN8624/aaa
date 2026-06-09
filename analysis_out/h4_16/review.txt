@@ -1,0 +1,16 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== h4_16_A1 [코더빈손] exit=-1 g=0
+PermanentHTTPError: 403: {
+  "error": {
+    "code": 403,
+    "message": "Permission 'aiplatform.endpoints.predict' denied on resource '//aiplatform.googleapis.com/projects/994280418087/locations/us-central1/publishers/google/models/gemini-3.5-flash' (or it may not exist).",
+    "status": "PERMISSION_DENIED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "IAM_PERMISSION_DENIED",
+        "domain": "aiplatform.googleapis.com",
+        "metadata": {
+          "resour
+
