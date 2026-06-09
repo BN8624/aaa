@@ -1,0 +1,11 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== h4_15_A1 [코더빈손] exit=-1 g=0
+RateLimitError: 429 RESOURCE_EXHAUSTED after 5 retries: {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
