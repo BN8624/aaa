@@ -1,5 +1,18 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §21 H4 Docker h4_8 유효 회차 (2026-06-09)
+
+- **원 실행 Docker exit**: exit=125 0건 → Docker 정상.
+- **H1b = 0 / 10칸.** exit0가짜 9 / STDIN_FORMAT_MISMATCH 1(E2). runstate: alive 9 / reject 1(A1).
+- **E2 STDIN_FORMAT_MISMATCH**: verify_channel이 프로그램 stdout을 JSON으로 파싱 시도 → `Extra data: line 2 column 1 (char 3)`. 원 실행 exit=0, 프로그램 자체는 정상 동작. H1b 아님, 입력포맷 불일치.
+- **누적(h4_3 첫10+h4_5+h4_6+h4_7+h4_8)**: 유효 Docker 50칸, H1b=0.
+
+## §20 H4 Docker h4_7 유효 회차 (2026-06-09)
+
+- **원 실행 Docker exit**: 10/10 exit=0. exit=125 0건 → Docker 정상.
+- **H1b = 0 / 10칸.** exit0가짜 10/10. runstate: alive 9 / reject 1(A1, stdout-return).
+- 패턴: A1은 h4_5·h4_6·h4_7·h4_8 연속으로 reject(stdout-return). 동일 태스크 동일 패턴 — 비결정 아님, 해당 생성 코드 구조 고정.
+
 ## §19 H4 Docker h4_5 유효 회차 (2026-06-09)
 
 - commit: bot push. h4_3 두 번째 배치(exit=125)·h4_4(전부 exit=125) 무효 이후, 사용자가 직접 Windows 세션에서 봇 재시작(PID 30272) → Docker 접근 복원.
