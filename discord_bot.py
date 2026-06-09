@@ -216,6 +216,7 @@ def start_background_task(task: str, channel: str = None, mode: str = "pipeline"
       "pipeline" : /실행 - arun.sh 6단계 재현 (runner 스크립트를 subprocess로 기동)
       "pipeline_docker" : /도커실행 - batch.py --docker 를 쓰는 H4 실측 파이프라인
       "pipeline_many" : /연속실행 - 여러 태그를 같은 러너에서 순차 실행
+      "pipeline_docker_many" : /연속도커 - Docker 파이프라인을 여러 태그 순차 실행
       "analyze"  : /분석 - analyze_h1b.py
       "verify"   : /검증 - verify_channel.py runs.jsonl <tag>
     """
@@ -231,6 +232,9 @@ def start_background_task(task: str, channel: str = None, mode: str = "pipeline"
     elif mode == "pipeline_many":
         tags = [t for t in str(channel or "").split() if t]
         cmd = [sys.executable, str(Path(__file__).resolve()), "--pipeline-many", *tags]
+    elif mode == "pipeline_docker_many":
+        tags = [t for t in str(channel or "").split() if t]
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--pipeline-docker-many", *tags]
     elif mode == "analyze":
         cmd = [sys.executable, "analyze_h1b.py", channel]
     elif mode == "verify":
@@ -399,9 +403,11 @@ def run_pipeline(tag: str, *, use_docker: bool = False) -> int:
     return 0
 
 
-def run_pipeline_many(tags: list[str]) -> int:
+def run_pipeline_many(tags: list[str], *, use_docker: bool = False) -> int:
     """여러 회차를 같은 백그라운드 러너에서 순차 실행."""
-    print(f"===== 연속 실행 시작: {' '.join(tags)} =====", flush=True)
+    label = "연속 도커 실행" if use_docker else "연속 실행"
+    cmd_name = "/연속도커" if use_docker else "/연속실행"
+    print(f"===== {label} 시작: {' '.join(tags)} =====", flush=True)
     rc = 0
     for i, tag in enumerate(tags, 1):
         st = load_state() or {}
@@ -409,14 +415,14 @@ def run_pipeline_many(tags: list[str]) -> int:
             st["channel"] = tag
             st["current_index"] = i
             st["total_count"] = len(tags)
-            st["last_command"] = f"/연속실행 {' '.join(tags)}"
+            st["last_command"] = f"{cmd_name} {' '.join(tags)}"
             save_state(st)
         print(f"\n===== [{i}/{len(tags)}] {tag} =====", flush=True)
-        rc = run_pipeline(tag)
+        rc = run_pipeline(tag, use_docker=use_docker)
         if rc != 0:
             print(f"[중단] {tag} exit={rc}", flush=True)
             return rc
-    print(f"\n===== 연속 실행 완료: {' '.join(tags)} =====", flush=True)
+    print(f"\n===== {label} 완료: {' '.join(tags)} =====", flush=True)
     return rc
 
 
@@ -621,6 +627,43 @@ async def 연속실행(interaction: discord.Interaction, 채널들: str):
     await interaction.followup.send(f"```\n{msg}\n```")
 
 
+# ---- /연속도커 ----
+@tree.command(name="연속도커", description="여러 H4 Docker 회차를 순서대로 실행 (예: h4_6 h4_7 h4_8)")
+@app_commands.describe(채널들="공백으로 구분한 태그 목록 (예: h4_6 h4_7 h4_8)")
+async def 연속도커(interaction: discord.Interaction, 채널들: str):
+    if not _channel_allowed(interaction):
+        return await interaction.response.send_message("이 채널에서는 사용할 수 없다.", ephemeral=True)
+    tags = [t.strip() for t in 채널들.split() if t.strip()]
+    if not tags:
+        return await interaction.response.send_message("태그를 하나 이상 넣어라. 예: `h4_6 h4_7 h4_8`", ephemeral=True)
+    if len(tags) > 5:
+        return await interaction.response.send_message("한 번에 최대 5회차까지만 허용한다.", ephemeral=True)
+    bad = [t for t in tags if not validate_channel_name(t)]
+    if bad:
+        return await interaction.response.send_message(
+            f"잘못된 태그: {', '.join(bad)}\n허용: 영문/숫자/_/- 만 가능", ephemeral=True)
+    if len(set(tags)) != len(tags):
+        return await interaction.response.send_message("중복 태그가 있다. 회차 tag 재사용은 금지.", ephemeral=True)
+    busy = _busy_state()
+    if busy:
+        return await interaction.response.send_message(
+            f"이미 실행 중이다: {busy.get('task')} {busy.get('channel')} (pid {busy.get('pid')})\n"
+            f"`/상태`로 확인하라.", ephemeral=True)
+
+    await interaction.response.defer()
+    joined = " ".join(tags)
+    state, log_path = start_background_task("run_many", joined, mode="pipeline_docker_many")
+    msg = (
+        "Started AAA Docker sequential runs (H4 실측 파이프라인)\n\n"
+        f"channels: {joined}\n"
+        f"pid: {state['pid']}\n"
+        f"log: {log_path.name}\n\n"
+        "각 회차마다 pull → batch --docker → analyze → commit → push → webhook 후 다음 회차로 간다.\n"
+        "진행은 `/상태`, `/로그`로 확인하라."
+    )
+    await interaction.followup.send(f"```\n{msg}\n```")
+
+
 # ---- /분석 ----
 @tree.command(name="분석", description="분석 스크립트 실행 (analyze_h1b.py)")
 @app_commands.describe(채널="분석할 채널/태그 (예: vtx_18)")
@@ -819,6 +862,20 @@ def main():
         rc = 0
         try:
             rc = run_pipeline_many(tags)
+        finally:
+            _finalize_pipeline_state(rc)
+        raise SystemExit(rc)
+
+    if len(sys.argv) >= 3 and sys.argv[1] == "--pipeline-docker-many":
+        tags = sys.argv[2:]
+        bad = [t for t in tags if not validate_channel_name(t)]
+        if bad:
+            print(f"[error] invalid tags: {bad}", file=sys.stderr)
+            _finalize_pipeline_state(2)
+            raise SystemExit(2)
+        rc = 0
+        try:
+            rc = run_pipeline_many(tags, use_docker=True)
         finally:
             _finalize_pipeline_state(rc)
         raise SystemExit(rc)
