@@ -319,8 +319,11 @@ def _notify_webhook(tag: str):
         return
     body = _build_run_summary(tag)
     payload = _json.dumps({"content": f"```\n{body}\n```"}).encode("utf-8")
-    req = _ur.Request(url, data=payload,
-                      headers={"Content-Type": "application/json"}, method="POST")
+    req = _ur.Request(url, data=payload, headers={
+        "Content-Type": "application/json",
+        # Discord/Cloudflare may reject urllib's default/no User-Agent with 403/1010.
+        "User-Agent": "aaa-discord-bot/1.0 (+https://github.com/BN8624/aaa)",
+    }, method="POST")
     try:
         with _ur.urlopen(req, timeout=15) as resp:
             print(f"[알림] 웹훅 전송 완료 (HTTP {resp.status})", flush=True)
