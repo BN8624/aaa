@@ -1,12 +1,12 @@
 # aaa — HANDOFF (작업용)
 
-## 2026-06-09 H4 Docker h4_3 완료 — 최초 유효 회차
+## 2026-06-09 H4 Docker h4_5 완료 — 유효 Docker 회차 2회차
 
-- 최신 커밋: `0261462 run h4_3`.
-- h4_3: Docker 정상 작동. exit=125/Access denied 0건. **최초 유효 H4 Docker 실측.**
-- 결과: H1b=0/10, exit0가짜 9 / H1c 1(C2 broken). alive 8 / reject 1 / broken 1.
-- C2 broken = H1c (S-expression 평가기, 중위식 입력→폴란드식 기대 불일치, H1b 아님). → FINDINGS §18.
-- **관측 천장 주의**: Docker도 stdin 미연결 → B·C 메뉴형이 EOF 즉시 종료 후 exit=0(alive로 분류). 메뉴 루프 실제 실행 여부는 미확인. vtx와 동일한 관측 천장.
+- 최신 커밋: bot push (h4_5).
+- **유효 Docker 회차 누적: h4_3(첫 10칸) + h4_5(10칸) = 20칸, H1b=0.**
+- h4_5: exit=125 0건. exit0가짜 9 / inputmismatch 1(A2, argparse). H1b=0.
+- h4_3·h4_4 무효 경위: Claude Code subprocess로 봇 재시작(PID 28908) → Docker pipe 권한 미상속. → FINDINGS §18.
+- **운영 원칙 추가**: Docker 사용 시 봇 재시작은 사용자가 직접 Windows PS 터미널에서 restart_bot2.ps1 실행. Claude Code 도구로 재시작 금지.
 
 > 이 문서 = 살아있는 현재 상태만. **얇게 유지(1~2화면).** 정의·명세·근거는 베끼지 않고 가리킨다.
 > 
@@ -22,18 +22,18 @@
 - **H1 (a/b/c) 종료.** H1b = 부재(Gemini 누적 표면 0, 진짜 부재 다중 확인). vtx_13~30 유효 회차 **150칸 연속 H1b 0** + **h4_3 Docker 10칸 H1b 0 추가** → 총 160칸. → FINDINGS §1~18.
 - **Q7 (왜 dict 수렴) 종료, 단 미세수정.** 주류는 dict/list 경계라 멤버 계약 충돌 구조적 미발생. → FINDINGS §15.
 - **Q8 (실패=실행채널 문제?) 종료.** vtx_26~30 50칸 회귀, broken 0, H1b 0. → FINDINGS §16.
-- **H4 Docker 최초 유효 회차 완료(h4_3).** Docker 정상 작동, H1b=0. 관측 천장(stdin 미연결) 여전히 유효 — B·C 메뉴형 관측 미완. → FINDINGS §18.
+- **H4 Docker 유효 회차 2회 완료(h4_3·h4_5).** 20칸 H1b=0. 관측 천장(stdin 미연결) 여전히 유효. → FINDINGS §18·§19.
 - 보류: H2(모델 통일로 비교군 소멸). 미착수: H3. → 정본 리스크 레지스터.
 
 ## 2. 다음 한 수 (하나만 고르고 그것만)
 
-직전 완료(2026-06-09): ①~⑨(vtx 시리즈, Q8 종료) ✅ ⑩H4 Docker 구현(runner/run/batch/Discord) ✅ ⑪Docker Access Denied 해소·봇 재시작 ✅ ⑫h4_3 최초 유효 Docker 회차 완료(H1b=0, C2 H1c) ✅ ⑬FINDINGS §18 기록 ✅.
+직전 완료(2026-06-09): ①~⑨(vtx 시리즈, Q8 종료) ✅ ⑩H4 Docker 구현 ✅ ⑪h4_3 최초 유효 Docker 회차(H1b=0) ✅ ⑫h4_3(2차)·h4_4 무효(봇 재시작 권한 문제) ✅ ⑬봇 재시작 운영 원칙 확립 ✅ ⑭h4_5 유효 회차(H1b=0) ✅ ⑮FINDINGS §18·§19 기록 ✅.
 
 ★ §13 수정 핵심(client.py·limiter.py·run.py·batch.py): 400/401/403/404=재시도금지(`PermanentHTTPError`), 429=`RateLimitError`로 분리·재시도, Retry-After 우선+없으면 지수백오프+jitter(cap60), model별 global cooldown(`limiter.set_cooldown`)로 연쇄429 차단, 최종실패 로그에 본문·모델·attempt·sleep. 그리고 ★ 쿼터/권한 최종실패는 `RPDExceeded`처럼 회차를 멈춤 — 가짜 exit=-1 칸으로 데이터 오염하던 것 차단(§3). limiter 자가검증 8케이스 통과. 단 실호출 HTTP 분기는 미실행(키·네트워크 부재, 코드리뷰만).
 
 후보:
 
-1. **H4 추가 회차(h4_4~) 누적** ★ 추천. 1회차(10칸)만으로는 비결정적 판정 불가. Docker 정상 확인됐으니 `/도커실행 h4_4` 등 최소 3~5회차 더 쌓아 H1b=0 패턴 강화. 또한 stdin 주입(대본) 병행 실험 시 B·C 메뉴형 관측 천장 해소 가능.
+1. **H4 추가 회차(h4_6~) 누적** ★ 추천. 현재 20칸(h4_3+h4_5). 최소 3~5회차 더 쌓아야 비결정적 패턴 강화. `/도커실행 h4_6` 등. 봇 재시작 필요 시 사용자가 직접 PS 터미널에서 restart_bot2.ps1 실행 필수.
 1. **★ 인증경로/쿼터 확정(§13 미결, 근본 원인 후보)** — client.py가 `aiplatform.googleapis.com`에 `?key=`로 호출 중. 정식 Vertex는 OAuth/서비스계정 요구 → 이 키 경로가 유료 1티어 project quota를 안 타고 별도 버킷에 묶였을 가능성. GCP 콘솔 Quotas 확인.
 1. **H3/known_failures 실험 설계** — 되돌림 루프를 켜야 하므로 Docker 관측층 뒤가 자연스럽다.
 
