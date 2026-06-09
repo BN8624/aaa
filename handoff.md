@@ -6,7 +6,7 @@
 - **유효 Docker 회차 누적: h4_3(첫 10칸) + h4_5(10칸) = 20칸, H1b=0.**
 - h4_5: exit=125 0건. exit0가짜 9 / inputmismatch 1(A2, argparse). H1b=0.
 - h4_3·h4_4 무효 경위: Claude Code subprocess로 봇 재시작(PID 28908) → Docker pipe 권한 미상속. → FINDINGS §18.
-- **운영 원칙 추가**: Docker 사용 시 봇 재시작은 사용자가 직접 Windows PS 터미널에서 restart_bot2.ps1 실행. Claude Code 도구로 재시작 금지.
+- **운영 원칙 추가**: Docker 사용 시 봇 재시작 방법 — ①코드 업데이트 후: Discord `/업데이트`(`os.execv`로 프로세스 교체 → Docker 권한 유지). ②봇이 완전히 죽었을 때: 사용자가 직접 PS 터미널에서 `restart_bot2.ps1`. Claude Code `Start-Process` 재시작 금지(Docker 권한 미상속).
 
 > 이 문서 = 살아있는 현재 상태만. **얇게 유지(1~2화면).** 정의·명세·근거는 베끼지 않고 가리킨다.
 > 
