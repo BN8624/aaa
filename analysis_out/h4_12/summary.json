@@ -1,0 +1,104 @@
+{
+  "label": "h4_12",
+  "n_rows": 6,
+  "cells": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2"
+  ],
+  "rounds": [
+    "12"
+  ],
+  "exec": {
+    "tally": {
+      "exit0가짜": 3,
+      "메뉴앞EOF": 2,
+      "코더빈손": 1
+    },
+    "h1b": 0,
+    "h1b_types": {}
+  },
+  "replay": {
+    "n_replayed": 6,
+    "runstate": {
+      "alive": 3,
+      "broken": 2,
+      "fake": 1
+    },
+    "runchannel": {
+      "stdout-ok": 3,
+      "stderr-exc": 2
+    },
+    "run_h1b_flags": 0,
+    "static_h1b_false_positive": 0,
+    "cat_x_runstate": {
+      "exit0가짜": {
+        "alive": 3
+      },
+      "메뉴앞EOF": {
+        "broken": 2
+      },
+      "코더빈손": {
+        "fake": 1
+      }
+    }
+  },
+  "round": {
+    "h1b_cells": 0,
+    "total_cells": 6
+  },
+  "nondeterministic_splits": [],
+  "per_cell": {
+    "A1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "A2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "B1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 1
+      }
+    },
+    "B2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "메뉴앞EOF": 1
+      }
+    },
+    "C1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "C2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1
+      }
+    }
+  }
+}
