@@ -1,0 +1,4 @@
+# 정식 Vertex 인증(C안, §28/§30)용. express API 키만 쓰면 불필요(stdlib만으로 동작).
+#   pip install -r requirements-vertex.txt
+google-auth
+requests

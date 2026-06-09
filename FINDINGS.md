@@ -1,5 +1,17 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §30 C안 구현 — 이중 인증(SA OAuth ↔ express API 키 폴백), express 저캡 탈출 (2026-06-09)
+
+- **계기**: §28 재검증 결론 = express(`?key=`)는 분당 ~6 고정 저캡 + 느린 회복(12초 재프로브가 call#1 즉시 429 = 직전 버킷 미회복). 페이싱으로 배치 회차 못 살림 → 정식 Vertex 인증(C안)이 유일한 구조적 해결.
+- **코드(하위호환, 모델 동작 불변 — 인프라만, 절대 제약 무관)**:
+  - `client.py`: `_endpoint_and_headers(model)` 추가. 환경변수 `GOOGLE_APPLICATION_CREDENTIALS`+`VERTEX_PROJECT`+`VERTEX_LOCATION` **셋 다 있으면** OAuth 경로(`https://<loc>-aiplatform.googleapis.com/v1/projects/<proj>/locations/<loc>/publishers/google/models/<model>:generateContent` + `Authorization: Bearer`), 아니면 기존 express `?key=` 폴백. `_get_sa_token`이 SA JSON→토큰 발급·캐시(만료 60s 전 갱신). URL/헤더를 **매 재시도마다** 재생성(긴 backoff 사이 토큰 만료 대비).
+  - `run.py`: 같은 3종 환경변수 있으면 `Limiter(rpm=60, rpd_limit=10000, min_interval=0)`(페이싱 해제), 없으면 express용 `Limiter(rpm=5, min_interval=12)`.
+  - `requirements-vertex.txt`(google-auth, requests) 추가 — 정식 인증 경로에서만 필요. express는 stdlib만.
+  - `.env.example`에 GOOGLE_APPLICATION_CREDENTIALS/VERTEX_PROJECT/VERTEX_LOCATION 추가.
+  - 자가검증: SA 환경변수 없을 때 express URL(`?key=`, Authorization 없음) / 있을 때 OAuth 경로 선택 둘 다 확인.
+- **사용자 GCP 작업(코드 밖, 미완)**: ①프로젝트+결제+Vertex AI API 사용설정 ②서비스계정 생성+역할 `Vertex AI User`(roles/aiplatform.user) ③JSON 키 다운로드→기계에 둠 ④프로젝트ID·리전 환경변수. handoff "다음 한 수"에 콘솔 절차 안내 있음.
+- **검증 계획**: SA 환경 갖춘 뒤 `python client.py`(단독 호출 1건 통과) → 한도 풀렸나 `python probe_quota.py 30`(연사 30콜 통과 기대) → 통과 시 h4_16부터 정식 quota로 재개(완주율로 B 논쟁 자체가 사라짐).
+
 ## §29 봇 ~30초 만에 죽던 원인 = AAABotRestart 작업의 StopOnIdleEnd (2026-06-09)
 
 - 증상: 봇 무응답. `/재시작봇`·`/업데이트`는 **봇이 처리하는 슬래시 명령**이라 봇이 죽으면 못 씀(닭-달걀). 그리고 예약 작업으로 띄워도 ~30초 만에 죽음.

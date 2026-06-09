@@ -14,6 +14,7 @@
 # ★ expected_type은 TaskState에 기록만 하고 planner엔 넘기지 않는다(§2-3, 난이도 숨김).
 #   여기서 make_design에 requirement만 넘기는 걸로 그 규칙이 코드로 강제된다.
 
+import os
 import time
 
 from limiter import Limiter
@@ -47,10 +48,14 @@ def run_task(requirement: str, *, expected_type: str = None,
     if task_id is None:
         task_id = time.strftime("%Y%m%d_%H%M%S")
 
-    # Vertex(aiplatform) 한도 = 분당 ~6 고정 저캡(§28 재측정: 4초 페이싱에도 7번째 429).
-    # 버스트가 아니라 분당 캡이므로 4초(=~15/min)론 못 지킨다 → 12초(=~5/min, 캡 밑)로 페이싱.
-    # rpm=5는 백스톱. 잔여 429는 client backoff(8회)가 흡수. 근본책은 정식 Vertex 인증(C안).
-    limiter = Limiter(rpm=5, rpd_limit=1450, min_interval=12.0)
+    # limiter는 인증 경로에 맞춘다(§28):
+    #  - 정식 인증(C안, SA OAuth): 프로젝트 quota라 페이싱 불필요 → 넉넉히.
+    #  - express API 키(폴백): 분당 ~6 고정 저캡(4초 페이싱에도 7번째 429) → 12초(~5/min)로 캡 밑.
+    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") and \
+       os.environ.get("VERTEX_PROJECT") and os.environ.get("VERTEX_LOCATION"):
+        limiter = Limiter(rpm=60, rpd_limit=10000, min_interval=0.0)
+    else:
+        limiter = Limiter(rpm=5, rpd_limit=1450, min_interval=12.0)
     state = TaskState(task_id, expected_type=expected_type, save_dir=save_dir)
 
     # 실행 결과(runner가 못 가면 기본값) — runs.jsonl에 넣을 '사실'

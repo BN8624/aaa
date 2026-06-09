@@ -3,8 +3,14 @@
 # 2·3·4 단계는 이 call_model()만 부른다 — limiter/usage를 직접 만지지 않는다.
 #
 # ★ Vertex 전환판: google-genai SDK 대신 Vertex AI publisher 엔드포인트를 REST로 직접 호출한다.
-#   - 엔드포인트: https://aiplatform.googleapis.com/v1/publishers/google/models/<model>:generateContent?key=...
-#   - 인증: 환경변수 VERTEX_API_KEY (코드·커밋에 키를 넣지 않는다 — §14 보안)
+#   인증은 두 경로 중 환경에 따라 자동 선택(§28 C안):
+#   (A) 정식 인증(서비스계정 OAuth) — 환경변수 GOOGLE_APPLICATION_CREDENTIALS + VERTEX_PROJECT + VERTEX_LOCATION 다 있을 때.
+#       엔드포인트: https://<loc>-aiplatform.googleapis.com/v1/projects/<proj>/locations/<loc>/publishers/google/models/<model>:generateContent
+#       헤더 Authorization: Bearer <SA OAuth 토큰>. → 프로젝트 정식 quota(express 저캡 탈출). google-auth 필요.
+#   (B) express API 키(폴백) — 위 셋이 없으면 기존대로.
+#       엔드포인트: https://aiplatform.googleapis.com/v1/publishers/google/models/<model>:generateContent?key=...
+#       인증: 환경변수 VERTEX_API_KEY. 분당 ~6 공유 저캡(§28).
+#   - 키/자격은 코드·커밋에 넣지 않는다(환경변수/파일 경로만) — §14 보안.
 #   - body: {"contents":[{"role":"user","parts":[{"text":...}]}], "systemInstruction":{...}, "generationConfig":{...}}
 #   - 모델: Gemini 3.5 Flash (planner/coder/scripter가 모델명을 넘긴다)
 #
@@ -59,6 +65,57 @@ def _get_key() -> str:
     return key
 
 
+# SA OAuth 토큰 캐시(토큰 수명 ~1h). 매 호출마다 새로 발급하지 않는다.
+_SA_TOKEN = {"value": None, "exp": 0.0}
+
+
+def _get_sa_token(sa_path: str) -> str:
+    """서비스계정 JSON에서 OAuth2 access token을 얻는다(캐시·만료 갱신).
+    google-auth 미설치면 명확한 안내와 함께 멈춘다(express 폴백을 쓰려면 SA 환경변수를 비울 것)."""
+    now = time.time()
+    if _SA_TOKEN["value"] and now < _SA_TOKEN["exp"] - 60:
+        return _SA_TOKEN["value"]
+    try:
+        from google.oauth2 import service_account
+        from google.auth.transport.requests import Request as _GARequest
+    except ImportError as e:
+        raise RuntimeError(
+            "정식 인증(C안)에 google-auth가 필요하다: pip install google-auth requests. "
+            "(express API 키로 돌리려면 GOOGLE_APPLICATION_CREDENTIALS/VERTEX_PROJECT/VERTEX_LOCATION를 비워라.)"
+        ) from e
+    creds = service_account.Credentials.from_service_account_file(
+        sa_path, scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+    creds.refresh(_GARequest())
+    _SA_TOKEN["value"] = creds.token
+    # creds.expiry는 naive UTC datetime → epoch로. 없으면 보수적으로 50분.
+    if creds.expiry is not None:
+        import calendar
+        _SA_TOKEN["exp"] = calendar.timegm(creds.expiry.timetuple())
+    else:
+        _SA_TOKEN["exp"] = now + 3000
+    return _SA_TOKEN["value"]
+
+
+def _endpoint_and_headers(model: str) -> tuple[str, dict]:
+    """환경에 따라 (URL, 헤더)를 만든다. SA 3종 환경변수가 다 있으면 정식 OAuth 경로,
+    아니면 express API 키 폴백. 호출부(call_model)는 어느 경로인지 몰라도 된다."""
+    sa = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    project = os.environ.get("VERTEX_PROJECT")
+    location = os.environ.get("VERTEX_LOCATION")
+    if sa and project and location:
+        token = _get_sa_token(sa)
+        base = (f"https://{location}-aiplatform.googleapis.com/v1"
+                f"/projects/{project}/locations/{location}/publishers/google/models")
+        url = f"{base}/{model}:generateContent"
+        return url, {"Content-Type": "application/json",
+                     "Authorization": f"Bearer {token}"}
+    # 폴백: express API 키
+    key = _get_key()
+    url = f"{_BASE}/{model}:generateContent?key={key}"
+    return url, {"Content-Type": "application/json"}
+
+
 def call_model(model: str, contents, *, limiter, system: str = None,
                max_retries: int = 8) -> dict:
     """모델 1회 호출(Vertex REST). 순서:
@@ -74,9 +131,6 @@ def call_model(model: str, contents, *, limiter, system: str = None,
     system: 시스템 프롬프트(있으면 systemInstruction).
     """
     from usage import record_call
-
-    key = _get_key()
-    url = f"{_BASE}/{model}:generateContent?key={key}"
 
     # contents 정규화: 문자열 → 단일 user 턴
     if isinstance(contents, str):
@@ -103,11 +157,14 @@ def call_model(model: str, contents, *, limiter, system: str = None,
         # --- 한도 슬롯 확보(RPM/RPD). RPD 초과면 RPDExceeded가 올라온다(멈춤) ---
         limiter.acquire(model)
 
+        # URL·헤더는 매 시도마다 만든다 — OAuth 토큰이 긴 재시도 사이 만료될 수 있어서(캐시가 알아서 갱신).
+        url, headers = _endpoint_and_headers(model)
+
         start = time.time()
         try:
             req = urllib.request.Request(
                 url, data=data,
-                headers={"Content-Type": "application/json"},
+                headers=headers,
                 method="POST",
             )
             with urllib.request.urlopen(req, timeout=180) as resp:
