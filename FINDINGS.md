@@ -146,3 +146,17 @@
 - ★ vtx_20·22의 C AST 스키마 불일치는 vtx_23~25에서 직접 재현 안 됨. C1/C2는 세 회차 모두 alive/silent. 따라서 “C 파서/평가기류에서 반복” 가설은 아직 강한 결론 금지. 대신 더 넓은 “데이터계약/문법계약 H1c가 드문드문 발생”으로 완화.
 - ★ 새 관측: vtx_25_D2가 `nodes.Node` 클래스를 별도 파일에서 만들고 parser/folder/serializer/main이 속성(`.type/.value/.left/.right`)으로 공유했지만 실행은 silent/exit0. 즉 “항상 dict/list만”은 약간 깨짐. 그러나 공유 생성자·동일 클래스 import로 계약이 맞아 H1b는 발생하지 않음. Q7 결론은 “객체가 나와도 경계 계약이 일관되면 H1b가 안 난다”로 미세 수정 필요.
 - 도구 수정 완료: analyzer/verify에 `DATA_CONTRACT_GRAMMAR`, `STDIN_FORMAT_MISMATCH`, `STATIC_H1B_FALSE_POSITIVE` 라벨 분리. 기존 broken 4칸 중 JSON 3칸은 inputmismatch로 이동했고, vtx_25_D2는 H1b?가 아니라 static false positive로 분리됨. Q8 표에서 모델 내부 깸은 vtx_23_D2 1칸만 남음.
+
+## §16 vtx_26~30 — Q8 회귀 확인, broken 0으로 닫기 (2026-06-09)
+
+- 사건: vtx_26 단일 회귀 후 vtx_27~30까지 연속 실행. 모두 10/10칸 생성·실행·분석·push 완료. 429/RESOURCE_EXHAUSTED 오염 없음. 웹훅은 vtx_27 이후 정상 요약 수신, `/연속실행` 운영도 정상.
+- 결과: vtx_26~30 정적 H1b 0/50. vtx_13~30 유효 타입계약 도메인 누적은 이제 **150칸 연속 H1b 0**(vtx_18·19·21 폐기). H1b 부재는 더 볼수록 강화될 뿐 새 신호 없음.
+- 재실행 합계(50칸): alive 44 / reject 3 / inputmismatch 3 / broken 0 / silent 0. `run_h1b_flags` 0, `static_h1b_false_positive` 0.
+  - vtx_26: alive 10.
+  - vtx_27: alive 9 / reject 1.
+  - vtx_28: alive 9 / reject 1.
+  - vtx_29: alive 9 / inputmismatch 1(`STDIN_FORMAT_MISMATCH`, E2 JSON stdin).
+  - vtx_30: alive 7 / reject 1 / inputmismatch 2(B2 argv-vs-stdin, E2 JSON stdin).
+- ★ 새 라벨 회귀 확인: `STDIN_FORMAT_MISMATCH`와 `argv-vs-stdin`이 broken을 오염하지 않고 inputmismatch로 분리됨. vtx_23_D2류 `DATA_CONTRACT_GRAMMAR` 추가 발생 없음. vtx_20·22류 AST 스키마 불일치도 재발 없음.
+- 결론(Q8): “실패=실행채널 문제?”는 **대부분 그렇다**로 닫을 수 있다. 관측된 비-alive의 대부분은 정상 reject 또는 입력채널/포맷 불일치이며, 모델 내부 데이터계약 broken은 드물게만 관측(vtx_20 C1, vtx_22 C1, vtx_23 D2). H1b로 넘어가는 사례는 없음.
+- 다음 스텝: Q8 추가 회차의 한계효용 낮음. 정본 리스크 레지스터를 갱신하고, 새 축으로 넘어간다. 후보는 (1) H4 도커 실측 구현으로 실제 런타임 판정 계층 만들기, (2) Vertex 인증경로/쿼터 정식화, (3) H3/known_failures 실험 설계.
