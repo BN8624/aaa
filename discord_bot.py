@@ -80,7 +80,8 @@ _CONFIG = {}
 
 def load_config():
     """`.env` 로드 후 설정 dict 반환."""
-    load_dotenv()
+    # 작업 스케줄러/시스템 환경에 오래된 값이 남아 있어도 repo .env가 우선이다.
+    load_dotenv(override=True)
     root = Path(os.environ.get("AAA_ROOT", ".")).resolve()
     cfg = {
         "token": os.environ.get("DISCORD_TOKEN", "").strip(),
@@ -323,6 +324,13 @@ def _notify_webhook(tag: str):
     try:
         with _ur.urlopen(req, timeout=15) as resp:
             print(f"[알림] 웹훅 전송 완료 (HTTP {resp.status})", flush=True)
+    except _ur.HTTPError as e:
+        # Discord는 실패 원인을 JSON 본문에 담아준다. URL/토큰은 절대 찍지 않는다.
+        try:
+            detail = e.read().decode("utf-8", errors="replace")
+        except Exception:
+            detail = ""
+        print(f"[알림] 웹훅 전송 실패(무시): HTTP {e.code} {detail}", flush=True)
     except Exception as e:
         # 알림 실패가 회차 결과를 덮지 않게 — 로그만 남기고 통과.
         print(f"[알림] 웹훅 전송 실패(무시): {type(e).__name__}: {e}", flush=True)
