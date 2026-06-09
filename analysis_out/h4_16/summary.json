@@ -1,45 +1,152 @@
 {
   "label": "h4_16",
-  "n_rows": 1,
+  "n_rows": 11,
   "cells": [
-    "A1"
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+    "D1",
+    "D2",
+    "E1",
+    "E2"
   ],
   "rounds": [
     "16"
   ],
   "exec": {
     "tally": {
-      "코더빈손": 1
+      "코더빈손": 1,
+      "exit0가짜": 7,
+      "argparse": 1,
+      "기타예외": 1,
+      "STDIN_FORMAT_MISMATCH": 1
     },
     "h1b": 0,
     "h1b_types": {}
   },
   "replay": {
-    "n_replayed": 1,
+    "n_replayed": 11,
     "runstate": {
-      "fake": 1
+      "fake": 1,
+      "reject": 2,
+      "alive": 6,
+      "inputmismatch": 2
     },
-    "runchannel": {},
+    "runchannel": {
+      "stdout-return": 2,
+      "stdout-ok": 6,
+      "argv-vs-stdin": 1,
+      "STDIN_FORMAT_MISMATCH": 1
+    },
     "run_h1b_flags": 0,
     "static_h1b_false_positive": 0,
     "cat_x_runstate": {
       "코더빈손": {
         "fake": 1
+      },
+      "exit0가짜": {
+        "reject": 1,
+        "alive": 6
+      },
+      "argparse": {
+        "inputmismatch": 1
+      },
+      "기타예외": {
+        "reject": 1
+      },
+      "STDIN_FORMAT_MISMATCH": {
+        "inputmismatch": 1
       }
     }
   },
   "round": {
     "h1b_cells": 0,
-    "total_cells": 1
+    "total_cells": 10
   },
   "nondeterministic_splits": [],
   "per_cell": {
     "A1": {
+      "n_exec": 2,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "코더빈손": 1,
+        "exit0가짜": 1
+      }
+    },
+    "A2": {
       "n_exec": 1,
       "h1b": 0,
       "h1b_types": {},
       "cats": {
-        "코더빈손": 1
+        "exit0가짜": 1
+      }
+    },
+    "B1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "B2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "argparse": 1
+      }
+    },
+    "C1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "기타예외": 1
+      }
+    },
+    "C2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "D1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "D2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "E1": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "exit0가짜": 1
+      }
+    },
+    "E2": {
+      "n_exec": 1,
+      "h1b": 0,
+      "h1b_types": {},
+      "cats": {
+        "STDIN_FORMAT_MISMATCH": 1
       }
     }
   }

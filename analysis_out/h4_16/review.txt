@@ -1,4 +1,4 @@
-# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+# 분류 애매/확인필요 2줄 (전문). 분류기 점검은 여기부터.
 
 === h4_16_A1 [코더빈손] exit=-1 g=0
 PermanentHTTPError: 403: {
@@ -13,4 +13,7 @@ PermanentHTTPError: 403: {
         "domain": "aiplatform.googleapis.com",
         "metadata": {
           "resour
+
+=== h4_16_C1 [기타예외] exit=1 g=4
+Error: Unknown AST node type: Program
 

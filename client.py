@@ -297,11 +297,10 @@ if __name__ == "__main__":
     print(f"    응답: {r['text'][:80]!r}")
     print(f"    finish_reason={r['finish_reason']}, truncated={r['truncated']}")
     print(f"    in={r['in']}, out={r['out']}, sec={r['sec']:.2f}")
-    print("[1] 반환 dict 형태 ✓")
+    print("[1] 반환 dict 형태 [OK]")
 
     after = usage_mod.today_calls(MODEL, path=REAL_USAGE)
     assert after == before + 1, f"calls 증가분이 1이 아님: {before} -> {after}"
-    print(f"[2] usage 기록 ✓ (calls {before} -> {after})")
+    print(f"[2] usage 기록 [OK] (calls {before} -> {after})")
 
-    print("\n=== 전체 통과 ✓ ===")
-
+    print("\n=== 전체 통과 [OK] ===")

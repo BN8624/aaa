@@ -11,3 +11,27 @@ h4_16_A1,16,A1,코더빈손,,-1,fake,,,,0,"PermanentHTTPError: 403: {
         ""domain"": ""aiplatform.googleapis.com"",
         ""metadata"": {
           ""resour",2026-06-09T05:14:15.995617-08:00
+h4_16_A1,16,A1,exit0가짜,,0,reject,stdout-return,,0,2,"
+",2026-06-09T07:12:22.020041-08:00
+h4_16_A2,16,A2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T07:13:02.532811-08:00
+h4_16_B1,16,B1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-09T07:13:24.863117-08:00
+h4_16_B2,16,B2,argparse,,2,inputmismatch,argv-vs-stdin,,2,3,"
+usage: main.py [-h] [--file FILE] {add,delete,list,descendants} ...
+main.py: error: argument command: invalid choice: '1' (choose from 'add', 'delete', 'list', 'descendants')
+",2026-06-09T07:14:32.950683-08:00
+h4_16_C1,16,C1,기타예외,,1,reject,stdout-return,,0,4,"
+Error: Unknown AST node type: Program
+",2026-06-09T07:15:19.988788-08:00
+h4_16_C2,16,C2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T07:16:23.101057-08:00
+h4_16_D1,16,D1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T07:17:27.273229-08:00
+h4_16_D2,16,D2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T07:18:27.471689-08:00
+h4_16_E1,16,E1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-09T07:19:59.728692-08:00
+h4_16_E2,16,E2,STDIN_FORMAT_MISMATCH,Error: Invalid JSON format: Extra data: line ,1,inputmismatch,STDIN_FORMAT_MISMATCH,,1,3,"
+Error: Invalid JSON format: Extra data: line 2 column 1 (char 3)
+",2026-06-09T07:20:39.874284-08:00
