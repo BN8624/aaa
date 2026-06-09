@@ -105,7 +105,11 @@ def _endpoint_and_headers(model: str) -> tuple[str, dict]:
     location = os.environ.get("VERTEX_LOCATION")
     if sa and project and location:
         token = _get_sa_token(sa)
-        base = (f"https://{location}-aiplatform.googleapis.com/v1"
+        # global 엔드포인트는 리전 프리픽스가 없다(공식 퀵스타트 기본값: API_ENDPOINT=aiplatform.googleapis.com,
+        # LOCATION=global). 리전(us-central1 등)이면 '<loc>-' 프리픽스를 붙인다. 신형 Gemini는 global에만 있을 수 있음.
+        host = ("aiplatform.googleapis.com" if location == "global"
+                else f"{location}-aiplatform.googleapis.com")
+        base = (f"https://{host}/v1"
                 f"/projects/{project}/locations/{location}/publishers/google/models")
         url = f"{base}/{model}:generateContent"
         return url, {"Content-Type": "application/json",
