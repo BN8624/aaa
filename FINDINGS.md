@@ -10,7 +10,15 @@
 - **h4_12 부분 5칸 관측(H1b=0)**: A1 alive / A2 alive(argparse 정상) / B1 메뉴앞EOF broken / B2 메뉴앞EOF broken / C1 alive(C 파서 채널 계속 완주). C2 이후 quota로 미실행.
   - **회차 판정**: h4_12는 vtx_21 선례(유효 칸 소수 → 폐기)에 따라 **부분/폐기** 처리 — 5칸 H1b=0 사실은 유효하나 회차로 안 침. h4_13~15 무효. **유효 Docker 누적은 70칸 유지(h4_11까지)**, 증가 없음.
 - **★ B1·B2 둘 다 메뉴앞EOF(broken) — DUMMY_STDIN 짧음 누적 패턴**: §25 B1 + §27 B2 + §28 B1·B2. 7~10옵션 메뉴 프로그램에 DUMMY_STDIN(12행) 소진 → EOFError. 깸 아님(입력채널). 이제 단발 아니라 반복 → DUMMY_STDIN 확장이 데이터로 호명됨(다음 한 수 후보).
-- **★ §13 미결(2) 인증경로/쿼터가 차단요인으로 격상**: h4_11까지 잘 돌다 h4_12 중반에 quota 소진 = 짧은 칸 수(누적 ~15칸/세션)에 비해 너무 빠른 소진. §13 의심대로 `?key=`(aiplatform 호스트에 Gemini API 인증) 경로가 1티어 project quota가 아니라 별도(무료/기본) 버킷에 묶였을 가능성 강해짐. H4 추가 회차·H3 둘 다 API 호출 필요 → **쿼터 미해결 시 어느 축도 진행 불가.** 콘솔 Quotas에서 generativelanguage vs aiplatform 사용량 확인 필요.
+- **★ §13 미결(2) 인증경로/쿼터 — 프로브로 해소(아래)**: h4_12 중반 quota 소진이 차단요인으로 보였으나, 직후 `probe_endpoints.py`(같은 키로 두 서비스 1콜씩)로 **일시적 429였음이 확정**.
+  - **유료/GA 모델 확정**(사용자): `gemini-3.5-flash`는 2026-05 출시 정식 모델. preview 아님. 크레딧 차감 정상.
+  - **limiter 값(rpm15/rpd1450)은 옛 Gemma4 무료키 잔재** — 실제 한도보다 수십 배 보수적이라 **429를 유발할 수 없음**(우리 사용량은 한도의 ~1%: 오늘 110콜·9.3만 토큰). 즉 limiter는 범인 아님, 위생상 갱신 대상일 뿐.
+  - **프로브 결과(결정적)**: `generativelanguage`(AI Studio) = **HTTP 403 blocked**(이 키엔 AI Studio API 자체가 차단). `aiplatform`(Vertex, 현재 코드) = **HTTP 200 정상**.
+    - → **§13/§28 초안의 "무료 버킷에 묶임"·엔드포인트 교체 가설 둘 다 폐기.** 코드가 쓰는 aiplatform이 맞는 경로다.
+    - → 사용자가 본 RPM1k/TPM2M/RPD10k(AI Studio)는 **적용 안 되는 숫자**(그 API가 403). 실제 적용 한도는 **Vertex(aiplatform) quota**이며 미확인.
+    - → aiplatform이 프로브 시점 200 = **h4_12~15 429는 일시적이었고 이미 회복.** /연속도커 4회차 연속 기동 시 Vertex 측 순간 한도(공유/지역 quota 혼잡 추정)에 잠깐 막힌 것.
+  - **조치**: 그냥 재개(새 tag h4_16+). §13 backoff/cooldown이 일시 429 흡수. 다회차는 2개씩 끊어 돌려 순간 한도 회피. 재발 시에만 **Vertex 콘솔 quota**(online_prediction/generate_content per-minute, 지역별 — AI Studio 페이지 아님) 확인 + 지역고정/증액.
+  - 부수 관측: aiplatform 200 응답이 `finishReason=MAX_TOKENS`·text=''(maxOutputTokens=16을 thinking이 다 소진) — gemini-3.5-flash가 thinking 모델임 재확인(프로덕션 32000은 충분).
 
 ## §27 H4 Docker h4_11 유효 회차 — argv=["1"] 검증 + E 도메인 데이터계약 H1c 첫 관측 (2026-06-09)
 
