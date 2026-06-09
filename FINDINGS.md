@@ -1,5 +1,19 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §31 정식 Vertex 경로 검증 완료 + h4_16 첫 정식경로 유효 회차(H1b 0/10) + 분석기 인프라가짜 자동제외 (2026-06-09~10)
+
+- **§30 C안 검증 완료(SA OAuth 경로 실작동)**: `.env` `VERTEX_PROJECT=ocr-project-496308`·`VERTEX_LOCATION=global`, SA `ocr-pj@ocr-project-496308.iam.gserviceaccount.com`, 역할 `roles/aiplatform.user`. `python client.py`(gemini-3.5-flash) 통과, `python probe_quota.py 8 0`(연사 8콜) **429 0건**. → §28의 express `?key=` ~6 저캡(연사 7번째 429)이 정식 OAuth 경로에선 사라짐 확인. **express 경로는 저quota 테스트 외 사용 금지**(§30 운영수칙). 사용량은 Agent Platform 메뉴 가시성 말고 **Cloud Monitoring Metrics Explorer**로 관찰.
+  - 부수: `client.py` 자가테스트 출력 `✓`→`[OK]`(Windows cp949 `UnicodeEncodeError` 회피). 모델/호출 로직 불변(인프라만).
+- **h4_16 = 정식 Vertex 경로 첫 유효 회차. H1b 0 / 10칸.** run_h1b 플래그 0. 재실행 runstate: **alive 6 / reject 2 / inputmismatch 2**(가짜 제외 후).
+  - **★ C1 = C 도메인 AST 스키마 불일치 재발(§12·§14·§22 패밀리)**: 4파일(lexer/parser/evaluator/main) 체인에서 parser가 `Program` 노드를 생산하나 evaluator가 미처리 → `Error: Unknown AST node type: Program`(reject, stdout-return). import·시그니처 통과(파일 간 호출 성공), AST 노드타입 계약만 불일치 → H1b 아님, 데이터계약 H1c 쪽. **C 도메인 파일간 AST 스키마 불일치 누적 3+회** — dict 수렴이 H1b는 막아도 파서/평가기류에서 새 깸을 만든다는 §14·§27 증거에 추가.
+  - E2 `STDIN_FORMAT_MISMATCH`(inputmismatch), B2 argparse `argv-vs-stdin`(inputmismatch) — 입력채널/형식 거부, H1b 아님. A2·B1·C2·D1·D2·E1 alive(stdout-ok), A1 reject(stdout-return).
+  - **H1b 0 연속 더 누적**(vtx_13~17 50칸 + h4_3~h4_11 + h4_16). 표면 H1b 0 = 모델의 원시 자료구조(dict/list) 수렴 본성(§10·§29) 재확인. **주의: 이번 세션엔 h4_16 Docker exit 로그(runlog) 미포착 → "유효 Docker 누적 칸수"는 §27의 70칸 유지로 보수 표기하고 h4_16 10칸은 별도 집계**(runtime 값만 있고 exit=125 점검 로그 없음). 다음 SA 회차부터 runlog 캡처 권장.
+- **★ 분석기 수정 — 인프라 가짜행 자동 제외(`analyze_h1b.py`)**: §30 데이터정책("자동 집계가 옛 403 A1을 깨끗이 못 빼면 h4_17 재수집")을 **도구에서 해결**(재수집 없이 분모 정정).
+  - `is_infra_fake(rec)`: `VERTEX_API_KEY` 부재 / `PermanentHTTPError 403`(PERMISSION_DENIED·RESOURCE_EXHAUSTED) / `exit=-1`+생성파일0 = API·인증 실패행(코더 데이터 아님). `verify_channel.is_fake` 기준 + 403 명시 포함, vc import 실패해도 독립 동작.
+  - **기본 제외**(분모 오염 차단), `--keep-fakes`로 옛 동작 복원. 제외 내역 `excluded.txt` + `summary.json:excluded_infra_fakes`로 투명화.
+  - 효과: h4_16 **11→10 실행, A1 0/2→0/1**, 재실행 교차표서 `fake×1` 사라짐. 회귀 점검: 가짜뿐이던 h4_15는 0행으로 정직히 드러남(이전엔 가짜 1행으로 잡힘).
+- **다음 한 수**: **h4_17은 사용자가 SA 환경에서 직접 수집**(이 임시 컨테이너엔 SA 키 부재 — gitignore 차단). 이후 `python analyze_h1b.py h4_17` → h4_16과 비교(특히 C·E 도메인 데이터계약 실패 재현·무푸트노트 회차 확보).
+
 ## §30 C안 구현 — 이중 인증(SA OAuth ↔ express API 키 폴백), express 저캡 탈출 (2026-06-09)
 
 - **계기**: §28 재검증 결론 = express(`?key=`)는 분당 ~6 고정 저캡 + 느린 회복(12초 재프로브가 call#1 즉시 429 = 직전 버킷 미회복). 페이싱으로 배치 회차 못 살림 → 정식 Vertex 인증(C안)이 유일한 구조적 해결.
