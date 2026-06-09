@@ -1,0 +1,12 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_22_A1,22,A1,exit0가짜,,0,alive,stdout-ok,,0,2,,2026-06-08T16:54:23.777129-08:00
+vtx_22_A2,22,A2,exit0가짜,,0,silent,none,,0,2,,2026-06-08T16:55:00.235811-08:00
+vtx_22_B1,22,B1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T16:55:22.262343-08:00
+vtx_22_B2,22,B2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T16:56:15.008000-08:00
+vtx_22_C1,22,C1,기타예외,,1,broken,stderr-exc,,1,4,"Error: Unknown AST node type: BinaryOp
+",2026-06-08T16:57:23.394140-08:00
+vtx_22_C2,22,C2,exit0가짜,,0,reject,stdout-return,,0,3,,2026-06-08T16:58:45.084853-08:00
+vtx_22_D1,22,D1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T16:59:31.871264-08:00
+vtx_22_D2,22,D2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:00:27.087778-08:00
+vtx_22_E1,22,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:01:48.635882-08:00
+vtx_22_E2,22,E2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:02:26.774747-08:00

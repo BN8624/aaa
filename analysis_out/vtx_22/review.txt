@@ -1,0 +1,5 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== vtx_22_C1 [기타예외] exit=1 g=4
+Error: Unknown AST node type: BinaryOp
+
