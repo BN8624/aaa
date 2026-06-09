@@ -63,7 +63,8 @@ def _docker_env(docker: str) -> dict:
 
 
 def run_in_subprocess(codes: dict, entry_point: str, *, timeout: int = 20,
-                      stdin_input: str = None) -> dict:
+                      stdin_input: str = None,
+                      argv: list[str] | None = None) -> dict:
     """Run generated files in a temporary directory on the host.
 
     This preserves the old runner contract. It is useful when Docker is not
@@ -75,7 +76,7 @@ def run_in_subprocess(codes: dict, entry_point: str, *, timeout: int = 20,
         _write_codes(workdir, codes)
         try:
             proc = subprocess.run(
-                [sys.executable, entry],
+                [sys.executable, entry, *(argv or [])],
                 cwd=workdir,
                 stdin=(subprocess.DEVNULL if stdin_input is None else None),
                 input=stdin_input,
@@ -109,6 +110,7 @@ def run_in_subprocess(codes: dict, entry_point: str, *, timeout: int = 20,
 
 def run_in_docker(codes: dict, requirements: list | None, entry_point: str, *,
                   timeout: int = 60, stdin_input: str = None,
+                  argv: list[str] | None = None,
                   image: str = "python:3.11-slim",
                   network: str = "none",
                   memory: str = "256m",
@@ -142,12 +144,13 @@ def run_in_docker(codes: dict, requirements: list | None, entry_point: str, *,
 
         container_entry = posixpath.join("/workspace", entry)
         stage_marker = "__AAA_STAGE_RUN__"
+        argv_str = (" " + " ".join(shlex.quote(a) for a in argv)) if argv else ""
         inner = (
             "if [ -s requirements.txt ]; then "
             "python -m pip install --no-cache-dir -r requirements.txt || exit $?; "
             "fi; "
             f"printf '\\n{stage_marker}\\n' >&2; "
-            f"exec python {shlex.quote(container_entry)}"
+            f"exec python {shlex.quote(container_entry)}{argv_str}"
         )
 
         cmd = [

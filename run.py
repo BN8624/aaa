@@ -27,6 +27,7 @@ def run_task(requirement: str, *, expected_type: str = None,
              task_id: str = None, save_dir: str = ".",
              runs_path: str = "runs.jsonl", timeout: int = 20,
              stdin_input: str = None, gen_stdin: bool = False,
+             argv: list[str] | None = None,
              use_docker: bool = False, docker_image: str = "python:3.11-slim",
              docker_network: str = "none") -> dict:
     """한 태스크를 직진 1회 실행하고 runs.jsonl에 결과 한 줄을 남긴다.
@@ -87,12 +88,13 @@ def run_task(requirement: str, *, expected_type: str = None,
                 codes, requirements, entry,
                 timeout=timeout,
                 stdin_input=stdin_input,
+                argv=argv,
                 image=docker_image,
                 network=docker_network,
             )
         else:
             run_result = run_in_subprocess(codes, entry, timeout=timeout,
-                                           stdin_input=stdin_input)
+                                           stdin_input=stdin_input, argv=argv)
 
         exit_code = run_result["exit_code"]
         stderr = run_result["stderr"]

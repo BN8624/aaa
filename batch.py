@@ -29,14 +29,23 @@ from run import run_task
 from limiter import RPDExceeded, RateLimitError, PermanentHTTPError
 
 
-# ★ H2_RUN 길1(a): 태스크 무관 '공통 더미 입력' 하나.
-#   FINDINGS 사실 B — 무료 모델이 작은 CLI를 input()/메뉴루프로 짜서, stdin=EOF면 메뉴 앞 EOFError로 다 죽어
-#   멀티파일이 멀쩡히 물려도 '메뉴 너머'(=H1b 파일간 동작)를 못 본다. 그 눈가림을 벗기는 최소 입력.
-#   설계 사상: 메뉴 진입 숫자 + 더미 문자열을 섞어 흘리고, 안 먹으면 timeout이 받친다(이중 안전망).
-#   ※ 측정장치(runner stdin)에만 닿는다 — planner/coder엔 안 닿아 모델 행동 불개입(§2-3 보존, 길2와의 차이).
-#   ※ 이게 '정답 입력'은 아니다. 메뉴 구조가 다르면 헛입력일 수 있고, 그 결과(통과/실패)도 그대로 데이터다.
-#     1~2개에 먼저 시험(H2_RUN §3) → 통과 확인됨. 정교화(설계서 기반 대본)는 데이터가 부르면 그때.
-DUMMY_STDIN = "1\n테스트\n2\n3\n2\n1\n0\n"
+# ★ 관측 천장 해소 입력 (A 과제 구현).
+#   문제: 메뉴형 프로그램은 stdin=EOF면 메뉴 루프에 도달 못 함. argparse 프로그램은 argv 없으면 exit=1.
+#   해법: ①DUMMY_STDIN — 메뉴 숫자+텍스트 고정 시퀀스로 메뉴 경로 실행. ②DUMMY_ARGV — positional arg를
+#   항상 주입해 argparse 프로그램도 진입.
+#   ※ 측정장치(runner)에만 닿음 — planner/coder엔 안 닿아 모델 행동 불개입(§2-3 보존).
+#   ※ '정답 입력'이 아니라 '관측 기회를 여는 입력'. 헛입력이면 그 결과도 데이터.
+#   ※ gen_stdin(scripter)은 비활성화 — 대본이 짧아 EOFError 유발(FINDINGS §4), 일관성 저해.
+DUMMY_STDIN = (
+    "1\n테스트 입력\n"
+    "2\n샘플 데이터\n"
+    "3\n1\n"
+    "4\nexample\n"
+    "1\nhello world\n"
+    "2\n"
+    "0\nquit\nexit\n"
+)
+DUMMY_ARGV = ["test input"]
 
 
 # A~E 각 2개. work_unified 리스크 레지스터의 칸별 예시를 그대로 쓴다.
@@ -71,20 +80,22 @@ TASKS = [
 def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
               timeout: int = 20, tag: str = None,
               stdin_input: str = DUMMY_STDIN, gen_stdin: bool = False,
+              argv: list[str] | None = DUMMY_ARGV,
               use_docker: bool = False, docker_image: str = "python:3.11-slim",
               docker_network: str = "none") -> list:
     """TASKS를 순서대로 run_task로 실행. 각 결과 요약을 모아 반환하고, runs.jsonl엔 run_task가 한 줄씩 쌓는다.
     tag가 있으면 task_id 앞에 붙여 회차를 구분(예 tag='r1' → r1_A1).
-    stdin_input: 모든 태스크에 흘릴 공통 stdin(H2_RUN 길1). 기본 DUMMY_STDIN. None으로 주면 H1과 동일(EOF).
-    gen_stdin: True면 H4_RUN 길B — 태스크별로 생성된 코드+acceptance에서 stdin 대본을 만들어 주입.
-               대본 생성 실패 시 위 stdin_input(=DUMMY_STDIN)으로 fallback.
+    stdin_input: 모든 태스크에 흘릴 공통 stdin. 기본 DUMMY_STDIN. None으로 주면 EOF.
+    argv: 프로그램에 넘길 CLI 인수 목록. 기본 DUMMY_ARGV(argparse 프로그램 진입용). None이면 인수 없음.
+    gen_stdin: True면 태스크별 LLM 대본 생성(scripter). 기본 False — 대본 짧아 EOFError 유발(FINDINGS §4).
     use_docker: True면 H4 Docker 실측 runner를 사용. 기본 False는 기존 subprocess 실측."""
     results = []
     n = len(TASKS)
     print(f"=== batch 시작: {n}개 (A~E × 2) ===")
     print(f"    runs_path={runs_path}, timeout={timeout}s")
-    print(f"    stdin: {'공통 더미 주입(길1)' if stdin_input is not None else 'EOF(H1 동일)'} "
-          f"{repr(stdin_input) if stdin_input is not None else ''}")
+    print(f"    stdin: {'더미 주입' if stdin_input is not None else 'EOF'} "
+          f"{repr(stdin_input[:30] + '...') if stdin_input is not None else ''}")
+    print(f"    argv: {argv!r}")
     print(f"    대본: {'태스크별 생성(길B) — 실패 시 위로 fallback' if gen_stdin else '고정(생성 없음)'}")
     print(f"    runner: {'docker' if use_docker else 'subprocess'}"
           f"{f' image={docker_image} network={docker_network}' if use_docker else ''}\n")
@@ -96,7 +107,7 @@ def run_batch(*, save_dir: str = ".", runs_path: str = "runs.jsonl",
         try:
             summary = run_task(req, expected_type=etype, task_id=task_id,
                                save_dir=save_dir, runs_path=runs_path, timeout=timeout,
-                               stdin_input=stdin_input, gen_stdin=gen_stdin,
+                               stdin_input=stdin_input, gen_stdin=gen_stdin, argv=argv,
                                use_docker=use_docker, docker_image=docker_image,
                                docker_network=docker_network)
             dt = time.time() - t0
@@ -148,11 +159,11 @@ if __name__ == "__main__":
     results = run_batch(
         runs_path="runs.jsonl",
         tag=args.tag,
-        gen_stdin=True,
+        gen_stdin=False,
         use_docker=args.docker,
         docker_image=args.docker_image,
         docker_network=args.docker_network,
-    )   # H4 길B 켬
+    )
 
     # 끝나고 분포를 칸별로 한눈에(이건 화면 요약 — 로그엔 비율 저장 안 함, §3).
     # '사실 나열'이지 성공률 계산이 아니다: 칸별로 exit_code와 d/g 일치만 보여준다.
