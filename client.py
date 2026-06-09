@@ -265,9 +265,10 @@ def call_model(model: str, contents, *, limiter, system: str = None,
 if __name__ == "__main__":
     from limiter import Limiter
 
-    MODEL = "gemini-3.5-flash"
+    # 모델명을 인자로 받는다(없으면 기본). 예: python client.py gemini-2.5-flash
+    MODEL = sys.argv[1] if len(sys.argv) > 1 else "gemini-3.5-flash"
 
-    print("=== client.py 실호출 단독 테스트 (Vertex REST) ===\n")
+    print(f"=== client.py 실호출 단독 테스트 (Vertex REST) — model={MODEL} ===\n")
 
     _sa = bool(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
                and os.environ.get("VERTEX_PROJECT")
