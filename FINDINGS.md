@@ -1,5 +1,14 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §26 argv 부작용 해결 — DUMMY_ARGV ["test input"] → ["1"] (2026-06-09)
+
+- 동기: §25에서 `argv="test input"`이 표현식 파서(C1·C2·D2)에서 토크나이저 `'t'` 거부로 거짓 실패(`DATA_CONTRACT_GRAMMAR`) 유발. argparse는 열었으나 C·D 관측 천장을 다시 닫음.
+- 변경: `batch.py` `DUMMY_ARGV = ["1"]`. 단일 변수, 측정장치(runner)만 닿음(planner/coder 불개입 — §2-3 보존).
+- 근거: `"1"`은 ①유효한 산술식(단일 숫자 리터럴) → 표현식 파서가 tokenize→parse→evaluate 완주(§12·§14 AST 스키마 계약 경로를 실제로 가로지름) ②유효한 문자열 positional(argparse) ③`int(argv[1])` 통과. 모든 유형에서 `"test input"`을 지배. stdin 메뉴형은 argv 무시(무해).
+- handoff §2의 "`["1"]`은 표현식 파서엔 여전히 부적합" 메모는 오류 — `"1"`은 완전히 유효한 표현식. 정정함.
+- 깸을 줄이는 수정 아님 — 거짓 입력형식 실패를 제거해 진짜 H1b 신호를 더 깨끗이 관측(절대 제약 부합).
+- 미검증: 실호출 회차(h4_11+)로 C·D 표현식 파서가 실제 완주하는지, A2 argparse inputmismatch 0 유지되는지 확인 필요.
+
 ## §25 H4 Docker h4_10 유효 회차 — 새 관측 조건 첫 실행 (2026-06-09)
 
 - commit: 예약 작업 봇 재시작 후. **새 조건: DUMMY_ARGV=["test input"], DUMMY_STDIN 확장, gen_stdin=False.**

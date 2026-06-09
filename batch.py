@@ -45,7 +45,9 @@ DUMMY_STDIN = (
     "2\n"
     "0\nquit\nexit\n"
 )
-DUMMY_ARGV = ["test input"]
+# "1" = 유효한 산술식(단일 숫자 리터럴)이자 유효한 문자열 positional → 표현식 파서(C·D)·
+# argparse·int(argv[1]) 계열 모두 통과. "test input"은 표현식 토크나이저에서 즉사(§25 C1).
+DUMMY_ARGV = ["1"]
 
 
 # A~E 각 2개. work_unified 리스크 레지스터의 칸별 예시를 그대로 쓴다.
