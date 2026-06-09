@@ -1,0 +1,41 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_9_A1,9,A1,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:38:38.286227-08:00
+h4_9_A2,9,A2,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:39:14.272292-08:00
+h4_9_B1,9,B1,기타예외,,125,broken,stderr-exc,,1,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:39:37.431005-08:00
+h4_9_B2,9,B2,기타예외,,125,reject,stdout-return,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:40:17.209475-08:00
+h4_9_C1,9,C1,기타예외,,125,broken,exit1,,1,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:41:11.515278-08:00
+h4_9_C2,9,C2,기타예외,,125,alive,stdout-ok,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:42:21.769174-08:00
+h4_9_D1,9,D1,기타예외,,125,alive,stdout-ok,,0,5,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:43:06.576167-08:00
+h4_9_D2,9,D2,기타예외,,125,alive,stdout-ok,,0,5,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:44:09.786253-08:00
+h4_9_E1,9,E1,기타예외,,125,alive,stdout-ok,,0,4,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:45:21.523537-08:00
+h4_9_E2,9,E2,기타예외,,125,reject,stdout-return,,0,3,"docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+",2026-06-08T23:46:00.518711-08:00

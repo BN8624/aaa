@@ -1,0 +1,52 @@
+# 분류 애매/확인필요 10줄 (전문). 분류기 점검은 여기부터.
+
+=== h4_9_A1 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_A2 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_B1 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_B2 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_C1 [기타예외] exit=125 g=4
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_C2 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_D1 [기타예외] exit=125 g=5
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_D2 [기타예외] exit=125 g=5
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_E1 [기타예외] exit=125 g=4
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
+=== h4_9_E2 [기타예외] exit=125 g=3
+docker: Error response from daemon: Access is denied.
+
+Run 'docker run --help' for more information
+
