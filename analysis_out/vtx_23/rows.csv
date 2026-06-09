@@ -1,0 +1,13 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_23_A1,23,A1,exit0가짜,,0,reject,stdout-return,,0,3,,2026-06-08T17:14:07.428989-08:00
+vtx_23_A2,23,A2,exit0가짜,,0,alive,stdout-ok,,0,2,,2026-06-08T17:15:04.020548-08:00
+vtx_23_B1,23,B1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T17:15:26.298159-08:00
+vtx_23_B2,23,B2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T17:16:30.269517-08:00
+vtx_23_C1,23,C1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:17:30.826230-08:00
+vtx_23_C2,23,C2,exit0가짜,,0,silent,none,,0,3,,2026-06-08T17:18:47.738762-08:00
+vtx_23_D1,23,D1,exit0가짜,,0,alive,stdout-ok,,0,5,,2026-06-08T17:19:43.070321-08:00
+vtx_23_D2,23,D2,기타예외,,1,broken,stderr-exc,,1,4,"Error processing expression: Unexpected character: x
+",2026-06-08T17:20:54.857544-08:00
+vtx_23_E1,23,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T17:22:12.043385-08:00
+vtx_23_E2,23,E2,기타예외,,1,broken,stderr-exc,,1,3,"Error parsing JSON from stdin: Extra data: line 2 column 1 (char 2)
+",2026-06-08T17:22:51.652082-08:00
