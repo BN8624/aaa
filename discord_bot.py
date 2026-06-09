@@ -774,6 +774,37 @@ async def 업데이트(interaction: discord.Interaction):
     sys.exit(0)
 
 
+# ---- /재시작봇 ----
+@tree.command(name="재시작봇", description="[관리자 전용] AAABotRestart 예약 작업으로 봇 재시작 (Docker 권한 보장)")
+async def 재시작봇(interaction: discord.Interaction):
+    if not _channel_allowed(interaction):
+        return await interaction.response.send_message("이 채널에서는 사용할 수 없다.", ephemeral=True)
+    if not _is_admin_user(interaction.user.id):
+        return await interaction.response.send_message("권한 없음. 관리자만 사용할 수 있다.", ephemeral=True)
+    busy = _busy_state()
+    if busy:
+        return await interaction.response.send_message(
+            f"이미 실행 중이다: {busy.get('task')} {busy.get('channel')} (pid {busy.get('pid')})\n"
+            "회차 실행 중에는 재시작하지 않는다.", ephemeral=True)
+
+    await interaction.response.defer()
+    task_rc = subprocess.run(
+        ["schtasks", "/run", "/tn", "AAABotRestart"],
+        capture_output=True, text=True,
+    ).returncode
+    if task_rc != 0:
+        return await interaction.followup.send(
+            f"AAABotRestart 작업 실행 실패 (exit {task_rc}).\n"
+            "schtasks 등록 여부 확인 필요.")
+    await interaction.followup.send(
+        "AAABotRestart 예약 작업 실행 → Docker 권한 있는 새 봇 시작 중.\n"
+        "2~3초 후 봇이 재연결된다.")
+    import asyncio as _aio
+    await _aio.sleep(2)
+    await client.close()
+    sys.exit(0)
+
+
 # ---- /명령 (관리자 전용 임의 명령 실행) ----
 @tree.command(name="명령", description="[관리자 전용] AAA 폴더에서 명령 실행 (SSH 유사)")
 @app_commands.describe(명령어="실행할 명령 (예: git status, dir, git push)")
