@@ -1,0 +1,5 @@
+﻿=== restart_bot2.ps1 started 06/09/2026 14:56:59 ===
+Killing PID=708
+No pythonw process or error: Exception calling "Kill" with "0" argument(s): "Access is denied"
+Started new bot PID=28908
+=== Done 06/09/2026 14:57:01 ===

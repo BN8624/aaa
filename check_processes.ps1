@@ -1,0 +1,2 @@
+Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -like "*discord_bot*" -or $_.CommandLine -like "*discord*bot*" } | Select-Object ProcessId, CommandLine | ConvertTo-Json | Out-File -FilePath "C:\Users\USER\aaa\processes_out.txt" -Encoding UTF8
+Get-WmiObject Win32_Process | Where-Object { $_.Name -like "python*" } | Select-Object ProcessId, Name, CommandLine | ConvertTo-Json | Out-File -FilePath "C:\Users\USER\aaa\python_procs.txt" -Encoding UTF8
