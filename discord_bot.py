@@ -431,6 +431,11 @@ def _busy_state():
     return None
 
 
+def _is_admin_user(user_id: int) -> bool:
+    admin = _CONFIG.get("admin_user_id")
+    return admin is not None and user_id == admin
+
+
 @client.event
 async def on_ready():
     g = _guild_obj()
@@ -570,6 +575,45 @@ async def 검증(interaction: discord.Interaction, 채널: str):
     await interaction.followup.send(f"```\n{msg}\n```")
 
 
+# ---- /업데이트 ----
+@tree.command(name="업데이트", description="[관리자 전용] git pull 후 봇 프로세스 재시작")
+async def 업데이트(interaction: discord.Interaction):
+    if not _channel_allowed(interaction):
+        return await interaction.response.send_message("이 채널에서는 사용할 수 없다.", ephemeral=True)
+    if not _is_admin_user(interaction.user.id):
+        return await interaction.response.send_message("권한 없음. 관리자만 사용할 수 있다.", ephemeral=True)
+    busy = _busy_state()
+    if busy:
+        return await interaction.response.send_message(
+            f"이미 실행 중이다: {busy.get('task')} {busy.get('channel')} (pid {busy.get('pid')})\n"
+            "회차 실행 중에는 업데이트/재시작하지 않는다.", ephemeral=True)
+
+    await interaction.response.defer()
+    root = _CONFIG["root"]
+    proc = subprocess.run(
+        ["git", "pull", "--rebase", "--autostash"],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=120,
+        env=os.environ.copy(),
+    )
+    out = ((proc.stdout or "") + (proc.stderr or "")).strip()
+    if len(out) > DISCORD_MSG_LIMIT:
+        out = "...(앞부분 생략)...\n" + out[-DISCORD_MSG_LIMIT:]
+    if proc.returncode != 0:
+        return await interaction.followup.send(
+            f"`git pull --rebase --autostash` 실패 (exit {proc.returncode})\n```\n{out or '(출력 없음)'}\n```")
+
+    await interaction.followup.send(
+        "`git pull --rebase --autostash` 완료. 봇 프로세스를 재시작한다.\n"
+        f"```\n{out or '(출력 없음)'}\n```")
+    await client.close()
+    os.execv(sys.executable, [sys.executable, str(Path(__file__).resolve())])
+
+
 # ---- /명령 (관리자 전용 임의 명령 실행) ----
 @tree.command(name="명령", description="[관리자 전용] AAA 폴더에서 명령 실행 (SSH 유사)")
 @app_commands.describe(명령어="실행할 명령 (예: git status, dir, git push)")
@@ -578,11 +622,10 @@ async def 명령(interaction: discord.Interaction, 명령어: str):
     if not _channel_allowed(interaction):
         return await interaction.response.send_message("이 채널에서는 사용할 수 없다.", ephemeral=True)
     # 관리자 본인만
-    admin = _CONFIG.get("admin_user_id")
-    if admin is None:
+    if _CONFIG.get("admin_user_id") is None:
         return await interaction.response.send_message(
             "`/명령`은 AAA_ADMIN_USER_ID 가 .env 에 설정돼야 사용할 수 있다.", ephemeral=True)
-    if interaction.user.id != admin:
+    if not _is_admin_user(interaction.user.id):
         return await interaction.response.send_message("권한 없음. 관리자만 사용할 수 있다.", ephemeral=True)
     # 명령어 검사
     reason = check_command_allowed(명령어)
