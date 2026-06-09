@@ -1,0 +1,14 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+vtx_30_A1,30,A1,exit0가짜,,0,reject,stdout-return,,0,4,,2026-06-08T19:56:52.954632-08:00
+vtx_30_A2,30,A2,exit0가짜,,0,alive,stdout-ok,,0,2,,2026-06-08T19:57:46.621819-08:00
+vtx_30_B1,30,B1,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T19:58:14.608767-08:00
+vtx_30_B2,30,B2,argparse,,2,inputmismatch,argv-vs-stdin,,2,3,"usage: main.py [-h] {add,delete,list,descendants} ...
+main.py: error: the following arguments are required: command
+",2026-06-08T19:59:07.750947-08:00
+vtx_30_C1,30,C1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T20:00:01.949623-08:00
+vtx_30_C2,30,C2,exit0가짜,,0,alive,stdout-ok,,0,3,,2026-06-08T20:01:03.615592-08:00
+vtx_30_D1,30,D1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T20:02:10.421715-08:00
+vtx_30_D2,30,D2,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T20:03:41.874192-08:00
+vtx_30_E1,30,E1,exit0가짜,,0,alive,stdout-ok,,0,4,,2026-06-08T20:05:04.684892-08:00
+vtx_30_E2,30,E2,STDIN_FORMAT_MISMATCH,Error: Invalid JSON input - Extra data: line ,1,inputmismatch,STDIN_FORMAT_MISMATCH,,1,3,"Error: Invalid JSON input - Extra data: line 2 column 1 (char 2)
+",2026-06-08T20:06:06.643092-08:00
