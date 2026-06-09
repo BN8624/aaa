@@ -1,0 +1,9 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_14_A1,14,A1,코더빈손,,-1,fake,,,,0,"RateLimitError: 429 RESOURCE_EXHAUSTED after 5 retries: {
+  ""error"": {
+    ""code"": 429,
+    ""message"": ""Resource has been exhausted (e.g. check quota)."",
+    ""status"": ""RESOURCE_EXHAUSTED""
+  }
+}
+",2026-06-09T01:06:20.706057-08:00
