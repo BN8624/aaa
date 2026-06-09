@@ -1,0 +1,5 @@
+# 분류 애매/확인필요 1줄 (전문). 분류기 점검은 여기부터.
+
+=== h4_18_D2 [기타예외] exit=1 g=5
+Error: redefinition of group name 'LPAREN' as group 8; was group 7 at position 130
+
