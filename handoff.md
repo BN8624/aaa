@@ -1,5 +1,13 @@
 # aaa — HANDOFF (작업용)
 
+## 2026-06-10 빠른 인계
+
+- **먼저 `NEXT_SESSION.md`를 읽을 것.** 2026-06-10 Vertex 경로/IAM 수정, `h4_16` 분석 결과, 다음 멘트가 거기에 짧게 정리되어 있다.
+- 정식 Vertex 경로 확인 완료: SA OAuth + `VERTEX_PROJECT=ocr-project-496308` + `VERTEX_LOCATION=global`.
+- 검증 완료: `python client.py` 성공, `python probe_quota.py 8 0` 8연속 429 없음.
+- `h4_16`은 전체 폐기하지 않는다. 첫 `h4_16_A1` 403 fake만 제외하면 유효 10칸 회차, `H1b=0/10`.
+- 다음 데이터 수집은 깨끗하게 `h4_17`부터 추천.
+
 ## 2026-06-09 현 상태 — h4_16 돌릴 준비 완료 (B 적용 + 봇 수정 끝)
 
 - 최신 커밋: `fd8d3df`. 봇 현재 생존·Discord 연결됨(예약 작업 경유, Docker 권한 보장).
