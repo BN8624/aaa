@@ -1,5 +1,12 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §29 봇 ~30초 만에 죽던 원인 = AAABotRestart 작업의 StopOnIdleEnd (2026-06-09)
+
+- 증상: 봇 무응답. `/재시작봇`·`/업데이트`는 **봇이 처리하는 슬래시 명령**이라 봇이 죽으면 못 씀(닭-달걀). 그리고 예약 작업으로 띄워도 ~30초 만에 죽음.
+- 진단: 작업 XML `<IdleSettings><StopOnIdleEnd>true</StopOnIdleEnd>` = "컴퓨터가 유휴 상태가 아니게 되면 작업 중지". 봇 기동 후 사용자가 PC를 만지면(유휴 해제) 스케줄러가 봇을 죽임. **RunOnlyIfIdle=false였는데도 StopOnIdleEnd가 적용된 게 함정.** (Start-Process로 띄운 인스턴스는 스케줄러 관할 밖이라 멀쩡 — 이 대조로 확진.)
+- 수정: `Set-ScheduledTask`로 `IdleSettings.StopOnIdleEnd=$false`, `RestartOnIdle=$false`, `RunOnlyIfIdle=$false`. 이후 작업 launch 봇이 100초+ 생존·Discord 443 연결 확인.
+- **운영 추가**: 봇 완전사망 시 `/재시작봇`·`/업데이트` 못 씀 → **Windows에서 직접 `schtasks /run /tn AAABotRestart`**가 유일 확실 부팅 경로(§23 작업 경유라 Docker 권한도 보장).
+
 ## §28 H4 Docker h4_12(부분)·h4_13~15(무효) — 쿼터 소진, §13 정지 메커니즘 실전 첫 발화 (2026-06-09)
 
 - commits `eb8ad35 run h4_12` ~ `9bd76c6 run h4_15`. /연속도커 h4_12~15.
