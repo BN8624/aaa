@@ -1,5 +1,21 @@
 # FINDINGS — aaa 살아있는 발견 (raw로 Claude가 읽음)
 
+## §27 H4 Docker h4_11 유효 회차 — argv=["1"] 검증 + E 도메인 데이터계약 H1c 첫 관측 (2026-06-09)
+
+- commit `daf5284 run h4_11`. 조건: `DUMMY_ARGV=["1"]`(§26), 그 외 §24 동일.
+- **원 실행 Docker exit**: exit=125 0건 → Docker 정상(예약 작업 픽스 계속 유효).
+- **H1b = 0 / 10칸.** run_h1b 플래그 0. 재실행 runstate: alive 6 / broken 3 / reject 1. 채널: stdout-ok 6 / stderr-exc 3 / stdout-return 1.
+- **누적(h4_3 첫10+h4_5+h4_6+h4_7+h4_8+h4_10+h4_11)**: 유효 Docker **70칸**, H1b=0.
+- **★ argv=["1"] 효과 확인(§26 검증, 예측 적중)**:
+  - A2: h4_5 argparse inputmismatch → 이번 alive. argparse 정상 진입.
+  - C1·C2: h4_10 `DATA_CONTRACT_GRAMMAR`(`Unexpected character: 't'`) → 이번 둘 다 alive. C1 main.py `expr=" ".join(sys.argv[1:])` → `run("1")` → lexer→parser→evaluator 3파일 체인 완주(exit=0). C2 S식도 동일. **`"test input"` 부작용 0건. C 파서/평가기 관측 채널 개방** — §12·§14 AST 스키마 불일치가 잡히던 표면이 다시 열림.
+  - D2: h4_10 broken → 이번 alive.
+- **broken 3칸 전수(전부 H1b 아님)**:
+  - **B2 메뉴앞EOF**: 7-옵션 메뉴(`input("Select an option (1-7): ")`)에 DUMMY_STDIN 소진 → `EOFError`. 입력채널(stdin 길이 부족). §25 B1과 동류 — DUMMY_STDIN이 일부 긴 메뉴엔 여전히 짧음.
+  - **★ E1 H1c런타임값 = 데이터계약 dict 스키마 불일치(E 도메인 첫 관측)**: `components.py::summarize_components`가 dict 키 `{component_id,size,min_node,max_node}` 생산 ↔ `main.py`가 `largest_summary.get('representative')` 기대 → None → `.get('rep')` → None → `raise KeyError`. main.py 주석이 자백: "expected to be 'representative' based on the parameter name in pipeline.py"(소비자가 `resolve_component_by_representative` 파라미터 이름에서 키 추론, 생산자는 그 키 미생산). import·시그니처·멤버접근 멀쩡, 파일 간 dict 키 값 계약 불일치 → H1c. **§12·§14·§20·§22의 데이터계약 H1c 패밀리(그간 C 파서 AST 스키마 한정)가 C 도메인을 넘어 E 그래프 파이프라인에서 처음 관측됨.** E1은 argv/stdin 안 읽는 데모형(하드코딩 sample_edges) — argv와 무관하게 원래 돌던 칸이라 관측 천장과 별개.
+  - **E2 기타예외**: `Error: Graph must be a dictionary representing adjacency list.` 입력 타입 검증 정당 거부(STDIN/argv 형식 불일치). H1b 아님.
+- 해석: §26 argv 조정은 의도대로 거짓 입력형식 실패(C·D `DATA_CONTRACT_GRAMMAR`)를 제거하고 C 파서 관측 채널을 열었다. 그 결과 깸은 줄지 않고 오히려 E1에서 진짜 데이터계약 H1c가 드러남(거짓실패 제거→진짜 신호 관측, §26 목표 부합). dict 수렴이 H1b는 구조적으로 막지만 데이터계약 H1c는 도메인 불문 드문드문 발생한다는 §15 완화 결론을 E 도메인까지 확장.
+
 ## §26 argv 부작용 해결 — DUMMY_ARGV ["test input"] → ["1"] (2026-06-09)
 
 - 동기: §25에서 `argv="test input"`이 표현식 파서(C1·C2·D2)에서 토크나이저 `'t'` 거부로 거짓 실패(`DATA_CONTRACT_GRAMMAR`) 유발. argparse는 열었으나 C·D 관측 천장을 다시 닫음.
