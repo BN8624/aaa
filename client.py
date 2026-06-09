@@ -265,9 +265,15 @@ if __name__ == "__main__":
 
     print("=== client.py 실호출 단독 테스트 (Vertex REST) ===\n")
 
-    if not os.environ.get("VERTEX_API_KEY"):
-        print("✗ VERTEX_API_KEY가 없다. 먼저: export VERTEX_API_KEY=\"...\"")
+    _sa = bool(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+               and os.environ.get("VERTEX_PROJECT")
+               and os.environ.get("VERTEX_LOCATION"))
+    if not _sa and not os.environ.get("VERTEX_API_KEY"):
+        print("✗ 인증 없음. 다음 중 하나를 걸어라:")
+        print("  - 정식(SA): GOOGLE_APPLICATION_CREDENTIALS + VERTEX_PROJECT + VERTEX_LOCATION")
+        print("  - express : VERTEX_API_KEY")
         raise SystemExit(1)
+    print(f"[auth] {'SA OAuth(정식)' if _sa else 'express API키'}\n")
 
     import usage as usage_mod
     REAL_USAGE = usage_mod.USAGE_PATH
