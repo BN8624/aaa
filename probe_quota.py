@@ -19,16 +19,15 @@
 #     여전히 ~6에서 429 → 분당 고정 저(低)캡 → rpm을 ≤5로 더 낮추거나 정식 Vertex 인증(C안).
 #   429 본문에 metric/limit 있으면 그게 진짜 한도(Retry-After도). 없으면(generic) 경험값이 전부.
 
-import os
 import sys
 import json
 import time
 import urllib.request
 import urllib.error
 
+import client  # 인증 경로(SA OAuth ↔ express API키)를 그대로 재사용 — §30
+
 MODEL = "gemini-3.5-flash"
-KEY = os.environ.get("VERTEX_API_KEY")
-BASE = f"https://aiplatform.googleapis.com/v1/publishers/google/models/{MODEL}:generateContent"
 MAX_CALLS = int(sys.argv[1]) if len(sys.argv) > 1 else 80
 INTERVAL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.0  # 콜 간 sleep(초). 0=연사.
 
@@ -63,19 +62,20 @@ def dump_429(e, err_body, n_ok, elapsed):
 
 
 def main():
-    if not KEY:
-        raise SystemExit("VERTEX_API_KEY 없음. export VERTEX_API_KEY=... 먼저.")
-    url = f"{BASE}?key={KEY}"
+    # 인증 경로는 client가 환경변수로 자동 선택(SA 3종 있으면 OAuth, 없으면 express 키).
+    auth = "SA OAuth(정식)" if client.os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") \
+        and client.os.environ.get("VERTEX_PROJECT") and client.os.environ.get("VERTEX_LOCATION") \
+        else "express API키"
     mode = f"{INTERVAL}초 간격 페이싱" if INTERVAL > 0 else "연사(간격 0)"
-    print(f"=== quota probe: {MODEL} 에 최대 {MAX_CALLS}콜 / {mode} ===")
+    print(f"=== quota probe: {MODEL} / {auth} / 최대 {MAX_CALLS}콜 / {mode} ===")
     t0 = time.time()
     n_ok = 0
     for i in range(MAX_CALLS):
         if INTERVAL > 0 and i > 0:
             time.sleep(INTERVAL)
+        url, headers = client._endpoint_and_headers(MODEL)
         req = urllib.request.Request(
-            url, data=BODY,
-            headers={"Content-Type": "application/json"}, method="POST",
+            url, data=BODY, headers=headers, method="POST",
         )
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
