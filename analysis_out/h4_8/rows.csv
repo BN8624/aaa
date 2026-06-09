@@ -1,0 +1,22 @@
+task_id,round,cell,cat,sub,exit,runstate,runchannel,run_h1b,replay_exit,g,stderr_full,created_at
+h4_8_A1,8,A1,exit0가짜,,0,reject,stdout-return,,0,3,"
+",2026-06-08T23:11:44.891633-08:00
+h4_8_A2,8,A2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-08T23:12:37.256004-08:00
+h4_8_B1,8,B1,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-08T23:13:16.085369-08:00
+h4_8_B2,8,B2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-08T23:14:09.199850-08:00
+h4_8_C1,8,C1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-08T23:15:04.610353-08:00
+h4_8_C2,8,C2,exit0가짜,,0,alive,stdout-ok,,0,3,"
+",2026-06-08T23:16:26.160740-08:00
+h4_8_D1,8,D1,exit0가짜,,0,alive,stdout-ok,,0,5,"
+",2026-06-08T23:17:21.445077-08:00
+h4_8_D2,8,D2,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-08T23:18:47.178285-08:00
+h4_8_E1,8,E1,exit0가짜,,0,alive,stdout-ok,,0,4,"
+",2026-06-08T23:20:53.651933-08:00
+h4_8_E2,8,E2,STDIN_FORMAT_MISMATCH,Error parsing JSON: Extra data: line 2 column,0,alive,stdout-ok,,0,2,"
+Error parsing JSON: Extra data: line 2 column 1 (char 3)
+",2026-06-08T23:21:51.104585-08:00
